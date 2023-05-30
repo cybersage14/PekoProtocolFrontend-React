@@ -1,5 +1,6 @@
 import { lazy } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
+import Blank from "./pages/Blank";
 
 // ----------------------------------------------------------------------------------
 
@@ -17,6 +18,18 @@ export default function Routes() {
         {
           path: 'lending',
           element: <Lending />
+        },
+        {
+          path: '/',
+          element: <Navigate to="/lending" replace />
+        },
+        {
+          path: '404',
+          element: <Blank />
+        },
+        {
+          path: '*',
+          element: <Navigate to="/404" replace />
         }
       ]
     }
