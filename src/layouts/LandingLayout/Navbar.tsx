@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Icon } from '@iconify/react';
 import Container from "../../components/Container";
 import TextButton from "../../components/buttons/TextButton";
+import TextIconButton from "../../components/buttons/TextIconButton";
+import FilledButton from "../../components/buttons/FilledButton";
 
 // -----------------------------------------------------------------------------------------
 
@@ -41,9 +43,9 @@ const NAV_LINKS: Array<INavLink> = [
   },
   {
     id: 5,
-    label: 'Trending',
-    iconName: 'icon-park-solid:trend',
-    to: '/trending'
+    label: 'Trading',
+    iconName: 'ep:histogram',
+    to: '/trading'
   },
 ]
 
@@ -70,6 +72,16 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
+        </div>
+
+        <div className="flex items-center gap-8">
+          <TextIconButton>
+            <Icon icon="octicon:question-16" className="text-xl" />
+          </TextIconButton>
+          <FilledButton className="flex items-center gap-1">
+            <Icon icon="mdi:wallet-outline" className="text-xl" />
+            Connect Wallet
+          </FilledButton>
         </div>
       </Container>
     </nav>
