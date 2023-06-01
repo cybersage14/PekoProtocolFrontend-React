@@ -6,6 +6,7 @@ import Blank from "./pages/Blank";
 
 const LandingLayout = lazy(() => import('./layouts/LandingLayout'))
 const Lending = lazy(() => import('./pages/Lending'))
+const Liquidate = lazy(() => import('./pages/Liquidate'))
 
 // ----------------------------------------------------------------------------------
 
@@ -18,6 +19,10 @@ export default function Routes() {
         {
           path: 'lending',
           element: <Lending />
+        },
+        {
+          path: 'liquidate',
+          element: <Liquidate />
         },
         {
           path: '/',

@@ -10,6 +10,8 @@ import Th from "../../components/tableComponents/Th";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
+import Table from "../../components/tableComponents/Table";
+import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 
 // -----------------------------------------------------------------------------------
 
@@ -61,7 +63,7 @@ export default function Lending() {
                   </div>
                 </div>
 
-                <table className="table-auto">
+                <Table>
                   <thead>
                     <tr>
                       <Th label="Asset Name" sortable />
@@ -79,7 +81,7 @@ export default function Lending() {
                       <Tr key={index} className="hover:bg-gray-900">
                         <Td>
                           <div className="flex items-center gap-2">
-                            <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
+                            <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                             <div className="flex flex-col">
                               <span className="font-semibold">USDC</span>
                               <span className="text-sm text-gray-500">$0.999925</span>
@@ -110,7 +112,7 @@ export default function Lending() {
                       </Tr>
                     ))}
                   </tbody>
-                </table>
+                </Table>
               </div>
             </CollapsibleBoard>
           </div>
@@ -161,7 +163,7 @@ export default function Lending() {
           <PrimaryBoard title="Deposits" action={<span className="text-gray-100">$11.22</span>}>
             <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
               <div className="flex items-center gap-2">
-                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
+                <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                 <div className="flex flex-col">
                   <span className="font-semibold">USDC</span>
                   <span className="text-sm text-gray-500">$0.999925</span>
@@ -178,7 +180,7 @@ export default function Lending() {
           <PrimaryBoard title="Borrow" action={<span className="text-gray-100">$11.22</span>}>
             <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
               <div className="flex items-center gap-2">
-                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
+                <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                 <div className="flex flex-col">
                   <span className="font-semibold">USDC</span>
                   <span className="text-sm text-gray-500">$0.999925</span>
