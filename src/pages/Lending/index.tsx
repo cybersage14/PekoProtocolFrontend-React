@@ -4,10 +4,11 @@ import Container from "../../components/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
 import MainInput from "../../components/MainInput";
-import Th from "../../components/tableComponents/Th";
 import CollapsibleBoard from "../../components/boards/CollapsibleBoard";
-import Td from "../../components/tableComponents/Td";
 import PrimaryBoard from "../../components/boards/PrimaryBoard";
+import Th from "../../components/tableComponents/Th";
+import Td from "../../components/tableComponents/Td";
+import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 
 // -----------------------------------------------------------------------------------
@@ -75,7 +76,7 @@ export default function Lending() {
 
                   <tbody>
                     {TEMP_INDEXES_OF_TABLE.map(index => (
-                      <tr key={index}>
+                      <Tr key={index} className="hover:bg-gray-900">
                         <Td>
                           <div className="flex items-center gap-2">
                             <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
@@ -106,7 +107,7 @@ export default function Lending() {
                             <span className="text-sm text-gray-500">$0.00</span>
                           </div>
                         </Td>
-                      </tr>
+                      </Tr>
                     ))}
                   </tbody>
                 </table>
