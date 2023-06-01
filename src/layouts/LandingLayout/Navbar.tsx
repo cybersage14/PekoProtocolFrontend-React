@@ -55,7 +55,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800">
+    <nav className="sticky top-0 bg-gray-900 border-b border-gray-800">
       <Container className="flex justify-between p-4">
         <div className="flex items-center gap-8">
           <Link to="/">

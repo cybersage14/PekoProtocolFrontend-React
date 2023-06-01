@@ -27,7 +27,7 @@ export default function Th({ className = '', label, sortable = false, sortAsc, s
 
   return (
     <th
-      className={`text-gray-100 px-4 py-4 text-sm ${sortable ? 'cursor-pointer' : ''} ${className}`}
+      className={`text-gray-500 px-4 py-4 text-sm ${sortable ? 'cursor-pointer' : ''} ${className}`}
       onClick={() => handleSort(!sortedAsc)} {...others}
     >
       {sortable ? (
@@ -36,11 +36,11 @@ export default function Th({ className = '', label, sortable = false, sortAsc, s
           <div className="flex flex-col items-center">
             <Icon
               icon="ep:arrow-up-bold"
-              className={`text-[8px] ${sortedAsc ? 'text-gray-100' : 'text-gray-600'}`}
+              className={`text-[8px] ${sortedAsc ? 'text-gray-100' : 'text-gray-500'}`}
             />
             <Icon
               icon="ep:arrow-down-bold"
-              className={`text-[8px] ${!sortedAsc ? 'text-gray-100' : 'text-gray-600'}`}
+              className={`text-[8px] ${!sortedAsc ? 'text-gray-100' : 'text-gray-500'}`}
             />
           </div>
         </div>
