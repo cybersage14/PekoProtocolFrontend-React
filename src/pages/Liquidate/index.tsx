@@ -30,7 +30,7 @@ export default function Liquidate() {
           <Switch
             id="ignore"
             className="bg-gray-800"
-            checked={visible}
+            checked={!visible}
             onChange={() => setVisible(!visible)}
           />
         </div>
