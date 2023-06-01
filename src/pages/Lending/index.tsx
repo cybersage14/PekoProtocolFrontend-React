@@ -5,8 +5,10 @@ import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
 import MainInput from "../../components/MainInput";
 import Th from "../../components/tableComponents/Th";
-import Board from "../../components/Board";
+import CollapsibleBoard from "../../components/boards/CollapsibleBoard";
 import Td from "../../components/tableComponents/Td";
+import PrimaryBoard from "../../components/boards/PrimaryBoard";
+import ProgressBar from "../../components/ProgressBar";
 
 // -----------------------------------------------------------------------------------
 
@@ -17,7 +19,7 @@ const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7];
 export default function Lending() {
   return (
     <Container className="my-8">
-      <div className="grid grid-cols-5 gap-12">
+      <div className="grid grid-cols-5 gap-8">
         <div className="col-span-4">
           <div className="flex flex-col gap-4">
             {/* Infos and Liquidate button */}
@@ -47,7 +49,7 @@ export default function Lending() {
             </div>
 
             {/* Assets board */}
-            <Board title="Assets" collapsible>
+            <CollapsibleBoard title="Assets" collapsible>
               <div className="flex flex-col gap-4">
                 <div className="px-4">
                   <div className="w-1/3">
@@ -109,11 +111,85 @@ export default function Lending() {
                   </tbody>
                 </table>
               </div>
-            </Board>
+            </CollapsibleBoard>
           </div>
         </div>
 
-        <div></div>
+        <div className="flex flex-col gap-4">
+          {/* Account Board */}
+          <PrimaryBoard
+            title="Account"
+            action={<span className="text-gray-500 text-sm">Connect Wallet</span>}
+          >
+            <div className="px-3 mb-6 flex flex-col gap-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
+                  <span className="text-gray-500 text-sm">APY</span>
+                  <span className="text-green-500 font-semibold">0.00%</span>
+                </div>
+                <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
+                  <span className="text-gray-500 text-sm">Borrowed</span>
+                  <span className="text-green-500 font-semibold">0.00%</span>
+                </div>
+                <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
+                  <span className="text-gray-500 text-sm">Risk Factor</span>
+                  <span className="text-green-500 font-semibold">0.00%</span>
+                </div>
+              </div>
+
+              <ProgressBar
+                label="Borrowing Power"
+                value={22.34}
+                valueNode={<span className="text-red-500">22.34%</span>}
+              />
+
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 text-sm">Available</span>
+                  <span className="text-gray-100">65.45%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 text-sm">Risk Factor</span>
+                  <span className="text-red-500">45.65%</span>
+                </div>
+              </div>
+            </div>
+          </PrimaryBoard>
+
+          {/* Deposits Board */}
+          <PrimaryBoard title="Deposits" action={<span className="text-gray-100">$11.22</span>}>
+            <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
+              <div className="flex items-center gap-2">
+                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
+                <div className="flex flex-col">
+                  <span className="font-semibold">USDC</span>
+                  <span className="text-sm text-gray-500">$0.999925</span>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="font-semibold">11.22 USDC</span>
+                <span className="text-sm text-gray-500">$11.22</span>
+              </div>
+            </div>
+          </PrimaryBoard>
+
+          {/* Borrow Board */}
+          <PrimaryBoard title="Borrow" action={<span className="text-gray-100">$11.22</span>}>
+            <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
+              <div className="flex items-center gap-2">
+                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025" alt="" className="w-10" />
+                <div className="flex flex-col">
+                  <span className="font-semibold">USDC</span>
+                  <span className="text-sm text-gray-500">$0.999925</span>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="font-semibold">11.22 USDC</span>
+                <span className="text-sm text-gray-500">$11.22</span>
+              </div>
+            </div>
+          </PrimaryBoard>
+        </div>
       </div>
     </Container>
   )
