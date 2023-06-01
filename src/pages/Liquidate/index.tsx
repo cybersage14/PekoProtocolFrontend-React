@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Switch } from "@material-tailwind/react";
-import Container from "../../components/Container";
+import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
 import Tr from "../../components/tableComponents/Tr";

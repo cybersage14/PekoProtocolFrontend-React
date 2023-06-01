@@ -5,3 +5,11 @@ export interface IPropsOfComponent {
   children?: ReactNode | string;
   [key: string]: any;
 }
+
+export interface IToken {
+  id: number;
+  name: string;
+  symbol: string;
+  imgSrc: string;
+  depositedAmount: number;
+}

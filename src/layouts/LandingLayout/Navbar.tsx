@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from '@iconify/react';
-import Container from "../../components/Container";
+import Container from "../../components/containers/Container";
 import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
 import FilledButton from "../../components/buttons/FilledButton";

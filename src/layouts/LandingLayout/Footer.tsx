@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import Container from "../../components/Container";
+import Container from "../../components/containers/Container";
 import TextIconButton from "../../components/buttons/TextIconButton";
 
 export default function Footer() {

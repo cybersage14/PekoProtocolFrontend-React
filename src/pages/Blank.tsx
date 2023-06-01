@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Container from "../components/Container";
+import Container from "../components/containers/Container";
 
 export default function Blank() {
   return (

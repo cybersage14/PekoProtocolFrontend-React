@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import Container from "../../components/Container";
+import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
-import MainInput from "../../components/MainInput";
+import MainInput from "../../components/form/MainInput";
 import CollapsibleBoard from "../../components/boards/CollapsibleBoard";
 import PrimaryBoard from "../../components/boards/PrimaryBoard";
 import Th from "../../components/tableComponents/Th";
