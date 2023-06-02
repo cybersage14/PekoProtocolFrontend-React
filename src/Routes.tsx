@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import Blank from "./pages/Blank";
+import Bridge from "./pages/Bridge.tsx";
 
 // ----------------------------------------------------------------------------------
 
@@ -28,6 +29,10 @@ export default function Routes() {
         {
           path: 'swap',
           element: <Swap />
+        },
+        {
+          path: 'bridge',
+          element: <Bridge />
         },
         {
           path: '/',

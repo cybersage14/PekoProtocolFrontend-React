@@ -13,3 +13,9 @@ export interface IToken {
   imgSrc: string;
   depositedAmount: number;
 }
+
+export interface IChain {
+  id: number;
+  imgSrc: string;
+  name: string;
+}

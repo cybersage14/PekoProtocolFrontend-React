@@ -5,7 +5,6 @@ import Slider from "rc-slider";
 import 'rc-slider/assets/index.css';
 import PageHeader from "../../components/PageHeader";
 import TextButton from "../../components/buttons/TextButton";
-import SelectToken from "../../components/form/SelectToken";
 import { IToken } from "../../utils/interfaces";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
 import FilledButton from "../../components/buttons/FilledButton";
@@ -13,6 +12,7 @@ import FilledButton from "../../components/buttons/FilledButton";
 // ---------------------------------------------------------------------------------------------
 
 const BorrowPanel = lazy(() => import('./BorrowPanel'))
+const SelectTokenWithPrice = lazy(() => import('../../components/form/SelectTokenWithPrice'))
 
 // ---------------------------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ export default function Swap() {
                   </div>
                 </div>
 
-                <SelectToken
+                <SelectTokenWithPrice
                   tokens={TOKENS}
                   selectedToken={payToken}
                   setSelectedToken={setPayToken}
@@ -143,7 +143,7 @@ export default function Swap() {
             <div className="py-6 px-6 bg-gray-900 rounded-md flex flex-col gap-4">
               <h2 className="text-lg text-gray-100">You Receive</h2>
 
-              <SelectToken
+              <SelectTokenWithPrice
                 tokens={TOKENS}
                 selectedToken={receiveToken}
                 setSelectedToken={setReceiveToken}

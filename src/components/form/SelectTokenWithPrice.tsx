@@ -1,6 +1,6 @@
-import { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce, useOnClickOutside } from "usehooks-ts";
 import { IPropsOfComponent, IToken } from "../../utils/interfaces";
 import MainInput from "./MainInput";
 import TextIconButton from "../buttons/TextIconButton";
@@ -25,7 +25,7 @@ interface IProps extends IPropsOfComponent {
 
 /* --------------------------------------------------------------------------- */
 
-export default function SelectToken({
+export default function SelectTokenWithPrice({
   className = '',
   classNameOfInput = '',
   startAdornment,
@@ -37,10 +37,14 @@ export default function SelectToken({
   setTokenAmount,
   ...others
 }: IProps) {
+  const ref = useRef(null)
+
   const [listVisible, setListVisible] = useState<boolean>(false)
   const [filteredTokens, setFilteredTokens] = useState<Array<IToken>>(tokens)
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const debouncedSearchKeyword = useDebounce<string>(searchKeyword, 500)
+
+  useOnClickOutside(ref, () => setListVisible(false))
 
   useEffect(() => {
     const _filteredTokens = tokens.filter(tokenItem => tokenItem.name.includes(debouncedSearchKeyword) || tokenItem.symbol.includes(debouncedSearchKeyword))
@@ -55,7 +59,7 @@ export default function SelectToken({
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <div
         className={`flex items-center gap-2 px-3 py-2 rounded bg-gray-900 border border-gray-800 ${className} ${error ? '!border-red-500' : ''}`}
       >
@@ -86,7 +90,7 @@ export default function SelectToken({
       </div>
 
       {listVisible && (
-        <div className="absolute w-full top-14 bg-gray-900 border border-gray-800 p-4 flex flex-col gap-2 rounded-b-md">
+        <div className="absolute z-50 w-full top-14 bg-gray-900 border border-gray-800 p-4 flex flex-col gap-2 rounded-b-md">
           <MainInput
             startAdornment={<Icon icon="material-symbols:search" className="text-gray-700 text-lg" />}
             placeholder="Search by symbol or name"
