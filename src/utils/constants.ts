@@ -80,4 +80,5 @@ export const TEMP_TOKENSe: Array<IToken> = [
     depositedAmount: 0
   }
 ];
+
 export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;

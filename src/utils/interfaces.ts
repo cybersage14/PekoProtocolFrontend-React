@@ -12,6 +12,7 @@ export interface IToken {
   symbol: string;
   imgSrc: string;
   depositedAmount: number;
+  tokenAddress?: string;
 }
 
 export interface IChain {
