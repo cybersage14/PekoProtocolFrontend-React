@@ -45,7 +45,7 @@ export default function Th({ className = '', label, sortable = false, sortAsc, s
           </div>
         </div>
       ) : (
-        <>{label}</>
+        <p className="text-left">{label}</p>
       )}
     </th>
   )
