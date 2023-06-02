@@ -81,4 +81,7 @@ export const TEMP_TOKENSe: Array<IToken> = [
   }
 ];
 
+export const TEMP_WALLET_ADDRESS =
+  "0xbee86614d7b0017fd77e07ee2b3c57f8a1908c4fdb5daf126eaaac44dcaff2e1";
+
 export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;

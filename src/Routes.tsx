@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import Blank from "./pages/Blank";
 import Bridge from "./pages/Bridge.tsx";
+import Dashboard from "./pages/Dashboard";
 
 // ----------------------------------------------------------------------------------
 
@@ -33,6 +34,10 @@ export default function Routes() {
         {
           path: 'bridge',
           element: <Bridge />
+        },
+        {
+          path: 'dashboard',
+          element: <Dashboard />
         },
         {
           path: '/',

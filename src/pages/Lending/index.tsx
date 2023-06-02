@@ -54,7 +54,7 @@ export default function Lending() {
             {/* Assets board */}
             <CollapsibleBoard title="Assets" collapsible>
               <div className="flex flex-col gap-4">
-                <div className="px-4">
+                <div className="px-4 pt-4">
                   <div className="w-1/3">
                     <MainInput
                       startAdornment={<Icon icon="material-symbols:search" className="text-gray-700 text-lg" />}
@@ -124,7 +124,7 @@ export default function Lending() {
             title="Account"
             action={<span className="text-gray-500 text-sm">Connect Wallet</span>}
           >
-            <div className="px-3 mb-6 flex flex-col gap-4">
+            <div className="p-4 flex flex-col gap-4">
               <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
                   <span className="text-gray-500 text-sm">APY</span>
@@ -161,7 +161,7 @@ export default function Lending() {
 
           {/* Deposits Board */}
           <PrimaryBoard title="Deposits" action={<span className="text-gray-100">$11.22</span>}>
-            <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
+            <div className="p-4 flex items-center justify-between text-gray-100">
               <div className="flex items-center gap-2">
                 <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                 <div className="flex flex-col">
@@ -178,7 +178,7 @@ export default function Lending() {
 
           {/* Borrow Board */}
           <PrimaryBoard title="Borrow" action={<span className="text-gray-100">$11.22</span>}>
-            <div className="mb-6 px-3 flex items-center justify-between text-gray-100">
+            <div className="p-4 flex items-center justify-between text-gray-100">
               <div className="flex items-center gap-2">
                 <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                 <div className="flex flex-col">
