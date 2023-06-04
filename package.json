@@ -1,5 +1,5 @@
 {
-  "name": "lending-protocol-frontend",
+  "name": "peko-protocol-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +11,8 @@
     "@types/node": "^17.0.45",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
+    "@web3modal/ethereum": "^2.4.2",
+    "@web3modal/react": "^2.4.2",
     "framer-motion": "^10.12.16",
     "rc-slider": "^10.2.0",
     "react": "^18.2.0",
@@ -19,6 +21,8 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "usehooks-ts": "^2.9.1",
+    "viem": "^0.3.50",
+    "wagmi": "^1.1.0",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.5.4",
     "workbox-broadcast-update": "^6.5.4",

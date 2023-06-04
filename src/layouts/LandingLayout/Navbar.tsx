@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from '@iconify/react';
+import { useWeb3Modal } from "@web3modal/react"
+import { useAccount, useDisconnect, useSwitchNetwork, useNetwork } from "wagmi"
 import Container from "../../components/containers/Container";
 import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
@@ -49,10 +51,17 @@ const NAV_LINKS: Array<INavLink> = [
   },
 ]
 
+const chainId = process.env.REACT_APP_CHAIN_ID
+
 // -----------------------------------------------------------------------------------------
 
 export default function Navbar() {
   const { pathname } = useLocation()
+  const { open } = useWeb3Modal()
+  const { isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
+  const { switchNetwork } = useSwitchNetwork()
+  const { chain } = useNetwork()
 
   return (
     <nav className="sticky top-0 bg-gray-900 border-b border-gray-800">
@@ -78,10 +87,23 @@ export default function Navbar() {
           <TextIconButton>
             <Icon icon="octicon:question-16" className="text-xl" />
           </TextIconButton>
-          <FilledButton className="flex items-center gap-1">
-            <Icon icon="mdi:wallet-outline" className="text-xl" />
-            Connect Wallet
-          </FilledButton>
+
+          {isConnected ? chain?.id === Number(chainId) ? (
+            <FilledButton className="flex items-center gap-1" onClick={() => disconnect()}>
+              <Icon icon="mdi:wallet-outline" className="text-xl" />
+              Disconnect
+            </FilledButton>
+          ) : (
+            <FilledButton className="flex items-center gap-1" onClick={() => switchNetwork?.(Number(chainId))}>
+              <Icon icon="mdi:wallet-outline" className="text-xl" />
+              Switch network
+            </FilledButton>
+          ) : (
+            <FilledButton className="flex items-center gap-1" onClick={() => open()}>
+              <Icon icon="mdi:wallet-outline" className="text-xl" />
+              Connect Wallet
+            </FilledButton>
+          )}
         </div>
       </Container>
     </nav>
