@@ -4,6 +4,7 @@ import { TEMP_LPS } from "../../utils/constants";
 import { ILP } from "../../utils/interfaces";
 import { TBuySellTabValue } from "../../utils/types";
 import OrdersCard from "./OrdersCard";
+import MarketCard from "./MarketCard";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -14,7 +15,7 @@ const BidCard = lazy(() => import('./BidCard'))
 // ---------------------------------------------------------------------------------------------
 
 export default function Trading() {
-  const [lp, setLp] = useState<ILP | null>(null)
+  const [lp, setLp] = useState<ILP | null>(TEMP_LPS[0])
   const [buySellTabValue, setBuySellTabValue] = useState<TBuySellTabValue>('buy')
 
   return (
@@ -36,6 +37,7 @@ export default function Trading() {
         <BuySellCard tabValue={buySellTabValue} setTabValue={setBuySellTabValue} />
         <BidCard setBuySellTabValue={setBuySellTabValue} />
         <OrdersCard className="col-span-3" />
+        <MarketCard />
       </div>
     </Container>
   )
