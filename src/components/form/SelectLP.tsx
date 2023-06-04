@@ -25,9 +25,10 @@ export default function SelectLP({ className = '', lps, selectedLP, setSelectedL
   }
 
   return (
-    <div ref={ref} className={`relative h-fit ${className}`} {...others}>
+    <div ref={ref} className="relative h-fit">
       <div
-        className="border border-gray-800 bg-gray-900 rounded-md py-3 px-3 flex items-center justify-between cursor-pointer"
+        className={`border border-gray-800 bg-gray-900 rounded-md py-3 px-3 flex items-center justify-between cursor-pointer ${className}`}
+        {...others}
         onClick={() => setListVisible(!listVisible)}
       >
         {selectedLP ? (

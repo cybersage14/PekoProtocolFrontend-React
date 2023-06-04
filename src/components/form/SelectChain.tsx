@@ -25,9 +25,10 @@ export default function SelectChain({ className = '', chains, selectedChain, set
   }
 
   return (
-    <div ref={ref} className={`relative h-fit ${className}`} {...others}>
+    <div ref={ref} className="relative h-fit">
       <div
-        className="border border-gray-800 rounded-md py-2 px-3 flex items-center justify-between cursor-pointer"
+        className={`border border-gray-800 rounded-md py-2 px-3 flex items-center justify-between cursor-pointer ${className}`}
+        {...others}
         onClick={() => setListVisible(!listVisible)}
       >
         <div className="flex items-center gap-2">
