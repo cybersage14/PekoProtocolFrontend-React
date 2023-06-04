@@ -20,3 +20,16 @@ export interface IChain {
   imgSrc: string;
   name: string;
 }
+
+export interface ILP {
+  id: number;
+  token: IToken;
+  coin: IToken;
+  powererBrandSrc: string;
+}
+
+export interface IOption {
+  id: number;
+  label: string;
+  value: string;
+}

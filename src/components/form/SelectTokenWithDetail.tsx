@@ -62,7 +62,7 @@ export default function SelectTokenWithDetail({ className = '', tokens, selected
         </div>
         <Icon
           icon={listVisible ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
-          className="text-gray-500 text-xl"
+          className="text-gray-500 text-md"
         />
       </div>
 

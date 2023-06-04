@@ -1,4 +1,4 @@
-import { IChain, IToken } from "./interfaces";
+import { IChain, ILP, IToken } from "./interfaces";
 
 export const TEMP_CRYPTO_LOGO_URL =
   "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025";
@@ -83,5 +83,26 @@ export const TEMP_TOKENSe: Array<IToken> = [
 
 export const TEMP_WALLET_ADDRESS =
   "0xbee86614d7b0017fd77e07ee2b3c57f8a1908c4fdb5daf126eaaac44dcaff2e1";
+
+export const TEMP_LPS: Array<ILP> = [
+  {
+    id: 1,
+    token: {
+      id: 6,
+      name: "Aptos Coin",
+      symbol: "APT",
+      imgSrc: "https://cryptologos.cc/logos/aptos-apt-logo.svg?v=025",
+      depositedAmount: 0
+    },
+    coin: {
+      id: 3,
+      name: "USD Coin",
+      symbol: "USDC",
+      imgSrc: "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025",
+      depositedAmount: 0
+    },
+    powererBrandSrc: "/assets/images/test-powerer-brand.png"
+  }
+];
 
 export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;

@@ -83,7 +83,7 @@ export default function SelectTokenWithPrice({
           <TextIconButton onClick={() => setListVisible(!listVisible)}>
             <Icon
               icon={listVisible ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
-              className="text-gray-500 text-xl"
+              className="text-gray-500 text-md"
             />
           </TextIconButton>
         </div>
