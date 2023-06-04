@@ -2,12 +2,19 @@ import { lazy, useState } from "react";
 import Container from "../../components/containers/Container";
 import { TEMP_LPS } from "../../utils/constants";
 import { ILP } from "../../utils/interfaces";
-import BuySellCard from "./BuySellCard";
+import { TBuySellTabValue } from "../../utils/types";
+
+// ---------------------------------------------------------------------------------------------
 
 const SelectLP = lazy(() => import('../../components/form/SelectLP'))
+const BuySellCard = lazy(() => import('./BuySellCard'))
+const BidCard = lazy(() => import('./BidCard'))
+
+// ---------------------------------------------------------------------------------------------
 
 export default function Trading() {
   const [lp, setLp] = useState<ILP | null>(null)
+  const [buySellTabValue, setBuySellTabValue] = useState<TBuySellTabValue>('buy')
 
   return (
     <Container className="my-8 flex flex-col gap-8">
@@ -25,8 +32,8 @@ export default function Trading() {
         <div className="col-span-2 bg-gray-900 flex flex-col justify-center">
           <p className="text-gray-100 text-center">Trading View</p>
         </div>
-
-        <BuySellCard />
+        <BuySellCard tabValue={buySellTabValue} setTabValue={setBuySellTabValue} />
+        <BidCard setBuySellTabValue={setBuySellTabValue} />
       </div>
     </Container>
   )

@@ -5,10 +5,14 @@ import MainInput from "../../components/form/MainInput";
 import { REGEX_NUMBER_VALID, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
+import { TBuySellTabValue } from "../../utils/types";
 
 // ---------------------------------------------------------------------------------
 
-type TTabValue = 'buy' | 'sell'
+interface IProps {
+  tabValue: TBuySellTabValue;
+  setTabValue: Function;
+}
 
 // ---------------------------------------------------------------------------------
 
@@ -22,8 +26,7 @@ const ORDER_TYPES: Array<IOption> = [
 
 // ---------------------------------------------------------------------------------
 
-export default function BuySellCard() {
-  const [tabValue, setTabValue] = useState<TTabValue>('buy')
+export default function BuySellCard({ tabValue, setTabValue }: IProps) {
   const [orderType, setOrderType] = useState<IOption>(ORDER_TYPES[0])
   const [price, setPrice] = useState<string>('0')
   const [amount, setAmount] = useState<string>('0')
