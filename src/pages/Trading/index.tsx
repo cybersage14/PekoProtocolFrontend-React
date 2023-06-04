@@ -3,6 +3,7 @@ import Container from "../../components/containers/Container";
 import { TEMP_LPS } from "../../utils/constants";
 import { ILP } from "../../utils/interfaces";
 import { TBuySellTabValue } from "../../utils/types";
+import OrdersCard from "./OrdersCard";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -34,6 +35,7 @@ export default function Trading() {
         </div>
         <BuySellCard tabValue={buySellTabValue} setTabValue={setBuySellTabValue} />
         <BidCard setBuySellTabValue={setBuySellTabValue} />
+        <OrdersCard className="col-span-3" />
       </div>
     </Container>
   )
