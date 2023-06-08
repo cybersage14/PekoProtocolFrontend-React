@@ -30,11 +30,11 @@ export const data = {
 export default function AccountStatusSection() {
   return (
     <Section title="Account Status">
-      <div className="grid grid-cols-4 gap-8">
-        <div className="col-span-3 bg-gray-900 flex flex-col justify-center items-center">
+      <div className="grid grid-cols-4 gap-4 lg:gap-8">
+        <div className="col-sapn-4 lg:col-span-3 bg-gray-900 flex flex-col justify-center items-center">
           <span className="text-gray-100">History</span>
         </div>
-        <div className="bg-gray-900 flex flex-col gap-4 p-3">
+        <div className="col-span-4 lg:col-span-1 bg-gray-900 flex flex-col gap-4 p-3">
           <h5 className="text-gray-100 text-xl font-bold">Composition</h5>
           <Doughnut data={data} />
         </div>

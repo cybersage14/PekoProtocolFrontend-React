@@ -25,17 +25,19 @@ export default function Dashboard() {
   useOnClickOutside(ref, () => copy(''))
 
   return (
-    <div className="container max-w-8xl my-8 flex flex-col gap-8">
+    <div className="container max-w-8xl my-8 flex flex-col gap-8 px-4 lg:px-0">
       <MainInput
         startAdornment={<Icon icon="material-symbols:search" className="text-gray-500 text-lg" />}
+        className="bg-gray-900"
+        classNameOfInput="bg-gray-900"
         placeholder="Search a wallet address"
       />
 
-      <header className="flex flex-col gap-4">
+      <header className="flex flex-col gap-2 lg:gap-4">
         <h2 className="text-gray-500 text-lg">Networth</h2>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-16">
+          <div className="flex items-center justify-between w-full lg:gap-16">
             <span className="text-gray-100 text-4xl">$0.00</span>
             <div className="flex items-center gap-2">
               <div className="rounded-md border border-gray-800 py-2 px-2 w-24 flex flex-col gap-1 items-center">
@@ -49,7 +51,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <Link to="/lending">
               <FilledButton className="">Lending</FilledButton>
             </Link>
@@ -74,11 +76,11 @@ export default function Dashboard() {
       </header>
 
       <AccountStatusSection />
-      <UserProfileSection />
+      {/* <UserProfileSection /> */}
       {/* <TokensSection />
       <LPTokensSection />
       <FarmsSection /> */}
-      <DepositsSection />
+      {/* <DepositsSection /> */}
     </div>
   )
 }
