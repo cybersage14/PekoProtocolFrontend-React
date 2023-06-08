@@ -9,8 +9,8 @@ const Lending = lazy(() => import('./pages/Lending'))
 const Liquidate = lazy(() => import('./pages/Liquidate'))
 const Swap = lazy(() => import('./pages/Swap'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
-const Bridge = lazy(() => import('./pages/Bridge'))
-const Trading = lazy(() => import('./pages/Trading'))
+// const Bridge = lazy(() => import('./pages/Bridge'))
+// const Trading = lazy(() => import('./pages/Trading'))
 
 // ----------------------------------------------------------------------------------
 
@@ -28,25 +28,25 @@ export default function Routes() {
           path: 'liquidate',
           element: <Liquidate />
         },
-        {
-          path: 'swap',
-          element: <Swap />
-        },
-        {
-          path: 'bridge',
-          element: <Bridge />
-        },
+        // {
+        //   path: 'swap',
+        //   element: <Swap />
+        // },
+        // {
+        //   path: 'bridge',
+        //   element: <Bridge />
+        // },
         {
           path: 'dashboard',
           element: <Dashboard />
         },
-        {
-          path: 'trading',
-          element: <Trading />
-        },
+        // {
+        //   path: 'trading',
+        //   element: <Trading />
+        // },
         {
           path: '/',
-          element: <Navigate to="/lending" replace />
+          element: <Navigate to="/dashboard" replace />
         },
         {
           path: '404',
