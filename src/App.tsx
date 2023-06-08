@@ -8,6 +8,7 @@ import Loading from './components/Loading';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { MobileMenuProvider } from './contexts/MobileMenuContext';
 import Routes from './Routes';
+import { DialogSizeProvider } from './contexts/DialogSizeContext';
 
 // -----------------------------------------------------------------------------------------------
 
@@ -30,7 +31,9 @@ function App() {
         <WagmiConfig config={wagmiConfig}>
           <LoadingProvider>
             <MobileMenuProvider>
-              <Routes />
+              <DialogSizeProvider>
+                <Routes />
+              </DialogSizeProvider>
             </MobileMenuProvider>
           </LoadingProvider>
         </WagmiConfig>
