@@ -37,7 +37,7 @@ export default function Dashboard() {
         <h2 className="text-gray-500 text-lg">Networth</h2>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center justify-between w-full lg:gap-16">
+          <div className="flex items-center justify-between w-full lg:justify-start lg:gap-16">
             <span className="text-gray-100 text-4xl">$0.00</span>
             <div className="flex items-center gap-2">
               <div className="rounded-md border border-gray-800 py-2 px-2 w-24 flex flex-col gap-1 items-center">
@@ -76,11 +76,11 @@ export default function Dashboard() {
       </header>
 
       <AccountStatusSection />
-      {/* <UserProfileSection /> */}
+      <UserProfileSection />
       {/* <TokensSection />
       <LPTokensSection />
       <FarmsSection /> */}
-      {/* <DepositsSection /> */}
+      <DepositsSection />
     </div>
   )
 }
