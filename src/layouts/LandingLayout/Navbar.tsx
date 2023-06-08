@@ -3,11 +3,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from '@iconify/react';
 import { useWeb3Modal } from "@web3modal/react"
 import { useAccount, useDisconnect, useSwitchNetwork, useNetwork } from "wagmi"
+import { Drawer, List, ListItem } from "@material-tailwind/react";
 import Container from "../../components/containers/Container";
 import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
 import FilledButton from "../../components/buttons/FilledButton";
-import { Drawer, List, ListItem } from "@material-tailwind/react";
 
 // -----------------------------------------------------------------------------------------
 
