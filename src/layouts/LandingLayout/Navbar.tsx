@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from '@iconify/react';
 import { useWeb3Modal } from "@web3modal/react"
@@ -6,7 +7,6 @@ import Container from "../../components/containers/Container";
 import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
 import FilledButton from "../../components/buttons/FilledButton";
-import { useState } from "react";
 import { Drawer, List, ListItem } from "@material-tailwind/react";
 
 // -----------------------------------------------------------------------------------------
@@ -33,25 +33,25 @@ const NAV_LINKS: Array<INavLink> = [
     iconName: 'cryptocurrency:lend',
     to: '/lending'
   },
-  // {
-  //   id: 2,
-  //   label: 'Swap',
-  //   iconName: 'ph:swap-bold',
-  //   to: '/swap'
-  // },
-  // {
-  //   id: 3,
-  //   label: 'Bridge',
-  //   iconName: 'mdi:bridge',
-  //   to: '/bridge'
-  // },
+  {
+    id: 2,
+    label: 'Swap',
+    iconName: 'ph:swap-bold',
+    to: '/swap'
+  },
+  {
+    id: 3,
+    label: 'Bridge',
+    iconName: 'mdi:bridge',
+    to: '/bridge'
+  },
 
-  // {
-  //   id: 5,
-  //   label: 'Trading',
-  //   iconName: 'ep:histogram',
-  //   to: '/trading'
-  // },
+  {
+    id: 5,
+    label: 'Trading',
+    iconName: 'ep:histogram',
+    to: '/trading'
+  },
 ]
 
 const chainId = process.env.REACT_APP_CHAIN_ID

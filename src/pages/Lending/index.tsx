@@ -1,3 +1,4 @@
+import { lazy, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import Container from "../../components/containers/Container";
@@ -15,11 +16,16 @@ import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 
 // -----------------------------------------------------------------------------------
 
+const AssetDialog = lazy(() => import('./AssetDialog'))
+
+// -----------------------------------------------------------------------------------
+
 const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7];
 
 // -----------------------------------------------------------------------------------
 
 export default function Lending() {
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
   return (
     <Container className="my-8">
       <div className="grid grid-cols-5 gap-8">
@@ -78,7 +84,7 @@ export default function Lending() {
 
                   <tbody>
                     {TEMP_INDEXES_OF_TABLE.map(index => (
-                      <Tr key={index} className="hover:bg-gray-900">
+                      <Tr key={index} className="hover:bg-gray-900" onClick={() => setDialogVisible(true)}>
                         <Td>
                           <div className="flex items-center gap-2">
                             <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
@@ -194,6 +200,12 @@ export default function Lending() {
           </PrimaryBoard>
         </div>
       </div>
+      {dialogVisible && (
+        <AssetDialog
+          visible={dialogVisible}
+          setVisible={setDialogVisible}
+        />
+      )}
     </Container>
   )
 }

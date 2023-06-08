@@ -53,9 +53,9 @@ export default function Dashboard() {
             <Link to="/lending">
               <FilledButton className="">Lending</FilledButton>
             </Link>
-            <Link to="/swap">
+            {/* <Link to="/swap">
               <FilledButton className="">Swap</FilledButton>
-            </Link>
+            </Link> */}
           </div>
         </div>
 

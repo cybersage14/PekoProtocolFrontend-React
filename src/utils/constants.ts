@@ -36,7 +36,7 @@ export const TEMP_CHAINS: Array<IChain> = [
   }
 ];
 
-export const TEMP_TOKENSe: Array<IToken> = [
+export const TEMP_TOKENS: Array<IToken> = [
   {
     id: 1,
     name: "Bitcoin",
