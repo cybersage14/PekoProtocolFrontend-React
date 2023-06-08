@@ -1,6 +1,8 @@
 import { lazy, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import { useMediaQuery } from 'react-responsive';
+import { List, ListItem } from "@material-tailwind/react";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -26,13 +28,15 @@ const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7];
 
 export default function Lending() {
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
+  const isMobile = useMediaQuery({ maxWidth: 1024 });
+
   return (
     <Container className="my-8">
       <div className="grid grid-cols-5 gap-8">
-        <div className="col-span-4">
+        <div className="col-span-5 lg:col-span-4">
           <div className="flex flex-col gap-4">
             {/* Infos and Liquidate button */}
-            <div className="flex items-center justify-between">
+            <div className="hidden lg:flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <InfoCard
                   label="Current Market Size"
@@ -57,35 +61,52 @@ export default function Lending() {
               </Link>
             </div>
 
+            <div className="lg:hidden grid grid-cols-2 gap-2">
+              <InfoCard
+                label="Current Market Size"
+                value="761K"
+                unit="$"
+              />
+              <InfoCard
+                label="Total Borrowed"
+                value="93K"
+                unit="$"
+              />
+              <InfoCard
+                label="Lent Out"
+                value="12.2%"
+              />
+              <Link to="/liquidate">
+                <OutlinedButton className="w-full">
+                  Liquidate
+                </OutlinedButton>
+              </Link>
+            </div>
+
             {/* Assets board */}
             <CollapsibleBoard title="Assets" collapsible>
               <div className="flex flex-col gap-4">
                 <div className="px-4 pt-4">
-                  <div className="w-1/3">
+                  <div className="w-full lg:w-1/3">
                     <MainInput
                       startAdornment={<Icon icon="material-symbols:search" className="text-gray-700 text-lg" />}
+                      className="bg-gray-900"
+                      classNameOfInput="bg-gray-900"
                       placeholder="Search token"
                     />
                   </div>
                 </div>
 
-                <Table>
-                  <thead>
-                    <tr>
-                      <Th label="Asset Name" sortable />
-                      <Th label="LTV" sortable />
-                      <Th label="Deposit APY" sortable />
-                      <Th label="Market Size" sortable />
-                      <Th label="Borrow APY" sortable />
-                      <Th label="Total Borrowed" sortable />
-                      <Th label="Wallet" sortable />
-                    </tr>
-                  </thead>
-
-                  <tbody>
+                {isMobile ? (
+                  <List className="block lg:hidden text-sm">
                     {TEMP_INDEXES_OF_TABLE.map(index => (
-                      <Tr key={index} className="hover:bg-gray-900" onClick={() => setDialogVisible(true)}>
-                        <Td>
+                      <ListItem
+                        key={index}
+                        className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
+                        onClick={() => setDialogVisible(true)}
+                      >
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">Asset Name: </span>
                           <div className="flex items-center gap-2">
                             <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                             <div className="flex flex-col">
@@ -93,38 +114,99 @@ export default function Lending() {
                               <span className="text-sm text-gray-500">$0.999925</span>
                             </div>
                           </div>
-                        </Td>
-                        <Td>50%</Td>
-                        <Td className="text-green-500">0.04%</Td>
-                        <Td>
+                        </div>
+
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">LTV: </span>
+                          <span>50%</span>
+                        </div>
+
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">Deposit APY: </span>
+                          <span className="text-green-500">0.04%</span>
+                        </div>
+
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">Borrow APY: </span>
                           <div className="flex flex-col">
                             <span className="font-semibold">187,300 USDC</span>
                             <span className="text-sm text-gray-500">$187,310.64</span>
                           </div>
-                        </Td>
-                        <Td className="text-red-500">0.04%</Td>
-                        <Td>
-                          <div className="flex flex-col">
-                            <span className="font-semibold">42,260 USDC</span>
-                            <span className="text-sm text-gray-500">$42,253.77</span>
-                          </div>
-                        </Td>
-                        <Td>
+                        </div>
+
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">Total Borrowed: </span>
+                          <span className="text-red-500">0.04%</span>
+                        </div>
+
+                        <div className="flex justify-between w-full">
+                          <span className="text-gray-500">Wallet: </span>
                           <div className="flex flex-col">
                             <span className="font-semibold">0 Cake</span>
                             <span className="text-sm text-gray-500">$0.00</span>
                           </div>
-                        </Td>
-                      </Tr>
+                        </div>
+                      </ListItem>
                     ))}
-                  </tbody>
-                </Table>
+                  </List>
+                ) : (
+                  <Table>
+                    <thead>
+                      <tr>
+                        <Th label="Asset Name" sortable />
+                        <Th label="LTV" sortable />
+                        <Th label="Deposit APY" sortable />
+                        <Th label="Market Size" sortable />
+                        <Th label="Borrow APY" sortable />
+                        <Th label="Total Borrowed" sortable />
+                        <Th label="Wallet" sortable />
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {TEMP_INDEXES_OF_TABLE.map(index => (
+                        <Tr key={index} className="hover:bg-gray-900" onClick={() => setDialogVisible(true)}>
+                          <Td>
+                            <div className="flex items-center gap-2">
+                              <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
+                              <div className="flex flex-col">
+                                <span className="font-semibold">USDC</span>
+                                <span className="text-sm text-gray-500">$0.999925</span>
+                              </div>
+                            </div>
+                          </Td>
+                          <Td>50%</Td>
+                          <Td className="text-green-500">0.04%</Td>
+                          <Td>
+                            <div className="flex flex-col">
+                              <span className="font-semibold">187,300 USDC</span>
+                              <span className="text-sm text-gray-500">$187,310.64</span>
+                            </div>
+                          </Td>
+                          <Td className="text-red-500">0.04%</Td>
+                          <Td>
+                            <div className="flex flex-col">
+                              <span className="font-semibold">42,260 USDC</span>
+                              <span className="text-sm text-gray-500">$42,253.77</span>
+                            </div>
+                          </Td>
+                          <Td>
+                            <div className="flex flex-col">
+                              <span className="font-semibold">0 Cake</span>
+                              <span className="text-sm text-gray-500">$0.00</span>
+                            </div>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
               </div>
             </CollapsibleBoard>
           </div>
-        </div>
+        </div >
 
-        <div className="flex flex-col gap-4">
+        <div className="col-span-5 lg:col-span-1 flex flex-col gap-4">
           {/* Account Board */}
           <PrimaryBoard
             title="Account"
@@ -199,13 +281,14 @@ export default function Lending() {
             </div>
           </PrimaryBoard>
         </div>
-      </div>
+      </div >
       {dialogVisible && (
         <AssetDialog
           visible={dialogVisible}
           setVisible={setDialogVisible}
         />
-      )}
-    </Container>
+      )
+      }
+    </Container >
   )
 }
