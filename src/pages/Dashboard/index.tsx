@@ -11,9 +11,9 @@ import { getVisibleWalletAddress } from "../../utils/functions";
 
 const AccountStatusSection = lazy(() => import('./AccountStatusSection'))
 const UserProfileSection = lazy(() => import('./UserProfileSection'))
-const TokensSection = lazy(() => import('./TokensSection'))
-const LPTokensSection = lazy(() => import('./LPTokensSection'))
-const FarmsSection = lazy(() => import('./FarmsSection'))
+// const TokensSection = lazy(() => import('./TokensSection'))
+// const LPTokensSection = lazy(() => import('./LPTokensSection'))
+// const FarmsSection = lazy(() => import('./FarmsSection'))
 const DepositsSection = lazy(() => import('./DepositsSection'))
 
 // -----------------------------------------------------------------------------------------------------
@@ -75,9 +75,9 @@ export default function Dashboard() {
 
       <AccountStatusSection />
       <UserProfileSection />
-      <TokensSection />
+      {/* <TokensSection />
       <LPTokensSection />
-      <FarmsSection />
+      <FarmsSection /> */}
       <DepositsSection />
     </div>
   )

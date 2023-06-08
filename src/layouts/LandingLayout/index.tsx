@@ -13,7 +13,7 @@ export default function LandingLayout() {
     <div className="min-h-screen flex flex-col bg-[#111111]">
       <Navbar />
       <div className="flex-1">
-        {/* <Outlet /> */}
+        <Outlet />
       </div>
       <Footer />
     </div>
