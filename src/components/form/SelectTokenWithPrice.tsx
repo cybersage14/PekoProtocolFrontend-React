@@ -91,7 +91,7 @@ export default function SelectTokenWithPrice({
       </div>
 
       {listVisible && (
-        <div className="absolute z-50 w-full top-14 bg-gray-900 border border-gray-800 p-4 flex flex-col gap-2 rounded-b-md">
+        <div className="absolute z-50 w-full top-14 bg-gray-900 border border-gray-800 p-4 flex flex-col gap-2 rounded-b-md h-64 overflow-auto">
           <MainInput
             startAdornment={<Icon icon="material-symbols:search" className="text-gray-700 text-lg" />}
             placeholder="Search by symbol or name"

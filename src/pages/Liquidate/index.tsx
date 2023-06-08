@@ -8,6 +8,7 @@ import Td from "../../components/tableComponents/Td";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
+import LiquidateDialog from "./LiquidateDialog";
 
 // -----------------------------------------------------------------------------------
 
@@ -17,6 +18,7 @@ const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 export default function Liquidate() {
   const [visible, setVisible] = useState<boolean>(true)
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
 
   return (
     <Container className="container my-8 flex flex-col gap-8">
@@ -69,13 +71,20 @@ export default function Liquidate() {
                 <Td>$0.00046209994186645765</Td>
                 <Td className="text-red-500">23691%</Td>
                 <Td>
-                  <FilledButton>Liquidate</FilledButton>
+                  <FilledButton onClick={() => setDialogVisible(true)}>Liquidate</FilledButton>
                 </Td>
               </Tr>
             ))}
           </tbody>
         )}
       </Table>
+
+      {dialogVisible && (
+        <LiquidateDialog
+          visible={dialogVisible}
+          setVisible={setDialogVisible}
+        />
+      )}
     </Container>
   )
 }
