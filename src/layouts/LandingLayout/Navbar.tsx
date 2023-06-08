@@ -33,25 +33,25 @@ const NAV_LINKS: Array<INavLink> = [
     iconName: 'cryptocurrency:lend',
     to: '/lending'
   },
-  {
-    id: 2,
-    label: 'Swap',
-    iconName: 'ph:swap-bold',
-    to: '/swap'
-  },
-  {
-    id: 3,
-    label: 'Bridge',
-    iconName: 'mdi:bridge',
-    to: '/bridge'
-  },
+  // {
+  //   id: 2,
+  //   label: 'Swap',
+  //   iconName: 'ph:swap-bold',
+  //   to: '/swap'
+  // },
+  // {
+  //   id: 3,
+  //   label: 'Bridge',
+  //   iconName: 'mdi:bridge',
+  //   to: '/bridge'
+  // },
 
-  {
-    id: 5,
-    label: 'Trading',
-    iconName: 'ep:histogram',
-    to: '/trading'
-  },
+  // {
+  //   id: 5,
+  //   label: 'Trading',
+  //   iconName: 'ep:histogram',
+  //   to: '/trading'
+  // },
 ]
 
 const chainId = process.env.REACT_APP_CHAIN_ID
@@ -79,7 +79,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 bg-gray-900 border-b border-gray-800">
+    <nav className="sticky top-0 bg-gray-900 border-b border-gray-800 z-[99]">
       <Container className="justify-between p-4 hidden lg:flex">
         <div className="flex items-center gap-8">
           <Link to="/">

@@ -106,7 +106,7 @@ export default function Lending() {
                         onClick={() => setDialogVisible(true)}
                       >
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">Asset Name: </span>
+                          <span className="text-gray-500 font-bold">Asset Name: </span>
                           <div className="flex items-center gap-2">
                             <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
                             <div className="flex flex-col">
@@ -117,17 +117,17 @@ export default function Lending() {
                         </div>
 
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">LTV: </span>
+                          <span className="text-gray-500 font-bold">LTV: </span>
                           <span>50%</span>
                         </div>
 
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">Deposit APY: </span>
+                          <span className="text-gray-500 font-bold">Deposit APY: </span>
                           <span className="text-green-500">0.04%</span>
                         </div>
 
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">Borrow APY: </span>
+                          <span className="text-gray-500 font-bold">Borrow APY: </span>
                           <div className="flex flex-col">
                             <span className="font-semibold">187,300 USDC</span>
                             <span className="text-sm text-gray-500">$187,310.64</span>
@@ -135,12 +135,12 @@ export default function Lending() {
                         </div>
 
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">Total Borrowed: </span>
+                          <span className="text-gray-500 font-bold">Total Borrowed: </span>
                           <span className="text-red-500">0.04%</span>
                         </div>
 
                         <div className="flex justify-between w-full">
-                          <span className="text-gray-500">Wallet: </span>
+                          <span className="text-gray-500 font-bold">Wallet: </span>
                           <div className="flex flex-col">
                             <span className="font-semibold">0 Cake</span>
                             <span className="text-sm text-gray-500">$0.00</span>
