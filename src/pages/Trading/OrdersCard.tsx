@@ -46,11 +46,11 @@ export default function OrdersCard({ className = '' }: IPropsOfComponent) {
                     <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-7" />
                     <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-7 absolute top-0 left-[60%]" />
                   </div>
-                  <span className="text-gray-100">APT / tUSDC</span>
+                  <span className="text-gray-100">USDC / tUSDC</span>
                 </div>
               </Td>
               <Td className="text-green-500">ASK</Td>
-              <Td>0.1 APT</Td>
+              <Td>0.1 USDC</Td>
               <Td>25 tUSDC</Td>
               <Td>2.5 tUSDC</Td>
               <Td><TextButton className="text-red-500 text-base">Cancel</TextButton></Td>
@@ -73,24 +73,24 @@ export default function OrdersCard({ className = '' }: IPropsOfComponent) {
               <Td>
                 <div className="flex items-center gap-2">
                   <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-7" />
-                  <span className="text-gray-100">APT</span>
+                  <span className="text-gray-100">USDC</span>
                 </div>
               </Td>
               <Td>
                 <div className="flex flex-col">
-                  <span className="text-gray-100">0 APT</span>
+                  <span className="text-gray-100">0 USDC</span>
                   <span className="text-gray-500 text-sm">$0.00</span>
                 </div>
               </Td>
               <Td>
                 <div className="flex flex-col">
-                  <span className="text-gray-100">0 APT</span>
+                  <span className="text-gray-100">0 USDC</span>
                   <span className="text-gray-500 text-sm">$0.00</span>
                 </div>
               </Td>
               <Td>
                 <div className="flex flex-col">
-                  <span className="text-gray-100">0 APT</span>
+                  <span className="text-gray-100">0 USDC</span>
                   <span className="text-gray-500 text-sm">$0.00</span>
                 </div>
               </Td>

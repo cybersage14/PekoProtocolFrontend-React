@@ -19,11 +19,11 @@ export default function BorrowPanel({ className = '', ...others }: IPropsOfCompo
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">Borrowing Amount</span>
-          <span className="text-blue-500">0 APT</span>
+          <span className="text-blue-500">0 USDC</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">Borrowable</span>
-          <span className="text-gray-100">0 APT</span>
+          <span className="text-gray-100">0 USDC</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">APY</span>
@@ -55,7 +55,7 @@ export default function BorrowPanel({ className = '', ...others }: IPropsOfCompo
                   <Td className="!py-3">
                     <div className="flex items-center gap-1">
                       <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-6" />
-                      <span>APT</span>
+                      <span>USDC</span>
                     </div>
                   </Td>
                   <Td className="!py-3">

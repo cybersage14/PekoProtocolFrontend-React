@@ -12,7 +12,7 @@ export default function MarketCard({ className = '' }: IPropsOfComponent) {
         <thead>
           <tr>
             <Th label="Side" />
-            <Th label="Size(APT)" />
+            <Th label="Size(USDC)" />
             <Th label="Price(tUSDC)" />
             <Th label="Version" />
           </tr>

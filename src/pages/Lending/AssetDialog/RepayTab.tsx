@@ -24,13 +24,13 @@ export default function RepayTab() {
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100">APT</span>}
+          endAdornment={<span className="text-gray-100">USDC</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 APT</p>
+          <p className="text-gray-500">Max: 2.790385 USDC</p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
@@ -55,7 +55,7 @@ export default function RepayTab() {
         {/* <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
-            <span className="text-gray-100">0 APT</span>
+            <span className="text-gray-100">0 USDC</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
@@ -63,7 +63,7 @@ export default function RepayTab() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100">2.89039 APT</span>
+            <span className="text-gray-100">2.89039 USDC</span>
           </div>
         </div> */}
 

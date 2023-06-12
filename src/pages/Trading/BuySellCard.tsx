@@ -103,7 +103,7 @@ export default function BuySellCard({ tabValue, setTabValue }: IProps) {
             id="amount"
             endAdornment={<div className="flex items-center gap-1">
               <img src={TEMP_CRYPTO_LOGO_URL} className="w-5" alt="" />
-              <span className="text-gray-100">APT</span>
+              <span className="text-gray-100">USDC</span>
             </div>}
             placeholder="0"
             value={amount}

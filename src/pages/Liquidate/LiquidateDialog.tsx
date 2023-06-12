@@ -49,13 +49,6 @@ const TOKENS: Array<IToken> = [
     symbol: 'SOL',
     imgSrc: 'https://cryptologos.cc/logos/solana-sol-logo.svg?v=025',
     depositedAmount: 0
-  },
-  {
-    id: 6,
-    name: 'Aptos Coin',
-    symbol: 'APT',
-    imgSrc: 'https://cryptologos.cc/logos/aptos-apt-logo.svg?v=025',
-    depositedAmount: 0
   }
 ]
 

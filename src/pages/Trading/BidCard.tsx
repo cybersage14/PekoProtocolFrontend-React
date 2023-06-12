@@ -63,9 +63,9 @@ export default function BidCard({ setBuySellTabValue }: IProps) {
         <span>ASK</span>
       </div>
       <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>Amount(APT)</span>
+        <span>Amount(USDC)</span>
         <span>Price(tUSDC)</span>
-        <span>Amount(APT)</span>
+        <span>Amount(USDC)</span>
       </div>
       <div className="grid grid-cols-2 text-sm gap-1">
         <div className="flex flex-col cursor-pointer" onClick={() => setBuySellTabValue('buy')}>
