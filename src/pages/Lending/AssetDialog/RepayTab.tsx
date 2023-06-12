@@ -72,12 +72,12 @@ export default function RepayTab() {
         </FilledButton>
 
         <div className="flex items-center">
-          <div className="flex-1 h-1 bg-gray-800" />
+          <div className="flex-1 h-[1px] bg-gray-800" />
           <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
             More Info
             <Icon icon={moreInfoCollapsed ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'} />
           </TextButton>
-          <div className="flex-1 h-1 bg-gray-800" />
+          <div className="flex-1 h-[1px] bg-gray-800" />
         </div>
 
         {moreInfoCollapsed && (

@@ -28,7 +28,7 @@ export default function LandingLayout() {
     } else if (isDesktop) {
       setDialogSizeAct('sm')
     } else {
-      setDialogSizeAct('xs')
+      setDialogSizeAct('sm')
     }
   }, [isMobile, isTablet, isLaptop, isDesktop])
 
