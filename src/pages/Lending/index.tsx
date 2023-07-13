@@ -19,6 +19,7 @@ import Table from "../../components/tableComponents/Table";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import useLoading from "../../hooks/useLoading";
 import { TAsset } from "../../utils/types";
+import { IAssetMetadata } from "../../utils/interfaces";
 
 // -----------------------------------------------------------------------------------
 
@@ -27,16 +28,18 @@ const AssetDialog = lazy(() => import('./AssetDialog'))
 // -----------------------------------------------------------------------------------
 
 const CHAIN_ID = process.env.REACT_APP_CHAIN_ID ? Number(process.env.REACT_APP_CHAIN_ID) : 59140;
-const ASSETS = [
+const ASSETS: Array<IAssetMetadata> = [
   {
     id: 1,
-    name: 'ETH',
-    imgSrc: '/assets/images/ethereum.png'
+    name: "Ethereum",
+    symbol: "eth",
+    imgSrc: "/assets/images/ethereum.png"
   },
   {
     id: 2,
-    name: 'USDC',
-    imgSrc: '/assets/images/usdc.png'
+    name: "USD Coin",
+    symbol: "usdc",
+    imgSrc: "/assets/images/usdc.png"
   }
 ]
 
@@ -74,8 +77,9 @@ export default function Lending() {
   //   }
   // }, [errorOfGetReservesList])
 
-  const openDialog = () => {
-    if(isConnected) {
+  const openDialog = (_asset: TAsset) => {
+    setAsset(_asset);
+    if (isConnected) {
       return setDialogVisible(true);
     } else {
       return toast.info('Please connect your wallet.');
@@ -155,7 +159,7 @@ export default function Lending() {
                       <ListItem
                         key={asset.id}
                         className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
-                        onClick={openDialog}
+                        onClick={() => openDialog(asset.symbol)}
                       >
                         <div className="flex justify-between w-full">
                           <span className="text-gray-500 font-bold">Asset Name: </span>
@@ -217,7 +221,7 @@ export default function Lending() {
 
                     <tbody>
                       {ASSETS.map(asset => (
-                        <Tr key={asset.id} className="hover:bg-gray-900" onClick={openDialog}>
+                        <Tr key={asset.id} className="hover:bg-gray-900" onClick={() => openDialog(asset.symbol)}>
                           <Td>
                             <div className="flex items-center gap-2">
                               <img src={asset.imgSrc} alt="" className="w-10" />
