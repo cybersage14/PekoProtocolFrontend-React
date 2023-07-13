@@ -4,6 +4,7 @@ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum';
 import { Web3Modal } from '@web3modal/react';
 import { mainnet, lineaTestnet } from 'wagmi/chains';
+import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { MobileMenuProvider } from './contexts/MobileMenuContext';
@@ -33,6 +34,7 @@ function App() {
             <MobileMenuProvider>
               <DialogSizeProvider>
                 <Routes />
+                <ToastContainer />
               </DialogSizeProvider>
             </MobileMenuProvider>
           </LoadingProvider>

@@ -1,16 +1,46 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import MainInput from "../../../components/form/MainInput";
-import { REGEX_NUMBER_VALID } from "../../../utils/constants";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
+import { TAsset } from "../../../utils/types";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
+import useLoading from "../../../hooks/useLoading";
+import { toast } from "react-toastify";
+import { parseEther } from "viem";
 
-export default function DepositTab() {
+//  ----------------------------------------------------------------------------------------------------
+
+interface IProps {
+  asset: TAsset;
+}
+
+//  ----------------------------------------------------------------------------------------------------
+
+export default function DepositTab({ asset }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+
+  //  -----------------------------------------------------
+
+  const { address } = useAccount()
+  const { openLoading, closeLoading } = useLoading()
+  const { data: balanceData, isError: useBalanceIsError, isLoading: useBalanceIsLoading } = useBalance({
+    address,
+    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
+  })
+  const { write, isError: useContractWriteIsError, isLoading: useContractWriteIsLoading, isSuccess: useContractWriteIsSuccess } = useContractWrite({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'deposit',
+    args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+  })
+
+  //  -----------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -20,20 +50,82 @@ export default function DepositTab() {
     }
   }
 
+  const handleWrite = () => {
+    if (asset === 'eth') {
+      return write({
+        value: parseEther(`${Number(amount)}`)
+      })
+    } else {
+      return write({
+        value: parseEther(`0`)
+      })
+    }
+  }
+
+  //  -----------------------------------------------------
+
+  const amountIsValid = useMemo<boolean>(() => {
+    const amountInNumber = Number(amount);
+    const balanceInNumber = Number(balanceData?.formatted);
+    if (amountInNumber !== 0) {
+      if (amountInNumber <= balanceInNumber) {
+        return true;
+      }
+    }
+    return false;
+  }, [amount, balanceData?.formatted])
+
+  //  -----------------------------------------------------
+
+  useEffect(() => {
+    if (useBalanceIsError) {
+      toast.error('useBalance() occurred error.')
+    }
+  }, [useBalanceIsError])
+
+  useEffect(() => {
+    if (useContractWriteIsError) {
+      toast.error('useContractWrite() occurred error.')
+    }
+  }, [useContractWriteIsError])
+
+  useEffect(() => {
+    if (useBalanceIsLoading || useContractWriteIsLoading) {
+      openLoading()
+    } else {
+      closeLoading()
+    }
+  }, [useBalanceIsLoading, useContractWriteIsLoading])
+
+  useEffect(() => {
+    if (useContractWriteIsSuccess) {
+      closeLoading();
+      toast.success('Deposit success!');
+    }
+  }, [useContractWriteIsSuccess])
+
+  //  -----------------------------------------------------
+
   return (
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100">USDC</span>}
+          endAdornment={<span className="text-gray-100">{METADATA_OF_ASSET[asset].symbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 USDC</p>
+          <p className="text-gray-500">Max: {Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</p>
           <div className="flex items-center gap-2">
-            <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
-            <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
+            <OutlinedButton
+              className="text-xs px-2 py-1"
+              onClick={() => setAmount(`${Number(balanceData?.formatted) / 2}`)}
+            >half</OutlinedButton>
+            <OutlinedButton
+              className="text-xs px-2 py-1"
+              onClick={() => setAmount(`${balanceData?.formatted}`)}
+            >max</OutlinedButton>
           </div>
         </div>
 
@@ -67,8 +159,12 @@ export default function DepositTab() {
           </div>
         </div>
 
-        <FilledButton className="mt-8 py-2 text-base">
-          Please input a valid number
+        <FilledButton
+          className="mt-8 py-2 text-base"
+          disabled={!write || !amountIsValid}
+          onClick={handleWrite}
+        >
+          Supply
         </FilledButton>
 
         <div className="flex items-center">

@@ -7,8 +7,17 @@ import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
+import { TAsset } from "../../../utils/types";
 
-export default function WithdrawTab() {
+//  ----------------------------------------------------------------------------------------------------
+
+interface IProps {
+  asset: TAsset;
+}
+
+//  ----------------------------------------------------------------------------------------------------
+
+export default function WithdrawTab({ asset }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
 

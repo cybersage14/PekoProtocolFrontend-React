@@ -1,8 +1,10 @@
-import { lazy, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
 import { List, ListItem } from "@material-tailwind/react";
+import { toast } from "react-toastify";
+import { useAccount, useContractRead } from "wagmi";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -14,7 +16,9 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
+import useLoading from "../../hooks/useLoading";
+import { TAsset } from "../../utils/types";
 
 // -----------------------------------------------------------------------------------
 
@@ -22,13 +26,61 @@ const AssetDialog = lazy(() => import('./AssetDialog'))
 
 // -----------------------------------------------------------------------------------
 
-const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7];
+const CHAIN_ID = process.env.REACT_APP_CHAIN_ID ? Number(process.env.REACT_APP_CHAIN_ID) : 59140;
+const ASSETS = [
+  {
+    id: 1,
+    name: 'ETH',
+    imgSrc: '/assets/images/ethereum.png'
+  },
+  {
+    id: 2,
+    name: 'USDC',
+    imgSrc: '/assets/images/usdc.png'
+  }
+]
 
 // -----------------------------------------------------------------------------------
 
 export default function Lending() {
-  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
   const isMobile = useMediaQuery({ maxWidth: 1024 });
+  const { openLoading, closeLoading } = useLoading();
+  const { isConnected } = useAccount();
+
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
+  const [asset, setAsset] = useState<TAsset>('eth');
+
+  /**
+   * Call getReservesList()
+   */
+  // const { data: reservesList, isError: errorOfGetReservesList, isLoading: loadingOfGetReservesList } = useContractRead({
+  //   address: POOL_CONTRACT_ADDRESS,
+  //   abi: POOL_CONTRACT_ABI,
+  //   functionName: 'getReservesList',
+  //   chainId: CHAIN_ID
+  // })
+
+  // useEffect(() => {
+  //   if (loadingOfGetReservesList) {
+  //     openLoading()
+  //   } else {
+  //     closeLoading()
+  //   }
+  // }, [loadingOfGetReservesList])
+
+  // useEffect(() => {
+  //   if (errorOfGetReservesList) {
+  //     toast.error('Error occured in getReservesList()')
+  //   }
+  // }, [errorOfGetReservesList])
+
+  const openDialog = () => {
+    if(isConnected) {
+      return setDialogVisible(true);
+    } else {
+      return toast.info('Please connect your wallet.');
+    }
+  }
 
   return (
     <Container className="my-8">
@@ -99,18 +151,18 @@ export default function Lending() {
 
                 {isMobile ? (
                   <List className="block lg:hidden text-sm">
-                    {TEMP_INDEXES_OF_TABLE.map(index => (
+                    {ASSETS.map(asset => (
                       <ListItem
-                        key={index}
+                        key={asset.id}
                         className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
-                        onClick={() => setDialogVisible(true)}
+                        onClick={openDialog}
                       >
                         <div className="flex justify-between w-full">
                           <span className="text-gray-500 font-bold">Asset Name: </span>
                           <div className="flex items-center gap-2">
-                            <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
+                            <img src={asset.imgSrc} alt="" className="w-10" />
                             <div className="flex flex-col">
-                              <span className="font-semibold">USDC</span>
+                              <span className="font-semibold">{asset.name}</span>
                               <span className="text-sm text-gray-500">$0.999925</span>
                             </div>
                           </div>
@@ -164,13 +216,13 @@ export default function Lending() {
                     </thead>
 
                     <tbody>
-                      {TEMP_INDEXES_OF_TABLE.map(index => (
-                        <Tr key={index} className="hover:bg-gray-900" onClick={() => setDialogVisible(true)}>
+                      {ASSETS.map(asset => (
+                        <Tr key={asset.id} className="hover:bg-gray-900" onClick={openDialog}>
                           <Td>
                             <div className="flex items-center gap-2">
-                              <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
+                              <img src={asset.imgSrc} alt="" className="w-10" />
                               <div className="flex flex-col">
-                                <span className="font-semibold">USDC</span>
+                                <span className="font-semibold">{asset.name}</span>
                                 <span className="text-sm text-gray-500">$0.999925</span>
                               </div>
                             </div>
@@ -282,13 +334,11 @@ export default function Lending() {
           </PrimaryBoard>
         </div>
       </div >
-      {dialogVisible && (
-        <AssetDialog
-          visible={dialogVisible}
-          setVisible={setDialogVisible}
-        />
-      )
-      }
+      <AssetDialog
+        visible={dialogVisible}
+        setVisible={setDialogVisible}
+        asset={asset}
+      />
     </Container >
   )
 }
