@@ -32,7 +32,7 @@ export default function DepositTab({ asset }: IProps) {
   const { openLoading, closeLoading } = useLoading()
 
   //  Balance data
-  const { data: balanceData, isError: useBalanceIsError, isLoading: useBalanceIsLoading } = useBalance({
+  const { data: balanceData, isError: balanceIsError, isLoading: balanceIsLoading } = useBalance({
     address,
     token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
   })
@@ -104,10 +104,10 @@ export default function DepositTab({ asset }: IProps) {
   //  -----------------------------------------------------
 
   useEffect(() => {
-    if (useBalanceIsError) {
+    if (balanceIsError) {
       toast.error('useBalance() occurred error.')
     }
-  }, [useBalanceIsError])
+  }, [balanceIsError])
 
   useEffect(() => {
     if (depositIsError) {
@@ -122,12 +122,12 @@ export default function DepositTab({ asset }: IProps) {
   }, [approveIsError])
 
   useEffect(() => {
-    if (!useBalanceIsLoading && !depositIsLoading && !approveIsLoading) {
+    if (!balanceIsLoading && !depositIsLoading && !approveIsLoading) {
       closeLoading()
     } else {
       openLoading()
     }
-  }, [useBalanceIsLoading, depositIsLoading, approveIsLoading])
+  }, [balanceIsLoading, depositIsLoading, approveIsLoading])
 
   useEffect(() => {
     if (depositIsSuccess) {

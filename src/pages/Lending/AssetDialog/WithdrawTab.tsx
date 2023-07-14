@@ -1,13 +1,16 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
+import { toast } from "react-toastify";
 import MainInput from "../../../components/form/MainInput";
-import { REGEX_NUMBER_VALID } from "../../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import useLoading from "../../../hooks/useLoading";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -21,6 +24,35 @@ export default function WithdrawTab({ asset }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
 
+  //  --------------------------------------------------------------------
+
+  const { address } = useAccount()
+  const { openLoading, closeLoading } = useLoading()
+
+  //  --------------------------------------------------------------------
+
+  //  Balance data
+  const { data: balanceData } = useBalance({
+    address,
+    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
+  })
+
+  //  Withdraw
+  const { config: withdrawConfig, isSuccess: withdrawPrepareIsSuccess } = usePrepareContractWrite({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'withdraw',
+    args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+  })
+
+  const { write: withdraw, data: withdrawData } = useContractWrite(withdrawConfig);
+
+  const { isLoading: withdrawIsLoading, isError: withdrawIsError, isSuccess: withdrawIsSuccess } = useWaitForTransaction({
+    hash: withdrawData?.hash
+  })
+
+  //  --------------------------------------------------------------------
+
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -28,6 +60,32 @@ export default function WithdrawTab({ asset }: IProps) {
       setAmount(value);
     }
   }
+
+  //  --------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!withdrawIsLoading) {
+      closeLoading()
+    } else {
+      openLoading()
+    }
+  }, [withdrawIsLoading])
+
+  useEffect(() => {
+    if (withdrawIsError) {
+      closeLoading()
+      toast.error('Withdraw has been failed.');
+    }
+  }, [withdrawIsError])
+
+  useEffect(() => {
+    if (withdrawIsSuccess) {
+      closeLoading()
+      toast.success('Withdrawed.')
+    }
+  }, [withdrawIsSuccess])
+
+  //  --------------------------------------------------------------------
 
   return (
     <>
@@ -76,8 +134,12 @@ export default function WithdrawTab({ asset }: IProps) {
           </div> */}
         </div>
 
-        <FilledButton className="mt-8 py-2 text-base">
-          Please input a valid number
+        <FilledButton
+          className="mt-8 py-2 text-base"
+          disabled={!withdrawPrepareIsSuccess}
+          onClick={() => withdraw?.()}
+        >
+          Withdraw
         </FilledButton>
 
         <div className="flex items-center">
