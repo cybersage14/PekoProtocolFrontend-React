@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import MainInput from "../../../components/form/MainInput";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
@@ -91,13 +91,13 @@ export default function WithdrawTab({ asset }: IProps) {
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100">USDC</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{METADATA_OF_ASSET[asset].symbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 USDC</p>
+          <p className="text-gray-500">Max: 2.790385 {METADATA_OF_ASSET[asset].symbol}</p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
