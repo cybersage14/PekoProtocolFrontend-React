@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useDebounce, useOnClickOutside } from "usehooks-ts";
-import { IPropsOfComponent, IToken } from "../../utils/interfaces";
+import { IAssetMetadata, IPropsOfComponent } from "../../utils/interfaces";
 import MainInput from "./MainInput";
 import TextIconButton from "../buttons/TextIconButton";
 import Table from "../tableComponents/Table";
@@ -15,8 +15,8 @@ import { REGEX_NUMBER_VALID } from "../../utils/constants";
 interface IProps extends IPropsOfComponent {
   classNameOfInput?: string;
   startAdornment?: ReactNode;
-  tokens: Array<IToken>;
-  selectedToken: IToken | null;
+  tokens: Array<IAssetMetadata>;
+  selectedToken: IAssetMetadata;
   setSelectedToken: Function;
   error?: boolean;
   tokenAmount: string;
@@ -40,7 +40,7 @@ export default function SelectTokenWithPrice({
   const ref = useRef(null)
 
   const [listVisible, setListVisible] = useState<boolean>(false)
-  const [filteredTokens, setFilteredTokens] = useState<Array<IToken>>(tokens)
+  const [filteredTokens, setFilteredTokens] = useState<Array<IAssetMetadata>>(tokens)
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const debouncedSearchKeyword = useDebounce<string>(searchKeyword, 500)
 
@@ -77,7 +77,7 @@ export default function SelectTokenWithPrice({
           {selectedToken && (
             <div className="flex items-center gap-2">
               <img src={selectedToken.imgSrc} alt={selectedToken.symbol} className="w-8" />
-              <span className="text-gray-100 font-semibold">{selectedToken.symbol}</span>
+              <span className="text-gray-100 font-semibold uppercase">{selectedToken.symbol}</span>
             </div>
           )}
 
@@ -113,7 +113,7 @@ export default function SelectTokenWithPrice({
                     <div className="flex items-center gap-3">
                       <img src={tokenItem.imgSrc} alt={tokenItem.symbol} className="w-10" />
                       <div className="flex flex-col">
-                        <span className="font-semibold">{tokenItem.symbol}</span>
+                        <span className="font-semibold uppercase">{tokenItem.symbol}</span>
                         <span className="text-sm text-gray-500">{tokenItem.name}</span>
                       </div>
                     </div>

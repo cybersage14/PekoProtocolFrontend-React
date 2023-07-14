@@ -2,7 +2,7 @@ import { useState } from "react";
 import CustomDialog from "../../components/dialogs/CustomDialog";
 import SelectTokenWithPrice from "../../components/form/SelectTokenWithPrice";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
-import { IToken } from "../../utils/interfaces";
+import { IAssetMetadata } from "../../utils/interfaces";
 import FilledButton from "../../components/buttons/FilledButton";
 
 // ---------------------------------------------------------------------------------------------
@@ -14,56 +14,36 @@ interface IProps {
 
 // ---------------------------------------------------------------------------------------------
 
-const TOKENS: Array<IToken> = [
+const ASSETS: Array<IAssetMetadata> = [
   {
     id: 1,
-    name: 'Bitcoin',
-    symbol: 'BTC',
-    imgSrc: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=025',
-    depositedAmount: 0
+    name: "Ethereum",
+    symbol: "eth",
+    imgSrc: "/assets/images/ethereum.png"
   },
   {
     id: 2,
-    name: 'BNB',
-    symbol: 'BNB',
-    imgSrc: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=025',
-    depositedAmount: 0
-  },
-  {
-    id: 3,
-    name: 'USD Coin',
-    symbol: 'USDC',
-    imgSrc: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025',
-    depositedAmount: 0
-  },
-  {
-    id: 4,
-    name: 'Ethereum',
-    symbol: 'ETH',
-    imgSrc: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=025',
-    depositedAmount: 0
-  },
-  {
-    id: 5,
-    name: 'Solana',
-    symbol: 'SOL',
-    imgSrc: 'https://cryptologos.cc/logos/solana-sol-logo.svg?v=025',
-    depositedAmount: 0
+    name: "USD Coin",
+    symbol: "usdc",
+    imgSrc: "/assets/images/usdc.png"
   }
 ]
 
 // ---------------------------------------------------------------------------------------------
 
 export default function LiquidateDialog({ visible, setVisible }: IProps) {
-  const [payToken, setPayToken] = useState<IToken | null>(null)
+  const [payToken, setPayToken] = useState<IAssetMetadata>(ASSETS[0])
   const [payTokenAmount, setPayTokenAmount] = useState<string>('0')
-  const [receiveToken, setReceiveToken] = useState<IToken | null>(null)
+  const [receiveToken, setReceiveToken] = useState<IAssetMetadata>(ASSETS[1])
   const [receiveTokenAmount, setReceiveTokenAmount] = useState<string>('0')
+
+  //  ---------------------------------------------------------------------------
+
 
   return (
     <CustomDialog title="Liquidate" visible={visible} setVisible={setVisible}>
       {/* You pay */}
-      <div className="py-6 bg-gray-900 rounded-md flex flex-col gap-16">
+      <div className="pb-6 bg-gray-900 rounded-md flex flex-col gap-8">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-gray-100">You Pay</h2>
@@ -71,7 +51,7 @@ export default function LiquidateDialog({ visible, setVisible }: IProps) {
           </div>
 
           <SelectTokenWithPrice
-            tokens={TOKENS}
+            tokens={ASSETS}
             selectedToken={payToken}
             setSelectedToken={setPayToken}
             tokenAmount={payTokenAmount}
@@ -89,7 +69,7 @@ export default function LiquidateDialog({ visible, setVisible }: IProps) {
         <h2 className="text-lg text-gray-100">Gain up to</h2>
 
         <SelectTokenWithPrice
-          tokens={TOKENS}
+          tokens={ASSETS}
           selectedToken={receiveToken}
           setSelectedToken={setReceiveToken}
           tokenAmount={receiveTokenAmount}
@@ -97,7 +77,10 @@ export default function LiquidateDialog({ visible, setVisible }: IProps) {
         />
       </div>
 
-      <FilledButton className="w-full text-base py-3 font-semibold">
+      <FilledButton
+        className="w-full text-base py-3 font-semibold"
+
+      >
         Repay
       </FilledButton>
     </CustomDialog>

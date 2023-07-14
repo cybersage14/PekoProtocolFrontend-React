@@ -90,13 +90,13 @@ export default function Swap() {
                   </div>
                 </div>
 
-                <SelectTokenWithPrice
+                {/* <SelectTokenWithPrice
                   tokens={TOKENS}
                   selectedToken={payToken}
                   setSelectedToken={setPayToken}
                   tokenAmount={payTokenAmount}
                   setTokenAmount={setPayTokenAmount}
-                />
+                /> */}
 
                 <div className="px-2">
                   <Slider
@@ -136,13 +136,13 @@ export default function Swap() {
             <div className="py-6 px-6 bg-gray-900 rounded-md flex flex-col gap-4">
               <h2 className="text-lg text-gray-100">You Receive</h2>
 
-              <SelectTokenWithPrice
+              {/* <SelectTokenWithPrice
                 tokens={TOKENS}
                 selectedToken={receiveToken}
                 setSelectedToken={setReceiveToken}
                 tokenAmount={receiveTokenAmount}
                 setTokenAmount={setReceiveTokenAmount}
-              />
+              /> */}
 
               <label className="text-gray-500">Select a token</label>
             </div>

@@ -7,9 +7,10 @@ import Th from "../../components/tableComponents/Th";
 import Tr from "../../components/tableComponents/Tr";
 import Td from "../../components/tableComponents/Td";
 import { getVisibleWalletAddress } from "../../utils/functions";
-import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 import LiquidateDialog from "./LiquidateDialog";
+import { useContractRead } from "wagmi";
 
 // -----------------------------------------------------------------------------------
 
@@ -21,7 +22,13 @@ export default function Liquidate() {
   const isMobile = useMediaQuery({ maxWidth: 1024 });
 
   const [visible, setVisible] = useState<boolean>(true)
-  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
+
+  const { data: listOfUsers } = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'listUserInfo'
+  })
+  console.log('>>>>>>>>> listOfUsers => ', listOfUsers);
 
   return (
     <Container className="container my-8 flex flex-col gap-8">
@@ -82,7 +89,7 @@ export default function Liquidate() {
               </div>
               <div className="flex justify-between w-full">
                 <span className="text-gray-500 font-bold">Operation: </span>
-                <FilledButton onClick={() => setDialogVisible(true)}>Liquidate</FilledButton>
+                <FilledButton>Liquidate</FilledButton>
               </div>
             </ListItem>
           ))}
@@ -123,21 +130,13 @@ export default function Liquidate() {
                   <Td>$0.00046209994186645765</Td>
                   <Td className="text-red-500">23691%</Td>
                   <Td>
-                    <FilledButton onClick={() => setDialogVisible(true)}>Liquidate</FilledButton>
+                    <FilledButton>Liquidate</FilledButton>
                   </Td>
                 </Tr>
               ))}
             </tbody>
           )}
         </Table>
-      )}
-
-
-      {dialogVisible && (
-        <LiquidateDialog
-          visible={dialogVisible}
-          setVisible={setDialogVisible}
-        />
       )}
     </Container>
   )

@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -11,6 +11,7 @@ import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
+import { formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -19,11 +20,25 @@ interface IProps {
   setVisible: Function;
 }
 
+interface IUserInfo {
+  ehtColAmount: bigint;
+  ehtDebtAmount: bigint;
+  usdtColAmount: bigint;
+  usdtDebtAmount: bigint;
+  userAddress: string;
+}
+
+interface IReturnValueOfUserInfo {
+  data?: IUserInfo;
+  [key: string]: any;
+}
+
 //  ----------------------------------------------------------------------------------------------------
 
 export default function WithdrawTab({ asset, setVisible }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+  const [maxAmount, setMaxAmount] = useState<string>('0')
 
   //  --------------------------------------------------------------------
 
@@ -37,6 +52,15 @@ export default function WithdrawTab({ asset, setVisible }: IProps) {
     address,
     token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
   })
+
+  const { data: userInfo }: IReturnValueOfUserInfo = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getUserInfo',
+    args: [address]
+  });
+
+  console.log('>>>>>>>> userInfo => ', userInfo);
 
   //  Withdraw
   const { config: withdrawConfig, isSuccess: withdrawPrepareIsSuccess } = usePrepareContractWrite({
@@ -62,6 +86,18 @@ export default function WithdrawTab({ asset, setVisible }: IProps) {
     }
   }
 
+  const handleHalf = () => {
+    setAmount(`${Number(maxAmount) / 2}`)
+  }
+
+  const handleMax = () => {
+    setAmount(maxAmount)
+  }
+
+  const handleSlider = (value: any) => {
+    setAmount(`${value * Number(balanceData?.formatted) / 100}`)
+  }
+
   //  --------------------------------------------------------------------
 
   useEffect(() => {
@@ -83,8 +119,15 @@ export default function WithdrawTab({ asset, setVisible }: IProps) {
     if (withdrawIsSuccess) {
       closeLoading()
       toast.success('Withdrawed.')
+      setVisible(false)
     }
   }, [withdrawIsSuccess])
+
+  useEffect(() => {
+    if (userInfo && balanceData?.decimals) {
+      setMaxAmount(formatUnits(userInfo.ehtColAmount, balanceData.decimals))
+    }
+  }, [userInfo])
 
   //  --------------------------------------------------------------------
 
@@ -98,10 +141,10 @@ export default function WithdrawTab({ asset, setVisible }: IProps) {
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
+          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
           <div className="flex items-center gap-2">
-            <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
-            <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
           </div>
         </div>
 
@@ -117,6 +160,8 @@ export default function WithdrawTab({ asset, setVisible }: IProps) {
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
+            value={Number(amount) / Number(maxAmount) * 100}
+            onChange={handleSlider}
           />
         </div>
 

@@ -1,10 +1,10 @@
-import { lazy, useEffect, useState } from "react";
+import { lazy, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
 import { List, ListItem } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount } from "wagmi";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -16,8 +16,7 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
-import useLoading from "../../hooks/useLoading";
+import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import { TAsset } from "../../utils/types";
 import { IAssetMetadata } from "../../utils/interfaces";
 
@@ -27,7 +26,6 @@ const AssetDialog = lazy(() => import('./AssetDialog'))
 
 // -----------------------------------------------------------------------------------
 
-const CHAIN_ID = process.env.REACT_APP_CHAIN_ID ? Number(process.env.REACT_APP_CHAIN_ID) : 59140;
 const ASSETS: Array<IAssetMetadata> = [
   {
     id: 1,
@@ -47,35 +45,10 @@ const ASSETS: Array<IAssetMetadata> = [
 
 export default function Lending() {
   const isMobile = useMediaQuery({ maxWidth: 1024 });
-  const { openLoading, closeLoading } = useLoading();
   const { isConnected } = useAccount();
 
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
   const [asset, setAsset] = useState<TAsset>('eth');
-
-  /**
-   * Call getReservesList()
-   */
-  // const { data: reservesList, isError: errorOfGetReservesList, isLoading: loadingOfGetReservesList } = useContractRead({
-  //   address: POOL_CONTRACT_ADDRESS,
-  //   abi: POOL_CONTRACT_ABI,
-  //   functionName: 'getReservesList',
-  //   chainId: CHAIN_ID
-  // })
-
-  // useEffect(() => {
-  //   if (loadingOfGetReservesList) {
-  //     openLoading()
-  //   } else {
-  //     closeLoading()
-  //   }
-  // }, [loadingOfGetReservesList])
-
-  // useEffect(() => {
-  //   if (errorOfGetReservesList) {
-  //     toast.error('Error occured in getReservesList()')
-  //   }
-  // }, [errorOfGetReservesList])
 
   const openDialog = (_asset: TAsset) => {
     setAsset(_asset);
