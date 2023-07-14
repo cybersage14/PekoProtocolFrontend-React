@@ -2,7 +2,8 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -11,56 +12,29 @@ import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
-import { formatUnits } from "viem";
+import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
   setVisible: Function;
-}
-
-interface IUserInfo {
-  ehtColAmount: bigint;
-  ehtDebtAmount: bigint;
-  usdtColAmount: bigint;
-  usdtDebtAmount: bigint;
-  userAddress: string;
-}
-
-interface IReturnValueOfUserInfo {
-  data?: IUserInfo;
-  [key: string]: any;
+  balanceData?: IBalanceData;
+  userInfo?: IUserInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function WithdrawTab({ asset, setVisible }: IProps) {
+export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0')
 
   //  --------------------------------------------------------------------
 
-  const { address } = useAccount()
   const { openLoading, closeLoading } = useLoading()
 
   //  --------------------------------------------------------------------
-
-  //  Balance data
-  const { data: balanceData } = useBalance({
-    address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
-  })
-
-  const { data: userInfo }: IReturnValueOfUserInfo = useContractRead({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'getUserInfo',
-    args: [address]
-  });
-
-  console.log('>>>>>>>> userInfo => ', userInfo);
 
   //  Withdraw
   const { config: withdrawConfig, isSuccess: withdrawPrepareIsSuccess } = usePrepareContractWrite({

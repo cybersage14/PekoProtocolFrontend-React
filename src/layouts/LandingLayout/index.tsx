@@ -2,6 +2,8 @@ import { lazy, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Outlet } from "react-router-dom";
 import useDialogSize from "../../hooks/useDialogSize";
+import useLoading from "../../hooks/useLoading";
+import Loading from "../../components/Loading";
 
 // ---------------------------------------------------------------------------------------
 
@@ -15,7 +17,7 @@ export default function LandingLayout() {
   const isTablet = useMediaQuery({ minWidth: 480, maxWidth: 768 });
   const isLaptop = useMediaQuery({ minWidth: 768, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1280 });
-
+  const { isLoading } = useLoading()
   const { setDialogSizeAct } = useDialogSize()
 
   useEffect(() => {
@@ -32,14 +34,17 @@ export default function LandingLayout() {
     }
   }, [isMobile, isTablet, isLaptop, isDesktop])
 
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#111111]">
-      <Navbar />
-      <div className="flex-1">
-        <Outlet />
-      </div>
-      <Footer />
-    </div>
+    <>
+      {isLoading ? <Loading /> : (
+        <div className="min-h-screen flex flex-col bg-[#111111]">
+          <Navbar />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <Footer />
+        </div>)}
+    </>
+
   )
 }

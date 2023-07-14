@@ -34,7 +34,7 @@ function App() {
             <MobileMenuProvider>
               <DialogSizeProvider>
                 <Routes />
-                <ToastContainer className="!z-[99999]" />
+                <ToastContainer className="!z-[999]" />
               </DialogSizeProvider>
             </MobileMenuProvider>
           </LoadingProvider>

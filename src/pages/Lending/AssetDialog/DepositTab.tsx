@@ -2,41 +2,34 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { parseEther } from "viem";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits, parseEther } from "viem";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
-import useLoading from "../../../hooks/useLoading";
+import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
   setVisible: Function;
+  balanceData?: IBalanceData;
+  userInfo?: IUserInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function DepositTab({ asset, setVisible }: IProps) {
+export default function DepositTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
 
   //  -----------------------------------------------------
-
-  const { address } = useAccount()
-  const { openLoading, closeLoading } = useLoading()
-
-  //  Balance data
-  const { data: balanceData, isError: balanceIsError, isLoading: balanceIsLoading } = useBalance({
-    address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
-  })
 
   //  Deposit
   const { config: depositConfig } = usePrepareContractWrite({
@@ -96,28 +89,13 @@ export default function DepositTab({ asset, setVisible }: IProps) {
   //  -----------------------------------------------------
 
   useEffect(() => {
-    if (balanceIsError) {
-      toast.error('useBalance() occurred error.')
-    }
-  }, [balanceIsError])
-
-  useEffect(() => {
     if (approveIsError) {
       toast.error('approve() occurred error.')
     }
   }, [approveIsError])
 
   useEffect(() => {
-    if (!balanceIsLoading && !depositIsLoading && !approveIsLoading) {
-      closeLoading()
-    } else {
-      openLoading()
-    }
-  }, [balanceIsLoading, depositIsLoading, approveIsLoading])
-
-  useEffect(() => {
     if (depositIsSuccess) {
-      closeLoading();
       toast.success('Deposited!');
       setVisible(false);
     }
@@ -125,7 +103,6 @@ export default function DepositTab({ asset, setVisible }: IProps) {
 
   useEffect(() => {
     if (approveIsSuccess) {
-      closeLoading();
       toast.success('Approved!');
       setApproved(true)
     } else {
@@ -180,7 +157,10 @@ export default function DepositTab({ asset, setVisible }: IProps) {
         <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
-            <span className="text-gray-100">0 USDC</span>
+            <span className="text-gray-100 uppercase">
+              {userInfo && balanceData ? asset === 'eth' ? formatEther((userInfo.ehtColAmount - userInfo.ehtDebtAmount)) : formatUnits((userInfo.usdtColAmount - userInfo.usdtDebtAmount), balanceData.decimals) : ''}&nbsp;
+              {METADATA_OF_ASSET[asset].symbol}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
@@ -188,7 +168,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100">2.89039 USDC</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</span>
           </div>
         </div>
 
@@ -198,7 +178,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
             disabled={!deposit || !amountIsValid}
             onClick={() => deposit?.()}
           >
-            Supply
+            {depositIsLoading ? IN_PROGRESS : "Deposit"}
           </FilledButton>
         ) : approved ? (
           <FilledButton
@@ -206,7 +186,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
             disabled={!depositIsSuccess}
             onClick={() => deposit?.()}
           >
-            Supply
+            {depositIsLoading ? IN_PROGRESS : "Deposit"}
           </FilledButton>
         ) : (
           <FilledButton
@@ -214,7 +194,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
             disabled={!approve || !amountIsValid}
             onClick={() => approve?.()}
           >
-            Approve
+            {approveIsLoading ? IN_PROGRESS : 'Approve'}
           </FilledButton>
         )}
 

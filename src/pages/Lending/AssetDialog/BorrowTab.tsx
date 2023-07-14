@@ -2,42 +2,39 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
+import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
   setVisible: Function;
+  balanceData?: IBalanceData;
+  userInfo?: IUserInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ asset, setVisible }: IProps) {
+export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+  const [maxAmount, setMaxAmount] = useState<string>('0')
 
   //  ----------------------------------------------------------------------------
 
-  const { address } = useAccount()
   const { openLoading, closeLoading } = useLoading()
 
   //  ----------------------------------------------------------------------------
-
-  //  Balance data
-  const { data: balanceData } = useBalance({
-    address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
-  })
-
 
   //  Borrow
   const { config: borrowConfig, isSuccess: borrowPrepareIsSuccess, error: errorOfBorrowPrepare } = usePrepareContractWrite({
@@ -84,6 +81,7 @@ export default function BorrowTab({ asset, setVisible }: IProps) {
     if (borrowIsSuccess) {
       closeLoading()
       toast.success('Borrowed.')
+      setVisible(false)
     }
   }, [borrowIsSuccess])
 
@@ -92,6 +90,15 @@ export default function BorrowTab({ asset, setVisible }: IProps) {
       // toast.warn(`${errorOfBorrowPrepare.cause}`)
     }
   }, [errorOfBorrowPrepare])
+
+  useEffect(() => {
+    if (userInfo) {
+      const ethDepositAmount = Number(formatEther(userInfo.ehtColAmount)) - Number(formatEther(userInfo.ehtDebtAmount))
+      const usdcDepositAmount = Number(formatUnits(userInfo.usdtColAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtDebtAmount, USDC_DECIMAL))
+      console.log('>>>>>>> ethDepositAmount => ', ethDepositAmount)
+      console.log('>>>>>>> usdcDepositAmount => ', usdcDepositAmount)
+    }
+  }, [userInfo])
 
   //  ----------------------------------------------------------------------------
 

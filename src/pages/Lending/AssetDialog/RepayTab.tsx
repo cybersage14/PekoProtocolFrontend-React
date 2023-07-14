@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { parseEther } from "viem";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -12,33 +12,29 @@ import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
+import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
   setVisible: Function;
+  balanceData?: IBalanceData;
+  userInfo?: IUserInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function RepayTab({ asset, setVisible }: IProps) {
+export default function RepayTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
 
   //  --------------------------------------------------------------------------
 
-  const { address } = useAccount()
   const { openLoading, closeLoading } = useLoading()
 
   //  --------------------------------------------------------------------------
-
-  //  Balance data
-  const { data: balanceData } = useBalance({
-    address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
-  })
 
   //  Approve USDC
   const { config: approveConfig } = usePrepareContractWrite({
@@ -113,6 +109,7 @@ export default function RepayTab({ asset, setVisible }: IProps) {
     if (repayIsSuccess) {
       closeLoading()
       toast.success('Repaid.')
+      setVisible(false)
     }
   }, [repayIsSuccess])
 

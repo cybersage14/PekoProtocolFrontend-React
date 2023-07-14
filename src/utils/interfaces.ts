@@ -45,3 +45,28 @@ export interface IAssetMetadata {
 export interface IMetadataOfAsset {
   [key: string]: IAssetMetadata;
 }
+
+export interface IUserInfo {
+  ehtColAmount: bigint;
+  ehtDebtAmount: bigint;
+  usdtColAmount: bigint;
+  usdtDebtAmount: bigint;
+  userAddress: string;
+}
+
+export interface IReturnValueOfUserInfo {
+  data?: IUserInfo;
+  [key: string]: any;
+}
+
+export interface IBalanceData {
+  decimals: number;
+  formatted: string;
+  symbol: string;
+  value: bigint;
+}
+
+export interface IReturnValueOfBalance {
+  data?: IBalanceData;
+  [key: string]: any;
+}

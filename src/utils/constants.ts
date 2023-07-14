@@ -1020,3 +1020,5 @@ export const METADATA_OF_ASSET: IMetadataOfAsset = {
     imgSrc: "/assets/images/usdc.png"
   }
 };
+
+export const IN_PROGRESS = "In Progress...";
