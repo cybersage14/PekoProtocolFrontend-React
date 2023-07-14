@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -9,18 +10,18 @@ import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import useLoading from "../../../hooks/useLoading";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
+  setVisible: Function;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function WithdrawTab({ asset }: IProps) {
+export default function WithdrawTab({ asset, setVisible }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
 
@@ -97,7 +98,7 @@ export default function WithdrawTab({ asset }: IProps) {
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 {METADATA_OF_ASSET[asset].symbol}</p>
+          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>

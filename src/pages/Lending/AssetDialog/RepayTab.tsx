@@ -1,25 +1,75 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
+import { toast } from "react-toastify";
 import MainInput from "../../../components/form/MainInput";
-import { REGEX_NUMBER_VALID } from "../../../utils/constants";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import useLoading from "../../../hooks/useLoading";
+import { parseEther } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
   asset: TAsset;
+  setVisible: Function;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function RepayTab({ asset }: IProps) {
+export default function RepayTab({ asset, setVisible }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+  const [approved, setApproved] = useState<boolean>(false);
+
+  //  --------------------------------------------------------------------------
+
+  const { address } = useAccount()
+  const { openLoading, closeLoading } = useLoading()
+
+  //  --------------------------------------------------------------------------
+
+  //  Balance data
+  const { data: balanceData } = useBalance({
+    address,
+    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
+  })
+
+  //  Approve USDC
+  const { config: approveConfig } = usePrepareContractWrite({
+    address: USDC_CONTRACT_ADDRESS,
+    abi: USDC_CONTRACT_ABI,
+    functionName: 'approve',
+    args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)]
+  })
+
+  const { write: approve, data: approveData } = useContractWrite(approveConfig);
+
+  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
+    hash: approveData?.hash,
+  })
+
+  //  Repay
+  const { config: repayConfig, isSuccess: repayPrepareIsSuccess, error: errorOfRepayPrepare } = usePrepareContractWrite({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'repay',
+    args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    value: asset === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
+  })
+
+  const { write: repay, data: repayData } = useContractWrite(repayConfig)
+
+  const { isLoading: repayIsLoading, isError: repayIsError, isSuccess: repayIsSuccess } = useWaitForTransaction({
+    hash: repayData?.hash
+  })
+
+  //  --------------------------------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -29,17 +79,72 @@ export default function RepayTab({ asset }: IProps) {
     }
   }
 
+  //  --------------------------------------------------------------------------
+
+  const amountIsValid = useMemo<boolean>(() => {
+    const amountInNumber = Number(amount);
+    const balanceInNumber = Number(balanceData?.formatted);
+    if (amountInNumber !== 0) {
+      if (amountInNumber <= balanceInNumber) {
+        return true;
+      }
+    }
+    return false;
+  }, [amount, balanceData?.formatted])
+
+  //  --------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!repayIsLoading && !approveIsLoading) {
+      closeLoading()
+    } else {
+      openLoading()
+    }
+  }, [repayIsLoading, approveIsLoading])
+
+  useEffect(() => {
+    if (repayIsError) {
+      closeLoading()
+      toast.error('Borrow has been failed.')
+    }
+  }, [repayIsError])
+
+  useEffect(() => {
+    if (repayIsSuccess) {
+      closeLoading()
+      toast.success('Borrowed.')
+    }
+  }, [repayIsSuccess])
+
+  useEffect(() => {
+    if (errorOfRepayPrepare) {
+      // toast.warn(`${errorOfRepayPrepare.cause}`)
+    }
+  }, [errorOfRepayPrepare])
+
+  useEffect(() => {
+    if (approveIsSuccess) {
+      closeLoading();
+      toast.success('Approved!');
+      setApproved(true)
+    } else {
+      setApproved(false)
+    }
+  }, [approveIsSuccess])
+
+  //  --------------------------------------------------------------------------
+
   return (
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100">USDC</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{METADATA_OF_ASSET[asset].symbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 USDC</p>
+          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
@@ -76,9 +181,31 @@ export default function RepayTab({ asset }: IProps) {
           </div>
         </div> */}
 
-        <FilledButton className="mt-8 py-2 text-base">
-          Please input a valid number
-        </FilledButton>
+        {asset === 'eth' ? (
+          <FilledButton
+            className="mt-8 py-2 text-base"
+            disabled={!repayPrepareIsSuccess}
+            onClick={() => repay?.()}
+          >
+            Repay
+          </FilledButton>
+        ) : approved ? (
+          <FilledButton
+            className="mt-8 py-2 text-base"
+            disabled={!repayPrepareIsSuccess}
+            onClick={() => repay?.()}
+          >
+            Repay
+          </FilledButton>
+        ) : (
+          <FilledButton
+            className="mt-8 py-2 text-base"
+            disabled={!approve || !amountIsValid}
+            onClick={() => approve?.()}
+          >
+            Approve
+          </FilledButton>
+        )}
 
         <div className="flex items-center">
           <div className="flex-1 h-[1px] bg-gray-800" />

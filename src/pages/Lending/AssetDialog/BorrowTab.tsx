@@ -16,11 +16,12 @@ import { toast } from "react-toastify";
 
 interface IProps {
   asset: TAsset;
+  setVisible: Function;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ asset }: IProps) {
+export default function BorrowTab({ asset, setVisible }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
 
@@ -86,7 +87,7 @@ export default function BorrowTab({ asset }: IProps) {
 
   useEffect(() => {
     if (errorOfBorrowPrepare) {
-      toast.warn(`${errorOfBorrowPrepare.cause}`)
+      // toast.warn(`${errorOfBorrowPrepare.cause}`)
     }
   }, [errorOfBorrowPrepare])
 

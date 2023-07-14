@@ -17,11 +17,12 @@ import useLoading from "../../../hooks/useLoading";
 
 interface IProps {
   asset: TAsset;
+  setVisible: Function;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function DepositTab({ asset }: IProps) {
+export default function DepositTab({ asset, setVisible }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
@@ -38,14 +39,17 @@ export default function DepositTab({ asset }: IProps) {
   })
 
   //  Deposit
-  const { write: deposit, data: depositData } = useContractWrite({
+  const { config: depositConfig, isSuccess: depositIsSuccess } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'deposit',
     args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    value: asset === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
-  const { isLoading: depositIsLoading, isSuccess: depositIsSuccess, isError: depositIsError } = useWaitForTransaction({
+  const { write: deposit, data: depositData } = useContractWrite(depositConfig);
+
+  const { isLoading: depositIsLoading } = useWaitForTransaction({
     hash: depositData?.hash,
   })
 
@@ -69,18 +73,6 @@ export default function DepositTab({ asset }: IProps) {
 
     if (value.match(REGEX_NUMBER_VALID)) {
       setAmount(value);
-    }
-  }
-
-  const handleDeposit = () => {
-    if (asset === 'eth') {
-      return deposit({
-        value: parseEther(`${Number(amount)}`)
-      })
-    } else {
-      return deposit({
-        value: parseEther(`0`)
-      })
     }
   }
 
@@ -110,12 +102,6 @@ export default function DepositTab({ asset }: IProps) {
   }, [balanceIsError])
 
   useEffect(() => {
-    if (depositIsError) {
-      toast.error('deposit() occurred error.')
-    }
-  }, [depositIsError])
-
-  useEffect(() => {
     if (approveIsError) {
       toast.error('approve() occurred error.')
     }
@@ -132,14 +118,15 @@ export default function DepositTab({ asset }: IProps) {
   useEffect(() => {
     if (depositIsSuccess) {
       closeLoading();
-      toast.success('Deposit success!');
+      toast.success('Deposited!');
+      setVisible(false);
     }
   }, [depositIsSuccess])
 
   useEffect(() => {
     if (approveIsSuccess) {
       closeLoading();
-      toast.success('Deposit success!');
+      toast.success('Approved!');
       setApproved(true)
     } else {
       setApproved(false)
@@ -209,15 +196,15 @@ export default function DepositTab({ asset }: IProps) {
           <FilledButton
             className="mt-8 py-2 text-base"
             disabled={!deposit || !amountIsValid}
-            onClick={handleDeposit}
+            onClick={() => deposit?.()}
           >
             Supply
           </FilledButton>
         ) : approved ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!deposit || !amountIsValid}
-            onClick={handleDeposit}
+            disabled={!depositIsSuccess}
+            onClick={() => deposit?.()}
           >
             Supply
           </FilledButton>

@@ -44,9 +44,9 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
         >Repay</TextButton>
       </div>
       <div className="my-4">
-        {tabValue === 'deposit' ? <DepositTab asset={asset} /> :
-          tabValue === 'withdraw' ? <WithdrawTab asset={asset} /> : tabValue === 'borrow' ?
-            <BorrowTab asset={asset} /> : <RepayTab asset={asset} />}
+        {tabValue === 'deposit' ? <DepositTab asset={asset} setVisible={setVisible} /> :
+          tabValue === 'withdraw' ? <WithdrawTab asset={asset} setVisible={setVisible} /> : tabValue === 'borrow' ?
+            <BorrowTab asset={asset} setVisible={setVisible} /> : <RepayTab asset={asset} setVisible={setVisible} />}
       </div>
     </CustomDialog>
   )
