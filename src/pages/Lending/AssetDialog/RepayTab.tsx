@@ -2,6 +2,8 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
+import { parseEther } from "viem";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -9,9 +11,7 @@ import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import useLoading from "../../../hooks/useLoading";
-import { parseEther } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ export default function RepayTab({ asset, setVisible }: IProps) {
   useEffect(() => {
     if (repayIsSuccess) {
       closeLoading()
-      toast.success('Borrowed.')
+      toast.success('Repaid.')
     }
   }, [repayIsSuccess])
 

@@ -39,7 +39,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
   })
 
   //  Deposit
-  const { config: depositConfig, isSuccess: depositIsSuccess } = usePrepareContractWrite({
+  const { config: depositConfig } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'deposit',
@@ -49,7 +49,7 @@ export default function DepositTab({ asset, setVisible }: IProps) {
 
   const { write: deposit, data: depositData } = useContractWrite(depositConfig);
 
-  const { isLoading: depositIsLoading } = useWaitForTransaction({
+  const { isLoading: depositIsLoading, isSuccess: depositIsSuccess } = useWaitForTransaction({
     hash: depositData?.hash,
   })
 
