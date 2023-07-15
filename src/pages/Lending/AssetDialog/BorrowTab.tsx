@@ -1,9 +1,9 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther, formatUnits, parseEther } from "viem";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -52,11 +52,19 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   })
 
   //  Get the price of ethereum in USD.
-  const { data: ethPriceInUsdc }: IReturnValueOfCalcTokenPrice = useContractRead({
+  const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
-    watch: true
+    functionName: 'calcTokenPrice',
+  })
+
+  //  Get the price of ethereum in USD.
+  const { data: usdcPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
+    functionName: 'calcTokenPrice',
   })
 
   //  ----------------------------------------------------------------------------
@@ -68,6 +76,22 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
       setAmount(value);
     }
   }
+
+  //  ----------------------------------------------------------------------------
+
+  const ethPriceInUsd = useMemo<number>(() => {
+    if (ethPriceInBigInt) {
+      return Number(formatEther(ethPriceInBigInt))
+    }
+    return 0
+  }, [ethPriceInBigInt])
+
+  const usdcPriceInUsd = useMemo<number>(() => {
+    if (usdcPriceInBigInt) {
+      return Number(formatEther(usdcPriceInBigInt))
+    }
+    return 0
+  }, [usdcPriceInBigInt])
 
   //  ----------------------------------------------------------------------------
 
@@ -96,9 +120,9 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   //  Get max borrowable amount in USD
   useEffect(() => {
     if (userInfo) {
-      if (ethPriceInUsdc) {
-        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * Number(formatUnits(ethPriceInUsdc, USDC_DECIMAL))
-        const usdcAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))
+      if (ethPriceInUsd) {
+        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * ethPriceInUsd
+        const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))) * usdcPriceInUsd
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
 
         //  >>>>>>>>>>>>>> Require to calculate LTV

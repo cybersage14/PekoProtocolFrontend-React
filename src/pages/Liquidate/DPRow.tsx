@@ -19,11 +19,15 @@ interface IProps {
 
 export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const riskFactor = useMemo<number>(() => {
-    const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount = userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
-    const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd
+    const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+    const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
     return borrowedValueInUsd / (depositedValueInUsd * 0.9)
   }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
+
+  //  ----------------------------------------------------------------------------------------
+
+  
 
   //  ----------------------------------------------------------------------------------------
 

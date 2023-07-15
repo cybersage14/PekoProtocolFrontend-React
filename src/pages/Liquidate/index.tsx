@@ -2,11 +2,12 @@ import { useMemo, useState } from "react";
 import { List, ListItem, Switch } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
+import { formatEther, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
 import { getVisibleWalletAddress } from "../../utils/functions";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 import { IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
 import DPRow from "./DPRow";
@@ -33,30 +34,44 @@ export default function Liquidate() {
     functionName: 'listUserInfo'
   })
 
-  //  Ethereum price in USD
-  const { data: ethPriceInUsd }: IReturnValueOfCalcTokenPrice = useContractRead({
+  //  Get the price of ethereum in USD.
+  const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
+    args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
     functionName: 'calcTokenPrice',
-    args: [WETH_CONTRACT_ADDRESS]
   })
 
-  //  USDC price in USD
-  const { data: usdcPriceInUsd }: IReturnValueOfCalcTokenPrice = useContractRead({
+  //  Get the price of ethereum in USD.
+  const { data: usdcPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
+    args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
     functionName: 'calcTokenPrice',
-    args: [USDC_CONTRACT_ADDRESS]
   })
 
   //  ----------------------------------------------------------------
 
   const users = useMemo(() => {
     if (listOfUsers) {
-      // return listOfUsers.filter(userInfo => userInfo.ethBorrowAmount || userInfo.usdtBorrowAmount)
+      return listOfUsers.filter(userInfo => userInfo.ethBorrowAmount || userInfo.usdtBorrowAmount)
     }
     return []
   }, [listOfUsers])
+
+  const ethPriceInUsd = useMemo<number>(() => {
+    if (ethPriceInBigInt) {
+      return Number(formatEther(ethPriceInBigInt))
+    }
+    return 0
+  }, [ethPriceInBigInt])
+
+  const usdcPriceInUsd = useMemo<number>(() => {
+    if (usdcPriceInBigInt) {
+      return Number(formatEther(usdcPriceInBigInt))
+    }
+    return 0
+  }, [usdcPriceInBigInt])
 
   //  ----------------------------------------------------------------
 

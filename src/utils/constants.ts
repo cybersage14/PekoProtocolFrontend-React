@@ -101,30 +101,14 @@ export const TEMP_LPS: Array<ILP> = [
 export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;
 
 export const POOL_CONTRACT_ADDRESS =
-  "0x85ec059A6D0bd143f4a1911F54d303db22db2a23";
+  "0xCFB07f5b4A184a53B40D1955230691B8FFdDD504";
 export const POOL_CONTRACT_ABI = [
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_rewardAddress",
-        type: "address"
-      },
-      {
-        internalType: "address",
-        name: "_ethAdddress",
-        type: "address"
-      },
-      {
-        internalType: "address",
-        name: "_usdtAddress",
-        type: "address"
-      },
-      {
-        internalType: "address",
-        name: "_poolAddress",
-        type: "address"
-      }
+      { internalType: "address", name: "_rewardAddress", type: "address" },
+      { internalType: "address", name: "_ethAdddress", type: "address" },
+      { internalType: "address", name: "_usdtAddress", type: "address" },
+      { internalType: "address", name: "_poolAddress", type: "address" }
     ],
     stateMutability: "nonpayable",
     type: "constructor"
@@ -148,22 +132,11 @@ export const POOL_CONTRACT_ABI = [
     name: "OwnershipTransferred",
     type: "event"
   },
-  {
-    stateMutability: "payable",
-    type: "fallback"
-  },
+  { stateMutability: "payable", type: "fallback" },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "_tokenAddress", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" }
     ],
     name: "borrow",
     outputs: [],
@@ -172,36 +145,16 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "_tokenAddress", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" }
     ],
     name: "calcTokenPrice",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256"
-      }
-    ],
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
     name: "claimETH",
     outputs: [],
     stateMutability: "nonpayable",
@@ -216,16 +169,8 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "tokenAddress", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" }
     ],
     name: "claimToken",
     outputs: [],
@@ -233,55 +178,23 @@ export const POOL_CONTRACT_ABI = [
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address"
-      }
-    ],
+    inputs: [{ internalType: "address", name: "_account", type: "address" }],
     name: "collateral",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "nonpayable",
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address"
-      }
-    ],
+    inputs: [{ internalType: "address", name: "_account", type: "address" }],
     name: "debt",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "nonpayable",
     type: "function"
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "_tokenAddress", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" }
     ],
     name: "deposit",
     outputs: [],
@@ -290,30 +203,19 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_pool",
-        type: "address"
-      },
-      {
-        internalType: "address",
-        name: "_weth",
-        type: "address"
-      },
-      {
-        internalType: "address",
-        name: "_usdc",
-        type: "address"
-      }
+      { internalType: "address", name: "_pool", type: "address" },
+      { internalType: "address", name: "_weth", type: "address" },
+      { internalType: "address", name: "_usdc", type: "address" }
     ],
     name: "getEthValue",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "getLiquidationThreshhold",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function"
   },
@@ -321,28 +223,36 @@ export const POOL_CONTRACT_ABI = [
     inputs: [],
     name: "getMarketInfo",
     outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" }
     ],
     stateMutability: "view",
     type: "function"
   },
   {
     inputs: [
+      { internalType: "address", name: "_poolAddress", type: "address" }
+    ],
+    name: "getPoolInfo",
+    outputs: [
       {
-        internalType: "address",
-        name: "_account",
-        type: "address"
+        components: [
+          { internalType: "uint256", name: "LTV", type: "uint256" },
+          { internalType: "uint256", name: "depositApy", type: "uint256" },
+          { internalType: "uint256", name: "borrowApy", type: "uint256" },
+          { internalType: "uint256", name: "totalAmount", type: "uint256" },
+          { internalType: "uint256", name: "borrowAmount", type: "uint256" }
+        ],
+        internalType: "struct Lending.PoolInfo",
+        name: "",
+        type: "tuple"
       }
     ],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "_account", type: "address" }],
     name: "getUserInfo",
     outputs: [
       {
@@ -357,11 +267,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtDepositAmount",
             type: "uint256"
           },
-          {
-            internalType: "uint256",
-            name: "ethBorrowAmount",
-            type: "uint256"
-          },
+          { internalType: "uint256", name: "ethBorrowAmount", type: "uint256" },
           {
             internalType: "uint256",
             name: "usdtBorrowAmount",
@@ -377,11 +283,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtInterestAmount",
             type: "uint256"
           },
-          {
-            internalType: "uint256",
-            name: "ethRewardAmount",
-            type: "uint256"
-          },
+          { internalType: "uint256", name: "ethRewardAmount", type: "uint256" },
           {
             internalType: "uint256",
             name: "usdtRewardAmount",
@@ -412,11 +314,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtBorrowTotalAmount",
             type: "uint256"
           },
-          {
-            internalType: "address",
-            name: "accountAddress",
-            type: "address"
-          }
+          { internalType: "address", name: "accountAddress", type: "address" }
         ],
         internalType: "struct Lending.UserInfoForDisplay",
         name: "",
@@ -427,16 +325,30 @@ export const POOL_CONTRACT_ABI = [
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address"
-      }
-    ],
+    inputs: [{ internalType: "address", name: "_account", type: "address" }],
     name: "liquidate",
     outputs: [],
     stateMutability: "payable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "listPools",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "LTV", type: "uint256" },
+          { internalType: "uint256", name: "depositApy", type: "uint256" },
+          { internalType: "uint256", name: "borrowApy", type: "uint256" },
+          { internalType: "uint256", name: "totalAmount", type: "uint256" },
+          { internalType: "uint256", name: "borrowAmount", type: "uint256" }
+        ],
+        internalType: "struct Lending.PoolInfo[]",
+        name: "",
+        type: "tuple[]"
+      }
+    ],
+    stateMutability: "view",
     type: "function"
   },
   {
@@ -455,11 +367,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtDepositAmount",
             type: "uint256"
           },
-          {
-            internalType: "uint256",
-            name: "ethBorrowAmount",
-            type: "uint256"
-          },
+          { internalType: "uint256", name: "ethBorrowAmount", type: "uint256" },
           {
             internalType: "uint256",
             name: "usdtBorrowAmount",
@@ -475,11 +383,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtInterestAmount",
             type: "uint256"
           },
-          {
-            internalType: "uint256",
-            name: "ethRewardAmount",
-            type: "uint256"
-          },
+          { internalType: "uint256", name: "ethRewardAmount", type: "uint256" },
           {
             internalType: "uint256",
             name: "usdtRewardAmount",
@@ -510,11 +414,7 @@ export const POOL_CONTRACT_ABI = [
             name: "usdtBorrowTotalAmount",
             type: "uint256"
           },
-          {
-            internalType: "address",
-            name: "accountAddress",
-            type: "address"
-          }
+          { internalType: "address", name: "accountAddress", type: "address" }
         ],
         internalType: "struct Lending.UserInfoForDisplay[]",
         name: "",
@@ -527,13 +427,7 @@ export const POOL_CONTRACT_ABI = [
   {
     inputs: [],
     name: "owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function"
   },
@@ -546,16 +440,8 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "_tokenAddress", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" }
     ],
     name: "repay",
     outputs: [],
@@ -563,13 +449,7 @@ export const POOL_CONTRACT_ABI = [
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "limit",
-        type: "uint256"
-      }
-    ],
+    inputs: [{ internalType: "uint256", name: "limit", type: "uint256" }],
     name: "setLiquidationThreshhold",
     outputs: [],
     stateMutability: "nonpayable",
@@ -577,11 +457,7 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_poolAddress",
-        type: "address"
-      }
+      { internalType: "address", name: "_poolAddress", type: "address" }
     ],
     name: "setPoolAddress",
     outputs: [],
@@ -589,13 +465,7 @@ export const POOL_CONTRACT_ABI = [
     type: "function"
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address"
-      }
-    ],
+    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
@@ -603,26 +473,15 @@ export const POOL_CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_tokenAddress",
-        type: "address"
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256"
-      }
+      { internalType: "address", name: "_tokenAddress", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" }
     ],
     name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function"
   },
-  {
-    stateMutability: "payable",
-    type: "receive"
-  }
+  { stateMutability: "payable", type: "receive" }
 ];
 
 export const USDC_CONTRACT_ADDRESS =

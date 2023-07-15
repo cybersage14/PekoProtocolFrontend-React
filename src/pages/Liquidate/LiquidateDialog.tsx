@@ -39,7 +39,6 @@ export default function LiquidateDialog({ visible, setVisible }: IProps) {
 
   //  ---------------------------------------------------------------------------
 
-
   return (
     <CustomDialog title="Liquidate" visible={visible} setVisible={setVisible}>
       {/* You pay */}
