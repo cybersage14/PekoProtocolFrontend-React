@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
@@ -75,14 +75,6 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
   //  --------------------------------------------------------------------
 
   useEffect(() => {
-    if (!withdrawIsLoading) {
-      closeLoading()
-    } else {
-      openLoading()
-    }
-  }, [withdrawIsLoading])
-
-  useEffect(() => {
     if (withdrawIsError) {
       closeLoading()
       toast.error('Withdraw has been failed.');
@@ -91,7 +83,6 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
 
   useEffect(() => {
     if (withdrawIsSuccess) {
-      closeLoading()
       toast.success('Withdrawed.')
       setVisible(false)
     }
@@ -99,7 +90,11 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
 
   useEffect(() => {
     if (userInfo && balanceData?.decimals) {
-      setMaxAmount(formatUnits(userInfo.ehtColAmount, balanceData.decimals))
+      // if(asset === 'eth') {
+
+      // } else {
+      //   setMaxAmount(formatUnits(userInfo.usdtColAmount, balanceData.decimals))
+      // }
     }
   }, [userInfo])
 
@@ -142,7 +137,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
         <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100">0 USDC</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</span>
           </div>
           {/* <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
@@ -156,10 +151,10 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
 
         <FilledButton
           className="mt-8 py-2 text-base"
-          disabled={!withdrawPrepareIsSuccess}
+          disabled={!withdrawPrepareIsSuccess || withdrawIsLoading}
           onClick={() => withdraw?.()}
         >
-          Withdraw
+          {withdrawIsLoading ? IN_PROGRESS : 'Withdraw'}
         </FilledButton>
 
         <div className="flex items-center">

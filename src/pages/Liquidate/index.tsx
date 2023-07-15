@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { List, ListItem, Switch } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
+import { useContractRead } from "wagmi";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
-import Tr from "../../components/tableComponents/Tr";
-import Td from "../../components/tableComponents/Td";
 import { getVisibleWalletAddress } from "../../utils/functions";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
-import LiquidateDialog from "./LiquidateDialog";
-import { useContractRead } from "wagmi";
+import { IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
+import DPRow from "./DPRow";
 
 // -----------------------------------------------------------------------------------
 
@@ -21,14 +20,45 @@ const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 export default function Liquidate() {
   const isMobile = useMediaQuery({ maxWidth: 1024 });
 
+  //  ----------------------------------------------------------------
+
   const [visible, setVisible] = useState<boolean>(true)
 
-  const { data: listOfUsers } = useContractRead({
+  //  ----------------------------------------------------------------
+
+  //  Get listOfUsers
+  const { data: listOfUsers }: IReturnValueOfListOfUsers = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'listUserInfo'
   })
-  console.log('>>>>>>>>> listOfUsers => ', listOfUsers);
+
+  //  Ethereum price in USD
+  const { data: ethPriceInUsd }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'calcTokenPrice',
+    args: [WETH_CONTRACT_ADDRESS]
+  })
+
+  //  USDC price in USD
+  const { data: usdcPriceInUsd }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'calcTokenPrice',
+    args: [USDC_CONTRACT_ADDRESS]
+  })
+
+  //  ----------------------------------------------------------------
+
+  const users = useMemo(() => {
+    if (listOfUsers) {
+      return listOfUsers.filter(userInfo => userInfo.ehtDebtAmount || userInfo.usdtDebtAmount)
+    }
+    return []
+  }, [listOfUsers])
+
+  //  ----------------------------------------------------------------
 
   return (
     <Container className="container my-8 flex flex-col gap-8">
@@ -58,10 +88,6 @@ export default function Liquidate() {
               <div className="flex justify-between w-full">
                 <span className="text-gray-500 font-bold">User: </span>
                 <span className="!text-blue-500">{getVisibleWalletAddress('0x5da095266ec7ec1d979f01a9d7e4ee902e0182bc')}</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Profile: </span>
-                <span>Main Account</span>
               </div>
               <div className="flex justify-between w-full">
                 <span className="text-gray-500 font-bold">Borrowed Asset(s): </span>
@@ -101,7 +127,6 @@ export default function Liquidate() {
           <thead>
             <tr className="bg-gray-900">
               <Th label="User" />
-              <Th label="Profile" />
               <Th label="Borrowed Asset(s)" />
               <Th label="Borrowed Value" sortable />
               <Th label="Deposited Asset(s)" />
@@ -110,29 +135,10 @@ export default function Liquidate() {
               <Th label="Operation" />
             </tr>
           </thead>
-          {visible && (
+          {visible && ethPriceInUsd && usdcPriceInUsd && (
             <tbody>
-              {TEMP_INDEXES_OF_TABLE.map(index => (
-                <Tr key={index}>
-                  <Td className="!text-blue-500">{getVisibleWalletAddress('0x5da095266ec7ec1d979f01a9d7e4ee902e0182bc')}</Td>
-                  <Td>Main Account</Td>
-                  <Td>
-                    <div className="flex justify-center">
-                      <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                    </div>
-                  </Td>
-                  <Td>$0.08213020982964468</Td>
-                  <Td>
-                    <div className="flex justify-center">
-                      <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                    </div>
-                  </Td>
-                  <Td>$0.00046209994186645765</Td>
-                  <Td className="text-red-500">23691%</Td>
-                  <Td>
-                    <FilledButton>Liquidate</FilledButton>
-                  </Td>
-                </Tr>
+              {users?.map((userInfo, index) => (
+                <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} />
               ))}
             </tbody>
           )}

@@ -88,6 +88,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
   useEffect(() => {
     if (errorOfBorrowPrepare) {
       // toast.warn(`${errorOfBorrowPrepare.cause}`)
+      console.log('>>>>>>>>>> errorOfBorrowPrepare => ', errorOfBorrowPrepare)
     }
   }, [errorOfBorrowPrepare])
 

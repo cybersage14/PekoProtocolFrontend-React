@@ -70,3 +70,13 @@ export interface IReturnValueOfBalance {
   data?: IBalanceData;
   [key: string]: any;
 }
+
+export interface IReturnValueOfListOfUsers {
+  data?: Array<IUserInfo>;
+  [key: string]: any;
+}
+
+export interface IReturnValueOfCalcTokenPrice {
+  data?: number;
+  [key: string]: any;
+}

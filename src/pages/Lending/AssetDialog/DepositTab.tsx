@@ -158,7 +158,9 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
-              {userInfo && balanceData ? asset === 'eth' ? formatEther((userInfo.ehtColAmount - userInfo.ehtDebtAmount)) : formatUnits((userInfo.usdtColAmount - userInfo.usdtDebtAmount), balanceData.decimals) : ''}&nbsp;
+              {userInfo && balanceData ? asset === 'eth' ?
+                Number(formatEther((userInfo.ehtColAmount - userInfo.ehtDebtAmount))).toFixed(4) :
+                Number(formatUnits((userInfo.usdtColAmount - userInfo.usdtDebtAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
               {METADATA_OF_ASSET[asset].symbol}
             </span>
           </div>
@@ -175,7 +177,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
         {asset === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!deposit || !amountIsValid}
+            disabled={!deposit || !amountIsValid || depositIsLoading}
             onClick={() => deposit?.()}
           >
             {depositIsLoading ? IN_PROGRESS : "Deposit"}
@@ -183,7 +185,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
         ) : approved ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!depositIsSuccess}
+            disabled={!deposit || depositIsLoading}
             onClick={() => deposit?.()}
           >
             {depositIsLoading ? IN_PROGRESS : "Deposit"}
@@ -191,7 +193,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
         ) : (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid}
+            disabled={!approve || !amountIsValid || approveIsLoading}
             onClick={() => approve?.()}
           >
             {approveIsLoading ? IN_PROGRESS : 'Approve'}
