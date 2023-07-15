@@ -21,6 +21,7 @@ import { TAssetSymbol } from "../../utils/types";
 import { IAssetMetadata, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import { formatUnits, parseEther, parseUnits } from "viem";
+import MBRow from "./MBRow";
 
 // -----------------------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ export default function Lending() {
   const [assetSymbol, setAssetSymbol] = useState<TAssetSymbol>('eth');
 
   //  Wagmi hooks -------------------------------------------------------
-  
+
   //  Balance data
   const { data: balanceData } = useBalance({
     address,
@@ -187,53 +188,14 @@ export default function Lending() {
                 {isMobile ? (
                   <List className="block lg:hidden text-sm">
                     {ASSETS.map(asset => (
-                      <ListItem
+                      <MBRow
                         key={asset.id}
-                        className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
-                        onClick={() => openDialog(asset.symbol)}
-                      >
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">Asset Name: </span>
-                          <div className="flex items-center gap-2">
-                            <img src={asset.imgSrc} alt="" className="w-10" />
-                            <div className="flex flex-col">
-                              <span className="font-semibold">{asset.name}</span>
-                              <span className="text-sm text-gray-500">$0.999925</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">LTV: </span>
-                          <span>50%</span>
-                        </div>
-
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">Deposit APY: </span>
-                          <span className="text-green-500">0.04%</span>
-                        </div>
-
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">Borrow APY: </span>
-                          <div className="flex flex-col">
-                            <span className="font-semibold">187,300 USDC</span>
-                            <span className="text-sm text-gray-500">$187,310.64</span>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">Total Borrowed: </span>
-                          <span className="text-red-500">0.04%</span>
-                        </div>
-
-                        <div className="flex justify-between w-full">
-                          <span className="text-gray-500 font-bold">Wallet: </span>
-                          <div className="flex flex-col">
-                            <span className="font-semibold">0 Cake</span>
-                            <span className="text-sm text-gray-500">$0.00</span>
-                          </div>
-                        </div>
-                      </ListItem>
+                        asset={asset}
+                        openDialog={openDialog}
+                        ethPriceInUsd={ethPriceInUsd}
+                        usdcPriceInUsd={usdcPriceInUsd}
+                        balanceData={balanceData}
+                      />
                     ))}
                   </List>
                 ) : (
@@ -252,7 +214,14 @@ export default function Lending() {
 
                     <tbody>
                       {ASSETS.map(asset => (
-                        <DPRow key={asset.id} asset={asset} openDialog={openDialog} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+                        <DPRow
+                          key={asset.id}
+                          asset={asset}
+                          openDialog={openDialog}
+                          ethPriceInUsd={ethPriceInUsd}
+                          usdcPriceInUsd={usdcPriceInUsd}
+                          balanceData={balanceData}
+                        />
                       ))}
                     </tbody>
                   </Table>
