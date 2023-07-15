@@ -35,16 +35,17 @@ export interface IOption {
   value: string;
 }
 
-export interface IAssetMetadata {
+export interface IAsset {
   id: number;
   name: string;
   symbol: TAssetSymbol;
   imgSrc: string;
   contractAddress: string;
+  decimals: number;
 }
 
 export interface IMetadataOfAsset {
-  [key: string]: IAssetMetadata;
+  [key: string]: IAsset;
 }
 
 export interface IUserInfo {

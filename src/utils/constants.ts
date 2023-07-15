@@ -1173,14 +1173,16 @@ export const METADATA_OF_ASSET: IMetadataOfAsset = {
     name: "Ethereum",
     symbol: "eth",
     imgSrc: "/assets/images/ethereum.png",
-    contractAddress: WETH_CONTRACT_ADDRESS
+    contractAddress: WETH_CONTRACT_ADDRESS,
+    decimals: WETH_DECIMAL
   },
   usdc: {
     id: 2,
     name: "USD Coin",
     symbol: "usdc",
     imgSrc: "/assets/images/usdc.png",
-    contractAddress: USDC_CONTRACT_ADDRESS
+    contractAddress: USDC_CONTRACT_ADDRESS,
+    decimals: USDC_DECIMAL
   }
 };
 

@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useDebounce, useOnClickOutside } from "usehooks-ts";
-import { IAssetMetadata, IPropsOfComponent } from "../../utils/interfaces";
+import { IAsset, IPropsOfComponent } from "../../utils/interfaces";
 import MainInput from "./MainInput";
 import TextIconButton from "../buttons/TextIconButton";
 import Table from "../tableComponents/Table";
@@ -15,8 +15,8 @@ import { REGEX_NUMBER_VALID } from "../../utils/constants";
 interface IProps extends IPropsOfComponent {
   classNameOfInput?: string;
   startAdornment?: ReactNode;
-  tokens: Array<IAssetMetadata>;
-  selectedToken: IAssetMetadata;
+  tokens: Array<IAsset>;
+  selectedToken: IAsset;
   setSelectedToken: Function;
   error?: boolean;
   tokenAmount: string;
@@ -40,7 +40,7 @@ export default function SelectTokenWithPrice({
   const ref = useRef(null)
 
   const [listVisible, setListVisible] = useState<boolean>(false)
-  const [filteredTokens, setFilteredTokens] = useState<Array<IAssetMetadata>>(tokens)
+  const [filteredTokens, setFilteredTokens] = useState<Array<IAsset>>(tokens)
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const debouncedSearchKeyword = useDebounce<string>(searchKeyword, 500)
 

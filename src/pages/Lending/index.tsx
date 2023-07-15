@@ -16,9 +16,9 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
 import { TAssetSymbol } from "../../utils/types";
-import { IAssetMetadata, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import { formatUnits, parseEther, parseUnits } from "viem";
 import MBRow from "./MBRow";
@@ -29,20 +29,22 @@ const AssetDialog = lazy(() => import('./AssetDialog'))
 
 // -----------------------------------------------------------------------------------
 
-const ASSETS: Array<IAssetMetadata> = [
+const ASSETS: Array<IAsset> = [
   {
     id: 1,
     name: "Ethereum",
     symbol: "eth",
     imgSrc: "/assets/images/ethereum.png",
-    contractAddress: WETH_CONTRACT_ADDRESS
+    contractAddress: WETH_CONTRACT_ADDRESS,
+    decimals: WETH_DECIMAL
   },
   {
     id: 2,
     name: "USD Coin",
     symbol: "usdc",
     imgSrc: "/assets/images/usdc.png",
-    contractAddress: USDC_CONTRACT_ADDRESS
+    contractAddress: USDC_CONTRACT_ADDRESS,
+    decimals: USDC_DECIMAL
   }
 ]
 

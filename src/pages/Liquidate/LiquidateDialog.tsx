@@ -2,9 +2,9 @@ import { useState } from "react";
 import CustomDialog from "../../components/dialogs/CustomDialog";
 import SelectTokenWithPrice from "../../components/form/SelectTokenWithPrice";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
-import { IAssetMetadata } from "../../utils/interfaces";
+import { IAsset } from "../../utils/interfaces";
 import FilledButton from "../../components/buttons/FilledButton";
-import { USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -15,29 +15,31 @@ interface IProps {
 
 // ---------------------------------------------------------------------------------------------
 
-const ASSETS: Array<IAssetMetadata> = [
+const ASSETS: Array<IAsset> = [
   {
     id: 1,
     name: "Ethereum",
     symbol: "eth",
     imgSrc: "/assets/images/ethereum.png",
-    contractAddress: WETH_CONTRACT_ADDRESS
+    contractAddress: WETH_CONTRACT_ADDRESS,
+    decimals: WETH_DECIMAL
   },
   {
     id: 2,
     name: "USD Coin",
     symbol: "usdc",
     imgSrc: "/assets/images/usdc.png",
-    contractAddress: USDC_CONTRACT_ADDRESS
+    contractAddress: USDC_CONTRACT_ADDRESS,
+    decimals: USDC_DECIMAL
   }
 ]
 
 // ---------------------------------------------------------------------------------------------
 
 export default function LiquidateDialog({ visible, setVisible }: IProps) {
-  const [payToken, setPayToken] = useState<IAssetMetadata>(ASSETS[0])
+  const [payToken, setPayToken] = useState<IAsset>(ASSETS[0])
   const [payTokenAmount, setPayTokenAmount] = useState<string>('0')
-  const [receiveToken, setReceiveToken] = useState<IAssetMetadata>(ASSETS[1])
+  const [receiveToken, setReceiveToken] = useState<IAsset>(ASSETS[1])
   const [receiveTokenAmount, setReceiveTokenAmount] = useState<string>('0')
 
   //  ---------------------------------------------------------------------------
