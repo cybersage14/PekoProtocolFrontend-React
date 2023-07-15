@@ -159,8 +159,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
               {userInfo && balanceData ? asset === 'eth' ?
-                Number(formatEther((userInfo.ehtColAmount - userInfo.ehtDebtAmount))).toFixed(4) :
-                Number(formatUnits((userInfo.usdtColAmount - userInfo.usdtDebtAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
+                Number(formatEther((userInfo.ethDepositAmount - userInfo.ethBorrowAmount))).toFixed(4) :
+                Number(formatUnits((userInfo.usdtDepositAmount - userInfo.usdtBorrowAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
               {METADATA_OF_ASSET[asset].symbol}
             </span>
           </div>

@@ -93,7 +93,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo }
       // if(asset === 'eth') {
 
       // } else {
-      //   setMaxAmount(formatUnits(userInfo.usdtColAmount, balanceData.decimals))
+      //   setMaxAmount(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals))
       // }
     }
   }, [userInfo])

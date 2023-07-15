@@ -94,8 +94,8 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
 
   useEffect(() => {
     if (userInfo) {
-      const ethDepositAmount = Number(formatEther(userInfo.ehtColAmount)) - Number(formatEther(userInfo.ehtDebtAmount))
-      const usdcDepositAmount = Number(formatUnits(userInfo.usdtColAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtDebtAmount, USDC_DECIMAL))
+      const ethDepositAmount = Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))
+      const usdcDepositAmount = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))
       console.log('>>>>>>> ethDepositAmount => ', ethDepositAmount)
       console.log('>>>>>>> usdcDepositAmount => ', usdcDepositAmount)
     }

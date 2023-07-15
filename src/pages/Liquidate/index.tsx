@@ -53,7 +53,7 @@ export default function Liquidate() {
 
   const users = useMemo(() => {
     if (listOfUsers) {
-      return listOfUsers.filter(userInfo => userInfo.ehtDebtAmount || userInfo.usdtDebtAmount)
+      // return listOfUsers.filter(userInfo => userInfo.ethBorrowAmount || userInfo.usdtBorrowAmount)
     }
     return []
   }, [listOfUsers])

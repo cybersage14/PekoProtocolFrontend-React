@@ -47,11 +47,20 @@ export interface IMetadataOfAsset {
 }
 
 export interface IUserInfo {
-  ehtColAmount: bigint;
-  ehtDebtAmount: bigint;
-  usdtColAmount: bigint;
-  usdtDebtAmount: bigint;
-  userAddress: string;
+  ethDepositAmount: bigint;
+  usdtDepositAmount: bigint;
+  ethBorrowAmount: bigint;
+  usdtBorrowAmount: bigint;
+  ethInterestAmount: bigint;
+  usdtInterestAmount: bigint;
+  ethRewardAmount: bigint;
+  usdtRewardAmount: bigint;
+  pekoRewardAmount: bigint;
+  ethDepositTotalInUsdtAmount: bigint;
+  usdtDepositTotalAmount: bigint;
+  ethBorrowTotalInUsdtAmount: bigint;
+  usdtBorrowTotalAmount: bigint;
+  accountAddress: string;
 }
 
 export interface IReturnValueOfUserInfo {
