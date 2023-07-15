@@ -20,6 +20,7 @@ interface IProps {
 export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd, balanceData }: IProps) {
   const [marketSize, setMarketSize] = useState<number>(0)
   const [marketSizeInUsd, setMarketSizeInUsd] = useState<number>(0)
+  const [totalBorrowed, setTotalBorrowed] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
 
   //  ---------------------------------------------------------------------------------
@@ -48,15 +49,18 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       if (asset.symbol === 'eth') {
         setMarketSize(Number(formatEther(poolInfo.totalAmount)))
         setMarketSizeInUsd(Number(formatEther(poolInfo.totalAmount)) * ethPriceInUsd)
+        setTotalBorrowed(Number(formatEther(poolInfo.borrowAmount)))
         setTotalBorrowedInUsd(Number(formatEther(poolInfo.borrowAmount)) * ethPriceInUsd)
       } else {
         setMarketSize(Number(formatUnits(poolInfo.totalAmount, asset.decimals)))
         setMarketSizeInUsd(Number(formatUnits(poolInfo.totalAmount, asset.decimals)) * usdcPriceInUsd)
+        setTotalBorrowed(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)))
         setTotalBorrowedInUsd(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)) * usdcPriceInUsd)
       }
     } else {
       setMarketSize(0)
       setMarketSizeInUsd(0)
+      setTotalBorrowed(0)
       setTotalBorrowedInUsd(0)
     }
   }, [poolInfo, asset])
@@ -114,7 +118,7 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Total Borrowed: </span>
         <div className="flex flex-col">
-          <span className="font-semibold uppercase">{Number(poolInfo?.borrowAmount)} {asset.symbol}</span>
+          <span className="font-semibold uppercase">{totalBorrowed.toFixed(4)} {asset.symbol}</span>
           <span className="text-sm text-gray-500">${totalBorrowedInUsd.toFixed(4)}</span>
         </div>
       </div>

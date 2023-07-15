@@ -10,8 +10,8 @@ import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAssetSymbol } from "../../../utils/types";
-import useLoading from "../../../hooks/useLoading";
 import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -20,18 +20,16 @@ interface IProps {
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
+  ethPriceInUsd: number;
+  usdcPriceInUsd: number;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function WithdrawTab({ assetSymbol, setVisible, balanceData, userInfo }: IProps) {
+export default function WithdrawTab({ assetSymbol, setVisible, balanceData, userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0')
-
-  //  --------------------------------------------------------------------
-
-  const { openLoading, closeLoading } = useLoading()
 
   //  --------------------------------------------------------------------
 
@@ -68,14 +66,13 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${value * Number(balanceData?.formatted) / 100}`)
+    setAmount(`${value * Number(maxAmount) / 100}`)
   }
 
   //  --------------------------------------------------------------------
 
   useEffect(() => {
     if (withdrawIsError) {
-      closeLoading()
       toast.error('Withdraw has been failed.');
     }
   }, [withdrawIsError])
@@ -89,11 +86,10 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
 
   useEffect(() => {
     if (userInfo && balanceData?.decimals) {
-      // if(asset === 'eth') {
-
-      // } else {
-      //   setMaxAmount(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals))
-      // }
+      if (assetSymbol === 'eth') {
+      } else {
+        setMaxAmount(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals))
+      }
     }
   }, [userInfo])
 

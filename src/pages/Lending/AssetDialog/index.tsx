@@ -18,6 +18,8 @@ interface IProps {
   visible: boolean;
   setVisible: Function;
   assetSymbol: TAssetSymbol
+  ethPriceInUsd: number;
+  usdcPriceInUsd: number;
 }
 
 //  --------------------------------------------------------------------------------------------
@@ -32,7 +34,7 @@ const TEMP_POOL_INFO: IPoolInfo = {
 
 //  --------------------------------------------------------------------------------------------
 
-export default function AssetDialog({ visible, setVisible, assetSymbol }: IProps) {
+export default function AssetDialog({ visible, setVisible, assetSymbol, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [tabValue, setTabValue] = useState<TTabValue>('deposit')
 
   //  -----------------------------------------------------------------
@@ -48,8 +50,6 @@ export default function AssetDialog({ visible, setVisible, assetSymbol }: IProps
     watch: true
   })
 
-  console.log('>>>>>>>>>> balanceData => ', balanceData)
-
   //  Get Userinfo
   const { data: userInfo }: IReturnValueOfUserInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
@@ -58,8 +58,6 @@ export default function AssetDialog({ visible, setVisible, assetSymbol }: IProps
     args: [address],
     watch: true
   });
-
-  console.log('>>>>>>>>>> userInfo => ', userInfo)
 
   //  Get PoolInfo
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
@@ -92,9 +90,30 @@ export default function AssetDialog({ visible, setVisible, assetSymbol }: IProps
         >Repay</TextButton>
       </div>
       <div className="my-4">
-        {tabValue === 'deposit' ? <DepositTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
-          tabValue === 'withdraw' ? <WithdrawTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
-            tabValue === 'borrow' ? <BorrowTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} poolInfo={TEMP_POOL_INFO} /> :
+        {tabValue === 'deposit' ? 
+        <DepositTab 
+          assetSymbol={assetSymbol} 
+          setVisible={setVisible} 
+          balanceData={balanceData} 
+          userInfo={userInfo} 
+        /> : tabValue === 'withdraw' ? 
+        <WithdrawTab 
+          assetSymbol={assetSymbol} 
+          setVisible={setVisible} 
+          balanceData={balanceData} 
+          userInfo={userInfo} 
+          ethPriceInUsd={ethPriceInUsd}
+          usdcPriceInUsd={usdcPriceInUsd}
+        /> : tabValue === 'borrow' ? 
+        <BorrowTab 
+          assetSymbol={assetSymbol} 
+          setVisible={setVisible} 
+          balanceData={balanceData} 
+          userInfo={userInfo} 
+          poolInfo={TEMP_POOL_INFO}
+          ethPriceInUsd={ethPriceInUsd}
+          usdcPriceInUsd={usdcPriceInUsd} 
+        /> :
               <RepayTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} />}
       </div>
     </CustomDialog>

@@ -3,7 +3,7 @@ import { useContractRead } from "wagmi";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import { IAsset, IBalanceData, IReturnValueOfPoolInfo } from "../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../utils/constants";
 import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------
@@ -21,10 +21,11 @@ interface IProps {
 export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd, balanceData }: IProps) {
   const [marketSize, setMarketSize] = useState<number>(0)
   const [marketSizeInUsd, setMarketSizeInUsd] = useState<number>(0)
+  const [totalBorrowed, setTotalBorrowed] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
 
   //  ---------------------------------------------------------------------------------
-  
+
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
@@ -49,36 +50,23 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       if (asset.symbol === 'eth') {
         setMarketSize(Number(formatEther(poolInfo.totalAmount)))
         setMarketSizeInUsd(Number(formatEther(poolInfo.totalAmount)) * ethPriceInUsd)
+        setTotalBorrowed(Number(formatEther(poolInfo.borrowAmount)))
         setTotalBorrowedInUsd(Number(formatEther(poolInfo.borrowAmount)) * ethPriceInUsd)
       } else {
         setMarketSize(Number(formatUnits(poolInfo.totalAmount, asset.decimals)))
         setMarketSizeInUsd(Number(formatUnits(poolInfo.totalAmount, asset.decimals)) * usdcPriceInUsd)
+        setTotalBorrowed(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)))
         setTotalBorrowedInUsd(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)) * usdcPriceInUsd)
       }
     } else {
       setMarketSize(0)
       setMarketSizeInUsd(0)
+      setTotalBorrowed(0)
       setTotalBorrowedInUsd(0)
     }
   }, [poolInfo, asset])
 
   //  ----------------------------------------------------------------------------------
-
-  // const marketSizeInUsd = useMemo<number>(() => {
-  //   if (poolInfo) {
-  //     return Number(poolInfo.totalAmount) * (asset.symbol === 'eth' ? ethPriceInUsd : usdcPriceInUsd);
-  //   }
-  //   return 0
-  // }, [poolInfo])
-
-  // const totalBorrowedInUsd = useMemo<number>(() => {
-  //   if (poolInfo) {
-  //     return Number(poolInfo.borrowAmount) * (asset.symbol === 'eth' ? ethPriceInUsd : usdcPriceInUsd)
-  //   }
-  //   return 0
-  // }, [poolInfo])
-
-  
 
   return (
     <Tr className="hover:bg-gray-900" onClick={() => openDialog(asset.symbol)}>
@@ -115,7 +103,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       {/* Total Borrowed */}
       <Td>
         <div className="flex flex-col">
-          <span className="font-semibold uppercase">{Number(poolInfo?.borrowAmount)} {asset.symbol}</span>
+          <span className="font-semibold uppercase">{totalBorrowed.toFixed(4)} {asset.symbol}</span>
           <span className="text-sm text-gray-500">${totalBorrowedInUsd.toFixed(4)}</span>
         </div>
       </Td>

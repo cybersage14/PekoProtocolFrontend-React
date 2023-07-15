@@ -68,14 +68,6 @@ export default function Lending() {
     watch: true
   })
 
-  console.log('>>>>>>>>>> balanceData => ', balanceData)
-
-  const { data: poolInfos }: IReturnValueOfPoolInfo = useContractRead({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'listPools'
-  })
-
   //  Get the price of ethereum in USD.
   const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
@@ -93,6 +85,7 @@ export default function Lending() {
   })
 
   //  Functions ---------------------------------------------------------
+
   const openDialog = (_assetSymbol: TAssetSymbol) => {
     setAssetSymbol(_assetSymbol);
     if (isConnected) {
@@ -313,6 +306,8 @@ export default function Lending() {
         visible={dialogVisible}
         setVisible={setDialogVisible}
         assetSymbol={assetSymbol}
+        ethPriceInUsd={ethPriceInUsd}
+        usdcPriceInUsd={usdcPriceInUsd}
       />
     </Container >
   )

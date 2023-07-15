@@ -2,8 +2,8 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
@@ -11,8 +11,7 @@ import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAssetSymbol } from "../../../utils/types";
-import useLoading from "../../../hooks/useLoading";
-import { IBalanceData, IPoolInfo, IReturnValueOfCalcTokenPrice, IUserInfo } from "../../../utils/interfaces";
+import { IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -22,18 +21,16 @@ interface IProps {
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
   poolInfo: IPoolInfo;
+  ethPriceInUsd: number;
+  usdcPriceInUsd: number;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ assetSymbol, setVisible, balanceData, userInfo, poolInfo }: IProps) {
+export default function BorrowTab({ assetSymbol, setVisible, balanceData, userInfo, poolInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [maxAmountInUsd, setMaxAmountInUsd] = useState<string>('0')
-
-  //  ----------------------------------------------------------------------------
-
-  const { openLoading, closeLoading } = useLoading()
+  const [maxAmountInUsd, setMaxAmountInUsd] = useState<number>(0)
 
   //  ----------------------------------------------------------------------------
 
@@ -51,21 +48,17 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
     hash: borrowData?.hash
   })
 
-  //  Get the price of ethereum in USD.
-  const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
-    functionName: 'calcTokenPrice',
-  })
+  //  ----------------------------------------------------------------------------
 
-  //  Get the price of ethereum in USD.
-  const { data: usdcPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
-    functionName: 'calcTokenPrice',
-  })
+  const maxAmount = useMemo<number>(() => {
+    if (assetSymbol === 'eth' && ethPriceInUsd > 0) {
+      return maxAmountInUsd / ethPriceInUsd
+    }
+    if (assetSymbol === 'usdc' && usdcPriceInUsd > 0) {
+      return maxAmountInUsd / usdcPriceInUsd
+    }
+    return 0
+  }, [maxAmountInUsd])
 
   //  ----------------------------------------------------------------------------
 
@@ -77,34 +70,28 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
     }
   }
 
-  //  ----------------------------------------------------------------------------
+  const handleHalf = () => {
+    setAmount(`${maxAmount / 2}`)
+  }
 
-  const ethPriceInUsd = useMemo<number>(() => {
-    if (ethPriceInBigInt) {
-      return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
-    }
-    return 0
-  }, [ethPriceInBigInt])
+  const handleMax = () => {
+    setAmount(`${maxAmount}`)
+  }
 
-  const usdcPriceInUsd = useMemo<number>(() => {
-    if (usdcPriceInBigInt) {
-      return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
-    }
-    return 0
-  }, [usdcPriceInBigInt])
+  const handleSlider = (value: any) => {
+    setAmount(`${value * maxAmount / 100}`)
+  }
 
   //  ----------------------------------------------------------------------------
 
   useEffect(() => {
     if (borrowIsError) {
-      closeLoading()
       toast.error('Borrow has been failed.')
     }
   }, [borrowIsError])
 
   useEffect(() => {
     if (borrowIsSuccess) {
-      closeLoading()
       toast.success('Borrowed.')
       setVisible(false)
     }
@@ -126,7 +113,7 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
 
         //  >>>>>>>>>>>>>> Require to calculate LTV
-        setMaxAmountInUsd(`${amountInUsd * Number(poolInfo.LTV) / 100}`)
+        setMaxAmountInUsd(amountInUsd * Number(poolInfo.LTV) / 100)
       }
     }
   }, [userInfo])
@@ -143,10 +130,10 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{assetSymbol}</span></p>
+          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{assetSymbol}</span></p>
           <div className="flex items-center gap-2">
-            <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
-            <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
           </div>
         </div>
 
@@ -162,6 +149,8 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
+            value={Number(amount) / maxAmount * 100}
+            onChange={handleSlider}
           />
         </div>
 
