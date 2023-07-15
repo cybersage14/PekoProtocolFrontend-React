@@ -1,10 +1,10 @@
-import { lazy, useState } from "react";
+import { lazy, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
 import { List, ListItem } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead } from "wagmi";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -16,9 +16,11 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
-import { TAsset } from "../../utils/types";
-import { IAssetMetadata, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { TAssetSymbol } from "../../utils/types";
+import { IAssetMetadata, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import DPRow from "./DPRow";
+import { formatUnits, parseEther, parseUnits } from "viem";
 
 // -----------------------------------------------------------------------------------
 
@@ -31,13 +33,15 @@ const ASSETS: Array<IAssetMetadata> = [
     id: 1,
     name: "Ethereum",
     symbol: "eth",
-    imgSrc: "/assets/images/ethereum.png"
+    imgSrc: "/assets/images/ethereum.png",
+    contractAddress: WETH_CONTRACT_ADDRESS
   },
   {
     id: 2,
     name: "USD Coin",
     symbol: "usdc",
-    imgSrc: "/assets/images/usdc.png"
+    imgSrc: "/assets/images/usdc.png",
+    contractAddress: USDC_CONTRACT_ADDRESS
   }
 ]
 
@@ -46,28 +50,70 @@ const ASSETS: Array<IAssetMetadata> = [
 export default function Lending() {
   //  Context hooks -----------------------------------------------------
   const isMobile = useMediaQuery({ maxWidth: 1024 });
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   //  States  -----------------------------------------------------------
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
-  const [asset, setAsset] = useState<TAsset>('eth');
+  const [assetSymbol, setAssetSymbol] = useState<TAssetSymbol>('eth');
 
   //  Wagmi hooks -------------------------------------------------------
-  // const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
-  //   address: POOL_CONTRACT_ADDRESS,
-  //   abi: POOL_CONTRACT_ABI,
-  //   functionName: 'getMarketInfo'
-  // })
+  
+  //  Balance data
+  const { data: balanceData } = useBalance({
+    address,
+    token: assetSymbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
+    watch: true
+  })
+
+  console.log('>>>>>>>>>> balanceData => ', balanceData)
+
+  const { data: poolInfos }: IReturnValueOfPoolInfo = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'listPools'
+  })
+
+  //  Get the price of ethereum in USD.
+  const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
+    functionName: 'calcTokenPrice',
+  })
+
+  //  Get the price of ethereum in USD.
+  const { data: usdcPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
+    functionName: 'calcTokenPrice',
+  })
 
   //  Functions ---------------------------------------------------------
-  const openDialog = (_asset: TAsset) => {
-    setAsset(_asset);
+  const openDialog = (_assetSymbol: TAssetSymbol) => {
+    setAssetSymbol(_assetSymbol);
     if (isConnected) {
       return setDialogVisible(true);
     } else {
       return toast.info('Please connect your wallet.');
     }
   }
+
+  //  useMemo ------------------------------------------------------------
+
+  const ethPriceInUsd = useMemo<number>(() => {
+    if (ethPriceInBigInt) {
+      return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
+    }
+    return 0
+  }, [ethPriceInBigInt])
+
+  const usdcPriceInUsd = useMemo<number>(() => {
+    if (usdcPriceInBigInt) {
+      return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
+    }
+    return 0
+  }, [usdcPriceInBigInt])
 
   //  --------------------------------------------------------------------
 
@@ -206,38 +252,7 @@ export default function Lending() {
 
                     <tbody>
                       {ASSETS.map(asset => (
-                        <Tr key={asset.id} className="hover:bg-gray-900" onClick={() => openDialog(asset.symbol)}>
-                          <Td>
-                            <div className="flex items-center gap-2">
-                              <img src={asset.imgSrc} alt="" className="w-10" />
-                              <div className="flex flex-col">
-                                <span className="font-semibold">{asset.name}</span>
-                                <span className="text-sm text-gray-500">$0.999925</span>
-                              </div>
-                            </div>
-                          </Td>
-                          <Td>50%</Td>
-                          <Td className="text-green-500">0.04%</Td>
-                          <Td>
-                            <div className="flex flex-col">
-                              <span className="font-semibold">187,300 USDC</span>
-                              <span className="text-sm text-gray-500">$187,310.64</span>
-                            </div>
-                          </Td>
-                          <Td className="text-red-500">0.04%</Td>
-                          <Td>
-                            <div className="flex flex-col">
-                              <span className="font-semibold">42,260 USDC</span>
-                              <span className="text-sm text-gray-500">$42,253.77</span>
-                            </div>
-                          </Td>
-                          <Td>
-                            <div className="flex flex-col">
-                              <span className="font-semibold">0 Cake</span>
-                              <span className="text-sm text-gray-500">$0.00</span>
-                            </div>
-                          </Td>
-                        </Tr>
+                        <DPRow key={asset.id} asset={asset} openDialog={openDialog} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
                       ))}
                     </tbody>
                   </Table>
@@ -326,7 +341,7 @@ export default function Lending() {
       <AssetDialog
         visible={dialogVisible}
         setVisible={setDialogVisible}
-        asset={asset}
+        assetSymbol={assetSymbol}
       />
     </Container >
   )

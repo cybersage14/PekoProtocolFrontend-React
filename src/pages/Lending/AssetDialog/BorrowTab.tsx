@@ -5,19 +5,19 @@ import { toast } from "react-toastify";
 import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
-import { TAsset } from "../../../utils/types";
+import { TAssetSymbol } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
 import { IBalanceData, IPoolInfo, IReturnValueOfCalcTokenPrice, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
-  asset: TAsset;
+  assetSymbol: TAssetSymbol;
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
@@ -26,7 +26,7 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
+export default function BorrowTab({ assetSymbol, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmountInUsd, setMaxAmountInUsd] = useState<string>('0')
@@ -42,7 +42,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'borrow',
-    args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
   })
 
   const { write: borrow, data: borrowData } = useContractWrite(borrowConfig)
@@ -81,14 +81,14 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
 
   const ethPriceInUsd = useMemo<number>(() => {
     if (ethPriceInBigInt) {
-      return Number(formatEther(ethPriceInBigInt))
+      return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
     }
     return 0
   }, [ethPriceInBigInt])
 
   const usdcPriceInUsd = useMemo<number>(() => {
     if (usdcPriceInBigInt) {
-      return Number(formatEther(usdcPriceInBigInt))
+      return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
     }
     return 0
   }, [usdcPriceInBigInt])
@@ -137,13 +137,13 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{METADATA_OF_ASSET[asset].symbol}</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{assetSymbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
+          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{assetSymbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
@@ -169,10 +169,10 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
-              {userInfo && balanceData ? asset === 'eth' ?
+              {userInfo && balanceData ? assetSymbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
                 Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
-              {METADATA_OF_ASSET[asset].symbol}
+              {assetSymbol}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -181,7 +181,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {assetSymbol}</span>
           </div>
         </div>
 

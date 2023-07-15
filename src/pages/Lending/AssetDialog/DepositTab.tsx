@@ -5,18 +5,18 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
-import { TAsset } from "../../../utils/types";
+import { TAssetSymbol } from "../../../utils/types";
 import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
-  asset: TAsset;
+  assetSymbol: TAssetSymbol;
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
@@ -24,7 +24,7 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function DepositTab({ asset, setVisible, balanceData, userInfo }: IProps) {
+export default function DepositTab({ assetSymbol, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
@@ -36,8 +36,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'deposit',
-    args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
-    value: asset === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
+    args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    value: assetSymbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
   const { write: deposit, data: depositData } = useContractWrite(depositConfig);
@@ -116,14 +116,14 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{METADATA_OF_ASSET[asset].symbol}</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{assetSymbol}</span>}
           onChange={handleAmount}
           value={amount}
-          disabled={asset === 'usdc' ? approved ? true : false : false}
+          disabled={assetSymbol === 'usdc' ? approved ? true : false : false}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(balanceData?.formatted).toFixed(4)} <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
+          <p className="text-gray-500">Max: {Number(balanceData?.formatted).toFixed(4)} <span className="uppercase">{assetSymbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton
               className="text-xs px-2 py-1"
@@ -150,7 +150,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
             trackStyle={{ backgroundColor: '#3B82F6' }}
             value={Number(amount) / Number(balanceData?.formatted) * 100}
             onChange={handleSlider}
-            disabled={asset === 'usdc' ? approved ? true : false : false}
+            disabled={assetSymbol === 'usdc' ? approved ? true : false : false}
           />
         </div>
 
@@ -158,10 +158,10 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
-              {userInfo && balanceData ? asset === 'eth' ?
+              {userInfo && balanceData ? assetSymbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
                 Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)).toFixed(4) : ''}&nbsp;
-              {METADATA_OF_ASSET[asset].symbol}
+              {assetSymbol}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -170,11 +170,11 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo }:
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {assetSymbol}</span>
           </div>
         </div>
 
-        {asset === 'eth' ? (
+        {assetSymbol === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
             disabled={!deposit || !amountIsValid || depositIsLoading}

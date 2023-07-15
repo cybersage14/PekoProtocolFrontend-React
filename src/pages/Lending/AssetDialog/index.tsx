@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useAccount, useBalance, useContractRead } from "wagmi";
 import TextButton from "../../../components/buttons/TextButton";
 import CustomDialog from "../../../components/dialogs/CustomDialog";
-import { TAsset } from "../../../utils/types";
+import { TAssetSymbol } from "../../../utils/types";
 import DepositTab from "./DepositTab";
 import WithdrawTab from "./WithdrawTab";
 import BorrowTab from "./BorrowTab";
 import RepayTab from "./RepayTab";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
 import { IPoolInfo, IReturnValueOfPoolInfo, IReturnValueOfUserInfo } from "../../../utils/interfaces";
 
 //  --------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ type TTabValue = 'deposit' | 'withdraw' | 'borrow' | 'repay'
 interface IProps {
   visible: boolean;
   setVisible: Function;
-  asset: TAsset
+  assetSymbol: TAssetSymbol
 }
 
 //  --------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ const TEMP_POOL_INFO: IPoolInfo = {
 
 //  --------------------------------------------------------------------------------------------
 
-export default function AssetDialog({ visible, setVisible, asset }: IProps) {
+export default function AssetDialog({ visible, setVisible, assetSymbol }: IProps) {
   const [tabValue, setTabValue] = useState<TTabValue>('deposit')
 
   //  -----------------------------------------------------------------
@@ -44,7 +44,7 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
   //  Balance data
   const { data: balanceData } = useBalance({
     address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
+    token: assetSymbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
     watch: true
   })
 
@@ -66,13 +66,13 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getPoolInfo',
-    // args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS]
+    // args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS]
   })
 
   //  -----------------------------------------------------------------
 
   return (
-    <CustomDialog title={METADATA_OF_ASSET[asset].name} visible={visible} setVisible={setVisible}>
+    <CustomDialog title={METADATA_OF_ASSET[assetSymbol].name} visible={visible} setVisible={setVisible}>
       <div className="grid grid-cols-4">
         <TextButton
           className={`border-b-2 rounded-none text-base w-full ${tabValue === 'deposit' ? 'border-blue-500' : 'border-transparent'}`}
@@ -92,10 +92,10 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
         >Repay</TextButton>
       </div>
       <div className="my-4">
-        {tabValue === 'deposit' ? <DepositTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
-          tabValue === 'withdraw' ? <WithdrawTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
-            tabValue === 'borrow' ? <BorrowTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} poolInfo={TEMP_POOL_INFO} /> :
-              <RepayTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} />}
+        {tabValue === 'deposit' ? <DepositTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
+          tabValue === 'withdraw' ? <WithdrawTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
+            tabValue === 'borrow' ? <BorrowTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} poolInfo={TEMP_POOL_INFO} /> :
+              <RepayTab assetSymbol={assetSymbol} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} />}
       </div>
     </CustomDialog>
   )

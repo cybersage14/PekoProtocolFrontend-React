@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { TAsset } from "./types";
+import { TAssetSymbol } from "./types";
 
 export interface IPropsOfComponent {
   className?: string;
@@ -38,8 +38,9 @@ export interface IOption {
 export interface IAssetMetadata {
   id: number;
   name: string;
-  symbol: TAsset;
+  symbol: TAssetSymbol;
   imgSrc: string;
+  contractAddress: string;
 }
 
 export interface IMetadataOfAsset {
