@@ -63,9 +63,12 @@ export interface IUserInfo {
   accountAddress: string;
 }
 
-export interface IReturnValueOfUserInfo {
-  data?: IUserInfo;
-  [key: string]: any;
+export interface IPoolInfo {
+  LTV: bigint;
+  depositApy: bigint;
+  borrowApy: bigint;
+  totalAmount: bigint;
+  borrowAmount: bigint;
 }
 
 export interface IBalanceData {
@@ -73,6 +76,16 @@ export interface IBalanceData {
   formatted: string;
   symbol: string;
   value: bigint;
+}
+
+export interface IReturnValueOfUserInfo {
+  data?: IUserInfo;
+  [key: string]: any;
+}
+
+export interface IReturnValueOfPoolInfo {
+  data?: IPoolInfo;
+  [key: string]: any;
 }
 
 export interface IReturnValueOfBalance {
@@ -86,6 +99,6 @@ export interface IReturnValueOfListOfUsers {
 }
 
 export interface IReturnValueOfCalcTokenPrice {
-  data?: number;
+  data?: bigint;
   [key: string]: any;
 }

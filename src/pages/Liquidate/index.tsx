@@ -135,13 +135,13 @@ export default function Liquidate() {
               <Th label="Operation" />
             </tr>
           </thead>
-          {visible && ethPriceInUsd && usdcPriceInUsd && (
+          {visible && ethPriceInUsd && usdcPriceInUsd ? (
             <tbody>
               {users?.map((userInfo, index) => (
                 <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} />
               ))}
             </tbody>
-          )}
+          ) : (<></>)}
         </Table>
       )}
     </Container>

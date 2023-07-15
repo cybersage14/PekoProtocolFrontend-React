@@ -7,8 +7,8 @@ import DepositTab from "./DepositTab";
 import WithdrawTab from "./WithdrawTab";
 import BorrowTab from "./BorrowTab";
 import RepayTab from "./RepayTab";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
-import { IReturnValueOfUserInfo } from "../../../utils/interfaces";
+import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IPoolInfo, IReturnValueOfPoolInfo, IReturnValueOfUserInfo } from "../../../utils/interfaces";
 
 //  --------------------------------------------------------------------------------------------
 
@@ -18,6 +18,16 @@ interface IProps {
   visible: boolean;
   setVisible: Function;
   asset: TAsset
+}
+
+//  --------------------------------------------------------------------------------------------
+
+const TEMP_POOL_INFO: IPoolInfo = {
+  LTV: BigInt(80),
+  depositApy: BigInt(500),
+  borrowApy: BigInt(10000),
+  totalAmount: BigInt(0),
+  borrowAmount: BigInt(0)
 }
 
 //  --------------------------------------------------------------------------------------------
@@ -34,7 +44,8 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
   //  Balance data
   const { data: balanceData } = useBalance({
     address,
-    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined
+    token: asset === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
+    watch: true
   })
 
   console.log('>>>>>>>>>> balanceData => ', balanceData)
@@ -44,10 +55,19 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getUserInfo',
-    args: [address]
+    args: [address],
+    watch: true
   });
 
   console.log('>>>>>>>>>> userInfo => ', userInfo)
+
+  //  Get PoolInfo
+  const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getPoolInfo',
+    // args: [asset === 'eth' ? WETH_CONTRACT_ADDRESS]
+  })
 
   //  -----------------------------------------------------------------
 
@@ -74,7 +94,7 @@ export default function AssetDialog({ visible, setVisible, asset }: IProps) {
       <div className="my-4">
         {tabValue === 'deposit' ? <DepositTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
           tabValue === 'withdraw' ? <WithdrawTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
-            tabValue === 'borrow' ? <BorrowTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} /> :
+            tabValue === 'borrow' ? <BorrowTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} poolInfo={TEMP_POOL_INFO} /> :
               <RepayTab asset={asset} setVisible={setVisible} balanceData={balanceData} userInfo={userInfo} />}
       </div>
     </CustomDialog>

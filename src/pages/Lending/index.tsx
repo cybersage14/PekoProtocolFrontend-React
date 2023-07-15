@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
 import { List, ListItem } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -16,9 +16,9 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 import { TAsset } from "../../utils/types";
-import { IAssetMetadata } from "../../utils/interfaces";
+import { IAssetMetadata, IReturnValueOfPoolInfo } from "../../utils/interfaces";
 
 // -----------------------------------------------------------------------------------
 
@@ -44,12 +44,22 @@ const ASSETS: Array<IAssetMetadata> = [
 // -----------------------------------------------------------------------------------
 
 export default function Lending() {
+  //  Context hooks -----------------------------------------------------
   const isMobile = useMediaQuery({ maxWidth: 1024 });
   const { isConnected } = useAccount();
 
+  //  States  -----------------------------------------------------------
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
   const [asset, setAsset] = useState<TAsset>('eth');
 
+  //  Wagmi hooks -------------------------------------------------------
+  // const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
+  //   address: POOL_CONTRACT_ADDRESS,
+  //   abi: POOL_CONTRACT_ABI,
+  //   functionName: 'getMarketInfo'
+  // })
+
+  //  Functions ---------------------------------------------------------
   const openDialog = (_asset: TAsset) => {
     setAsset(_asset);
     if (isConnected) {
@@ -58,6 +68,8 @@ export default function Lending() {
       return toast.info('Please connect your wallet.');
     }
   }
+
+  //  --------------------------------------------------------------------
 
   return (
     <Container className="my-8">

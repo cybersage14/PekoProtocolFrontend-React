@@ -2,10 +2,10 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { parseEther } from "viem";
+import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
@@ -29,6 +29,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
+  const [maxAmount, setMaxAmount] = useState<string>('0');
 
   //  --------------------------------------------------------------------------
 
@@ -75,28 +76,32 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     }
   }
 
+  const handleMaxAmount = () => {
+    setAmount(maxAmount)
+  }
+
+  const handleHalfAmount = () => {
+    setAmount(`${Number(maxAmount) / 2}`)
+  }
+
+  const handleSlider = (value: any) => {
+    setAmount(`${value * Number(maxAmount) / 100}`)
+  }
+
   //  --------------------------------------------------------------------------
 
   const amountIsValid = useMemo<boolean>(() => {
     const amountInNumber = Number(amount);
-    const balanceInNumber = Number(balanceData?.formatted);
+    const maxAmountInNumber = Number(maxAmount);
     if (amountInNumber !== 0) {
-      if (amountInNumber <= balanceInNumber) {
+      if (amountInNumber <= maxAmountInNumber) {
         return true;
       }
     }
     return false;
-  }, [amount, balanceData?.formatted])
+  }, [amount, maxAmount])
 
   //  --------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!repayIsLoading && !approveIsLoading) {
-      closeLoading()
-    } else {
-      openLoading()
-    }
-  }, [repayIsLoading, approveIsLoading])
 
   useEffect(() => {
     if (repayIsError) {
@@ -129,6 +134,16 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     }
   }, [approveIsSuccess])
 
+  useEffect(() => {
+    if (userInfo) {
+      if (asset === 'eth') {
+        setMaxAmount(formatEther(userInfo.ethBorrowAmount))
+      } else {
+        setMaxAmount(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL))
+      }
+    }
+  }, [userInfo])
+
   //  --------------------------------------------------------------------------
 
   return (
@@ -136,15 +151,16 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
       <div className="flex flex-col gap-2">
         <MainInput
           endAdornment={<span className="text-gray-100 uppercase">{METADATA_OF_ASSET[asset].symbol}</span>}
+          disabled={asset === 'usdc' && approveIsLoading ? approved ? true : false : false}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: 2.790385 <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
+          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{METADATA_OF_ASSET[asset].symbol}</span></p>
           <div className="flex items-center gap-2">
-            <OutlinedButton className="text-xs px-2 py-1">half</OutlinedButton>
-            <OutlinedButton className="text-xs px-2 py-1">max</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalfAmount}>half</OutlinedButton>
+            <OutlinedButton className="text-xs px-2 py-1" onClick={handleMaxAmount}>max</OutlinedButton>
           </div>
         </div>
 
@@ -160,6 +176,9 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
+            disabled={asset === 'usdc' ? approved ? true : false : false}
+            onChange={handleSlider}
+            value={Number(amount) / Number(maxAmount) * 100}
           />
         </div>
 
@@ -181,26 +200,26 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
         {asset === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!repayPrepareIsSuccess}
+            disabled={!repayPrepareIsSuccess || repayIsLoading}
             onClick={() => repay?.()}
           >
-            Repay
+            {repayIsLoading ? IN_PROGRESS : 'Repay'}
           </FilledButton>
         ) : approved ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!repayPrepareIsSuccess}
+            disabled={!repayPrepareIsSuccess || repayIsLoading}
             onClick={() => repay?.()}
           >
-            Repay
+            {repayIsLoading ? IN_PROGRESS : 'Repay'}
           </FilledButton>
         ) : (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid}
+            disabled={!approve || !amountIsValid || approveIsLoading}
             onClick={() => approve?.()}
           >
-            Approve
+            {approveIsLoading ? IN_PROGRESS : 'Approve'}
           </FilledButton>
         )}
 

@@ -2,17 +2,17 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther, formatUnits } from "viem";
+import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits, parseEther } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAsset } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
-import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { IBalanceData, IPoolInfo, IReturnValueOfCalcTokenPrice, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -21,14 +21,15 @@ interface IProps {
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
+  poolInfo: IPoolInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: IProps) {
+export default function BorrowTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [maxAmount, setMaxAmount] = useState<string>('0')
+  const [maxAmountInUsd, setMaxAmountInUsd] = useState<string>('0')
 
   //  ----------------------------------------------------------------------------
 
@@ -50,6 +51,14 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
     hash: borrowData?.hash
   })
 
+  //  Get the price of ethereum in USD.
+  const { data: ethPriceInUsdc }: IReturnValueOfCalcTokenPrice = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
+    watch: true
+  })
+
   //  ----------------------------------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -61,14 +70,6 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
   }
 
   //  ----------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!borrowIsLoading) {
-      closeLoading()
-    } else {
-      openLoading()
-    }
-  }, [borrowIsLoading])
 
   useEffect(() => {
     if (borrowIsError) {
@@ -92,12 +93,17 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
     }
   }, [errorOfBorrowPrepare])
 
+  //  Get max borrowable amount in USD
   useEffect(() => {
     if (userInfo) {
-      const ethDepositAmount = Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))
-      const usdcDepositAmount = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))
-      console.log('>>>>>>> ethDepositAmount => ', ethDepositAmount)
-      console.log('>>>>>>> usdcDepositAmount => ', usdcDepositAmount)
+      if (ethPriceInUsdc) {
+        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * Number(formatUnits(ethPriceInUsdc, USDC_DECIMAL))
+        const usdcAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))
+        const amountInUsd = ethAmountInUsd + usdcAmountInUsd
+
+        //  >>>>>>>>>>>>>> Require to calculate LTV
+        setMaxAmountInUsd(`${amountInUsd * Number(poolInfo.LTV) / 100}`)
+      }
     }
   }, [userInfo])
 
@@ -138,7 +144,12 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
         <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
-            <span className="text-gray-100">0 USDC</span>
+            <span className="text-gray-100 uppercase">
+              {userInfo && balanceData ? asset === 'eth' ?
+                Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
+                Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
+              {METADATA_OF_ASSET[asset].symbol}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
@@ -146,16 +157,16 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo }: 
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100">2.89039 USDC</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {METADATA_OF_ASSET[asset].symbol}</span>
           </div>
         </div>
 
         <FilledButton
           className="mt-8 py-2 text-base"
-          disabled={!borrowPrepareIsSuccess}
+          disabled={!borrowPrepareIsSuccess || borrowIsLoading}
           onClick={() => borrow?.()}
         >
-          Borrow
+          {borrowIsLoading ? IN_PROGRESS : 'Borrow'}
         </FilledButton>
 
         <div className="flex items-center">
