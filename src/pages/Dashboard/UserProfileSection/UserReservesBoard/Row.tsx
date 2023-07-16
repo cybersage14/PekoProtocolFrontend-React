@@ -34,8 +34,6 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
     args: [asset.contractAddress]
   })
 
-  console.log('>>>>>>>>>>> asset => ', asset)
-
   //  ----------------------------------------------------------------------------
 
   useEffect(() => {

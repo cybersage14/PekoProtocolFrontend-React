@@ -143,10 +143,10 @@ export default function Liquidate() {
             <tr className="bg-gray-900">
               <Th label="User" />
               <Th label="Borrowed Asset(s)" />
-              <Th label="Borrowed Value" sortable />
+              <Th label="Borrowed Value" />
               <Th label="Deposited Asset(s)" />
-              <Th label="Deposited Value" sortable />
-              <Th label="Risk Factor" sortable />
+              <Th label="Deposited Value" />
+              <Th label="Risk Factor" />
               <Th label="Operation" />
             </tr>
           </thead>

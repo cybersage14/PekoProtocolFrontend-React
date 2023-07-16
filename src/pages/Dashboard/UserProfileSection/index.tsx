@@ -1,7 +1,12 @@
+import { lazy } from "react";
 import PrimaryBoard from "../../../components/boards/PrimaryBoard";
 import Section from "../../../components/Section";
 import { IUserInfo } from "../../../utils/interfaces";
-import UserReservesBoard from "./UserReservesBoard";
+
+// --------------------------------------------------------------------------------------------
+
+const UserReservesBoard = lazy(() => import('./UserReservesBoard'))
+const LiquidationsBoard = lazy(() => import('./LiquidationsBoard'))
 
 // --------------------------------------------------------------------------------------------
 
@@ -20,11 +25,7 @@ export default function UserProfileSection({ userInfo, ethPriceInUsd, usdcPriceI
       <div className="grid grid-cols-2 gap-4 h-fit lg:h-64">
         <UserReservesBoard userInfo={userInfo} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
 
-        <PrimaryBoard title="Liquidations" className="col-span-2 lg:col-span-1">
-          <div className="py-4 flex flex-col justify-center h-full">
-            <p className="text-gray-100 text-center">No Actions</p>
-          </div>
-        </PrimaryBoard>
+        <LiquidationsBoard userInfo={userInfo} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
       </div>
     </Section>
   )
