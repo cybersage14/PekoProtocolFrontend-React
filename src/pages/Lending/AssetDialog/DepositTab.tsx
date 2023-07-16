@@ -11,7 +11,7 @@ import FilledButton from "../../../components/buttons/FilledButton";
 import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
 import { TAssetSymbol } from "../../../utils/types";
-import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -20,11 +20,12 @@ interface IProps {
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
+  poolInfo?: IPoolInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function DepositTab({ assetSymbol, setVisible, balanceData, userInfo }: IProps) {
+export default function DepositTab({ assetSymbol, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
@@ -166,7 +167,7 @@ export default function DepositTab({ assetSymbol, setVisible, balanceData, userI
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">1.19%</span>
+            <span className="text-gray-100">{Number(poolInfo?.depositApy)}%</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
@@ -200,14 +201,14 @@ export default function DepositTab({ assetSymbol, setVisible, balanceData, userI
           </FilledButton>
         )}
 
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <div className="flex-1 h-[1px] bg-gray-800" />
           <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
             More Info
             <Icon icon={moreInfoCollapsed ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'} />
           </TextButton>
           <div className="flex-1 h-[1px] bg-gray-800" />
-        </div>
+        </div> */}
 
         {moreInfoCollapsed && (
           <MoreInfo />

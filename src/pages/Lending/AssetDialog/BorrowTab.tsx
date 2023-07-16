@@ -20,7 +20,7 @@ interface IProps {
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
-  poolInfo: IPoolInfo;
+  poolInfo?: IPoolInfo;
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
 }
@@ -55,6 +55,7 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
       return maxAmountInUsd / ethPriceInUsd
     }
     if (assetSymbol === 'usdc' && usdcPriceInUsd > 0) {
+      console.log(">>>>>>>> usdcPriceInUsd => ", usdcPriceInUsd)
       return maxAmountInUsd / usdcPriceInUsd
     }
     return 0
@@ -107,13 +108,15 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
   //  Get max borrowable amount in USD
   useEffect(() => {
     if (userInfo) {
-      if (ethPriceInUsd) {
+      if (ethPriceInUsd && usdcPriceInUsd) {
         const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * ethPriceInUsd
         const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))) * usdcPriceInUsd
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
+        console.log('>>>>>>> userInfo => ', userInfo)
+        console.log('>>>>>>> usdcAmountInUsd => ', usdcAmountInUsd)
 
         //  >>>>>>>>>>>>>> Require to calculate LTV
-        setMaxAmountInUsd(amountInUsd * Number(poolInfo.LTV) / 100)
+        setMaxAmountInUsd(amountInUsd * Number(poolInfo?.LTV) / 100)
       }
     }
   }, [userInfo])
@@ -166,7 +169,7 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">1.19%</span>
+            <span className="text-gray-100">{Number(poolInfo?.borrowApy).toFixed(2)}%</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
@@ -182,14 +185,14 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
           {borrowIsLoading ? IN_PROGRESS : 'Borrow'}
         </FilledButton>
 
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <div className="flex-1 h-[1px] bg-gray-800" />
           <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
             More Info
             <Icon icon={moreInfoCollapsed ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'} />
           </TextButton>
           <div className="flex-1 h-[1px] bg-gray-800" />
-        </div>
+        </div> */}
 
         {moreInfoCollapsed && (
           <MoreInfo />

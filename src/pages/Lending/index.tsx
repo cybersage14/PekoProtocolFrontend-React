@@ -61,13 +61,6 @@ export default function Lending() {
 
   //  Wagmi hooks -------------------------------------------------------
 
-  //  Balance data
-  const { data: balanceData } = useBalance({
-    address,
-    token: assetSymbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
-    watch: true
-  })
-
   //  Get the price of ethereum in USD.
   const { data: ethPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
@@ -189,7 +182,6 @@ export default function Lending() {
                         openDialog={openDialog}
                         ethPriceInUsd={ethPriceInUsd}
                         usdcPriceInUsd={usdcPriceInUsd}
-                        balanceData={balanceData}
                       />
                     ))}
                   </List>
@@ -215,7 +207,6 @@ export default function Lending() {
                           openDialog={openDialog}
                           ethPriceInUsd={ethPriceInUsd}
                           usdcPriceInUsd={usdcPriceInUsd}
-                          balanceData={balanceData}
                         />
                       ))}
                     </tbody>

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead } from "wagmi";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
-import { IAsset, IBalanceData, IReturnValueOfPoolInfo } from "../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../utils/constants";
+import { IAsset, IReturnValueOfBalance, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../utils/constants";
 import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------
@@ -13,12 +13,11 @@ interface IProps {
   openDialog: Function;
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
-  balanceData?: IBalanceData;
 }
 
 //  ----------------------------------------------------------------------------------
 
-export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd, balanceData }: IProps) {
+export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [marketSize, setMarketSize] = useState<number>(0)
   const [marketSizeInUsd, setMarketSizeInUsd] = useState<number>(0)
   const [totalBorrowed, setTotalBorrowed] = useState<number>(0)
@@ -26,11 +25,22 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   //  ---------------------------------------------------------------------------------
 
+  const { address } = useAccount()
+
+  //  ---------------------------------------------------------------------------------
+  //  Balance data
+  const { data: balanceData }: IReturnValueOfBalance = useBalance({
+    address,
+    token: asset.symbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
+    watch: true
+  })
+
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getPoolInfo',
-    args: [asset.contractAddress]
+    args: [asset.contractAddress],
+    watch: true
   })
 
   //  ----------------------------------------------------------------------------------
@@ -41,7 +51,6 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
     }
     return 0
   }, [balanceData])
-
 
   //  ----------------------------------------------------------------------------------
 

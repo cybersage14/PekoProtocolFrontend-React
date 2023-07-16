@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead } from "wagmi";
 import { ListItem } from "@material-tailwind/react";
-import { IAsset, IBalanceData, IReturnValueOfPoolInfo } from "../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../utils/constants";
+import { IAsset, IBalanceData, IReturnValueOfBalance, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../utils/constants";
 import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------
@@ -17,13 +17,24 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------
 
-export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd, balanceData }: IProps) {
+export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [marketSize, setMarketSize] = useState<number>(0)
   const [marketSizeInUsd, setMarketSizeInUsd] = useState<number>(0)
   const [totalBorrowed, setTotalBorrowed] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
 
   //  ---------------------------------------------------------------------------------
+
+  const { address } = useAccount()
+
+  //  ---------------------------------------------------------------------------------
+
+  //  Balance data
+  const { data: balanceData }: IReturnValueOfBalance = useBalance({
+    address,
+    token: asset.symbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
+    watch: true
+  })
 
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
