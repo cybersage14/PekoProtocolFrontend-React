@@ -1,4 +1,4 @@
-import { IChain, ILP, IMetadataOfAsset, IToken } from "./interfaces";
+import { IAsset, IChain, ILP, IMetadataOfAsset, IToken } from "./interfaces";
 
 export const TEMP_CRYPTO_LOGO_URL =
   "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=025";
@@ -1187,3 +1187,22 @@ export const METADATA_OF_ASSET: IMetadataOfAsset = {
 };
 
 export const IN_PROGRESS = "In Progress...";
+
+export const ASSETS: Array<IAsset> = [
+  {
+    id: 1,
+    name: "Ethereum",
+    symbol: "eth",
+    imgSrc: "/assets/images/ethereum.png",
+    contractAddress: WETH_CONTRACT_ADDRESS,
+    decimals: WETH_DECIMAL
+  },
+  {
+    id: 2,
+    name: "USD Coin",
+    symbol: "usdc",
+    imgSrc: "/assets/images/usdc.png",
+    contractAddress: USDC_CONTRACT_ADDRESS,
+    decimals: USDC_DECIMAL
+  }
+];

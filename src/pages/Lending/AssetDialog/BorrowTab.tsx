@@ -112,8 +112,6 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
         const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * ethPriceInUsd
         const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))) * usdcPriceInUsd
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
-        console.log('>>>>>>> userInfo => ', userInfo)
-        console.log('>>>>>>> usdcAmountInUsd => ', usdcAmountInUsd)
 
         //  >>>>>>>>>>>>>> Require to calculate LTV
         setMaxAmountInUsd(amountInUsd * Number(poolInfo?.LTV) / 100)

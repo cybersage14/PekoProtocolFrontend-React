@@ -1,53 +1,30 @@
 import { lazy, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
-import { List, ListItem } from "@material-tailwind/react";
+import { List } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
-import MainInput from "../../components/form/MainInput";
 import CollapsibleBoard from "../../components/boards/CollapsibleBoard";
 import PrimaryBoard from "../../components/boards/PrimaryBoard";
 import Th from "../../components/tableComponents/Th";
-import Td from "../../components/tableComponents/Td";
-import Tr from "../../components/tableComponents/Tr";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
+import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { TAssetSymbol } from "../../utils/types";
-import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo, IReturnValueOfPools } from "../../utils/interfaces";
+import { IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import MBRow from "./MBRow";
 import { getVisibleWalletAddress } from "../../utils/functions";
+import BorrowBoard from "./BorrowBoard";
 
 // -----------------------------------------------------------------------------------
 
 const AssetDialog = lazy(() => import('./AssetDialog'))
-
-// -----------------------------------------------------------------------------------
-
-const ASSETS: Array<IAsset> = [
-  {
-    id: 1,
-    name: "Ethereum",
-    symbol: "eth",
-    imgSrc: "/assets/images/ethereum.png",
-    contractAddress: WETH_CONTRACT_ADDRESS,
-    decimals: WETH_DECIMAL
-  },
-  {
-    id: 2,
-    name: "USD Coin",
-    symbol: "usdc",
-    imgSrc: "/assets/images/usdc.png",
-    contractAddress: USDC_CONTRACT_ADDRESS,
-    decimals: USDC_DECIMAL
-  }
-]
+const DepositBoard = lazy(() => import('./DepositBoard'))
 
 // -----------------------------------------------------------------------------------
 
@@ -81,11 +58,21 @@ export default function Lending() {
     functionName: 'calcTokenPrice',
   })
 
+  //  Get all pools
   const { data: poolInfos }: IReturnValueOfPools = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'listPools'
   })
+
+  //  Get Userinfo
+  const { data: userInfo }: IReturnValueOfUserInfo = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getUserInfo',
+    args: [address],
+    watch: true
+  });
 
   //  Functions ---------------------------------------------------------
 
@@ -156,7 +143,7 @@ export default function Lending() {
                 />
                 <InfoCard
                   label="Lent Out"
-                  value={(totalBorrowedInUsd / totalMarketSizeInUsd * 100).toFixed(2) + '%'}
+                  value={lentOut.toFixed(2) + '%'}
                 />
               </div>
 
@@ -254,10 +241,10 @@ export default function Lending() {
             action={<span className="text-gray-500 text-sm">{getVisibleWalletAddress(address || '', 6, 4)}</span>}
           >
             <div className="p-4 flex flex-col gap-4">
-              <div className="grid grid-cols-3 gap-3">
+              {/* <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
                   <span className="text-gray-500 text-sm">APY</span>
-                  <span className="text-green-500 font-semibold">0.00%</span>
+                  <span className="text-green-500 font-semibold">%</span>
                 </div>
                 <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
                   <span className="text-gray-500 text-sm">Borrowed</span>
@@ -267,7 +254,7 @@ export default function Lending() {
                   <span className="text-gray-500 text-sm">Risk Factor</span>
                   <span className="text-green-500 font-semibold">0.00%</span>
                 </div>
-              </div>
+              </div> */}
 
               <ProgressBar
                 label="Borrowing Power"
@@ -288,39 +275,14 @@ export default function Lending() {
             </div>
           </PrimaryBoard>
 
-          {/* Deposits Board */}
-          <PrimaryBoard title="Deposits" action={<span className="text-gray-100">$11.22</span>}>
-            <div className="p-4 flex items-center justify-between text-gray-100">
-              <div className="flex items-center gap-2">
-                <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                <div className="flex flex-col">
-                  <span className="font-semibold">USDC</span>
-                  <span className="text-sm text-gray-500">$0.999925</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="font-semibold">11.22 USDC</span>
-                <span className="text-sm text-gray-500">$11.22</span>
-              </div>
-            </div>
-          </PrimaryBoard>
+          {/* Deposits Board & Borrow Board */}
+          {userInfo && (
+            <>
+              <DepositBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
+              <BorrowBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
+            </>
+          )}
 
-          {/* Borrow Board */}
-          <PrimaryBoard title="Borrow" action={<span className="text-gray-100">$11.22</span>}>
-            <div className="p-4 flex items-center justify-between text-gray-100">
-              <div className="flex items-center gap-2">
-                <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                <div className="flex flex-col">
-                  <span className="font-semibold">USDC</span>
-                  <span className="text-sm text-gray-500">$0.999925</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="font-semibold">11.22 USDC</span>
-                <span className="text-sm text-gray-500">$11.22</span>
-              </div>
-            </div>
-          </PrimaryBoard>
         </div>
       </div >
       <AssetDialog
@@ -329,6 +291,7 @@ export default function Lending() {
         assetSymbol={assetSymbol}
         ethPriceInUsd={ethPriceInUsd}
         usdcPriceInUsd={usdcPriceInUsd}
+        userInfo={userInfo}
       />
     </Container >
   )

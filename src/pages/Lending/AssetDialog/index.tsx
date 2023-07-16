@@ -8,7 +8,7 @@ import WithdrawTab from "./WithdrawTab";
 import BorrowTab from "./BorrowTab";
 import RepayTab from "./RepayTab";
 import { METADATA_OF_ASSET, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
-import { IReturnValueOfPoolInfo, IReturnValueOfUserInfo } from "../../../utils/interfaces";
+import { IReturnValueOfPoolInfo, IReturnValueOfUserInfo, IUserInfo } from "../../../utils/interfaces";
 
 //  --------------------------------------------------------------------------------------------
 
@@ -20,11 +20,12 @@ interface IProps {
   assetSymbol: TAssetSymbol
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
+  userInfo?: IUserInfo;
 }
 
 //  --------------------------------------------------------------------------------------------
 
-export default function AssetDialog({ visible, setVisible, assetSymbol, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function AssetDialog({ visible, setVisible, assetSymbol, ethPriceInUsd, usdcPriceInUsd, userInfo }: IProps) {
   const [tabValue, setTabValue] = useState<TTabValue>('deposit')
 
   //  -----------------------------------------------------------------
@@ -49,15 +50,6 @@ export default function AssetDialog({ visible, setVisible, assetSymbol, ethPrice
     token: assetSymbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
     watch: true
   })
-
-  //  Get Userinfo
-  const { data: userInfo }: IReturnValueOfUserInfo = useContractRead({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'getUserInfo',
-    args: [address],
-    watch: true
-  });
 
   //  Get PoolInfo
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
