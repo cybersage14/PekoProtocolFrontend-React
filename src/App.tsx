@@ -10,16 +10,19 @@ import { LoadingProvider } from './contexts/LoadingContext';
 import { MobileMenuProvider } from './contexts/MobileMenuContext';
 import Routes from './Routes';
 import { DialogSizeProvider } from './contexts/DialogSizeContext';
+import { createPublicClient, http } from 'viem';
 
 // -----------------------------------------------------------------------------------------------
 
 const projectId = process.env.REACT_APP_CONNECT_PROJECT_ID || ''
 const chains = [mainnet, lineaTestnet]
-const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: w3mConnectors({ projectId, chains }),
-  publicClient
+  publicClient: createPublicClient({
+    chain: lineaTestnet,
+    transport: http()
+  })
 })
 const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
