@@ -31,7 +31,8 @@ export default function Liquidate() {
   const { data: listOfUsers }: IReturnValueOfListOfUsers = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
-    functionName: 'listUserInfo'
+    functionName: 'listUserInfo',
+    watch: true
   })
 
   //  Get the price of ethereum in USD.
@@ -48,6 +49,12 @@ export default function Liquidate() {
     abi: POOL_CONTRACT_ABI,
     args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
     functionName: 'calcTokenPrice',
+  })
+
+  const { data: liquidatationThresholdInBigInt } = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getLiquidationThreshhold'
   })
 
   //  ----------------------------------------------------------------
@@ -72,6 +79,13 @@ export default function Liquidate() {
     }
     return 0
   }, [usdcPriceInBigInt])
+
+  const liquidationThreshold = useMemo<number>(() => {
+    if (liquidatationThresholdInBigInt) {
+      return Number(liquidatationThresholdInBigInt)
+    }
+    return 0
+  }, [liquidatationThresholdInBigInt])
 
   //  ----------------------------------------------------------------
 
@@ -153,7 +167,7 @@ export default function Liquidate() {
           {visible && ethPriceInUsd && usdcPriceInUsd ? (
             <tbody>
               {users?.map((userInfo, index) => (
-                <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} />
+                <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
               ))}
             </tbody>
           ) : (<></>)}

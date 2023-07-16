@@ -25,7 +25,7 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   //  ---------------------------------------------------------------------------------
 
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
 
   //  ---------------------------------------------------------------------------------
 
@@ -135,13 +135,16 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       </div>
 
       {/* Wallet */}
-      <div className="flex justify-between w-full">
-        <span className="text-gray-500 font-bold">Wallet: </span>
-        <div className="flex flex-col">
-          <span className="font-semibold uppercase">{balanceData?.formatted ? Number(balanceData.formatted).toFixed(4) : 0} {asset.symbol}</span>
-          <span className="text-sm text-gray-500">${balanceInUsd.toFixed(4)}</span>
+      {isConnected && (
+        <div className="flex justify-between w-full">
+          <span className="text-gray-500 font-bold">Wallet: </span>
+          <div className="flex flex-col">
+            <span className="font-semibold uppercase">{balanceData?.formatted ? Number(balanceData.formatted).toFixed(4) : 0} {asset.symbol}</span>
+            <span className="text-sm text-gray-500">${balanceInUsd.toFixed(4)}</span>
+          </div>
         </div>
-      </div>
+      )}
+
     </ListItem>
   )
 }

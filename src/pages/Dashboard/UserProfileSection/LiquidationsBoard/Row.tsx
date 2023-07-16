@@ -63,12 +63,6 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
 
   //  ----------------------------------------------------------------------------------------
 
-  const handleLiquidate = () => {
-    approve?.()
-  }
-
-  //  ----------------------------------------------------------------------------------------
-
   useEffect(() => {
     if (liqudateIsSuccess) {
       toast.success('Liquidated.')

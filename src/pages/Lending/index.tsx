@@ -4,6 +4,7 @@ import { useMediaQuery } from 'react-responsive';
 import { List } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 import { useAccount, useContractRead } from "wagmi";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
@@ -16,7 +17,6 @@ import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS
 import { TAssetSymbol } from "../../utils/types";
 import { IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import MBRow from "./MBRow";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import BorrowBoard from "./BorrowBoard";
@@ -107,8 +107,9 @@ export default function Lending() {
       const usdcBorrowAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd;
       const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount)) * ethPriceInUsd;
       const usdcDepositAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd;
-
-      return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / (ethDepositAmountInUsd + usdcDepositAmountInUsd) * 100
+      if (ethDepositAmountInUsd + usdcDepositAmountInUsd > 0) {
+        return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / (ethDepositAmountInUsd + usdcDepositAmountInUsd) * 100
+      }
     }
     return 0
   }, [])
@@ -118,7 +119,9 @@ export default function Lending() {
       const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
       const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-      return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+      if (depositedValueInUsd > 0) {
+        return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+      }
     }
     return 0
   }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
@@ -236,7 +239,8 @@ export default function Lending() {
                         <Th label="Market Size" />
                         <Th label="Borrow APY" />
                         <Th label="Total Borrowed" />
-                        <Th label="Wallet" />
+                        {isConnected && (<Th label="Wallet" />)}
+
                       </tr>
                     </thead>
 
@@ -256,16 +260,17 @@ export default function Lending() {
               </div>
             </CollapsibleBoard>
           </div>
-        </div >
+        </div>
 
-        <div className="col-span-5 lg:col-span-1 flex flex-col gap-4">
-          {/* Account Board */}
-          <PrimaryBoard
-            title="Account"
-            action={<span className="text-gray-500 text-sm">{getVisibleWalletAddress(address || '', 6, 4)}</span>}
-          >
-            <div className="p-4 flex flex-col gap-4">
-              {/* <div className="grid grid-cols-3 gap-3">
+        {userInfo && (
+          <div className="col-span-5 lg:col-span-1 flex flex-col gap-4">
+            {/* Account Board */}
+            <PrimaryBoard
+              title="Account"
+              action={<span className="text-gray-500 text-sm">{getVisibleWalletAddress(address || '', 6, 4)}</span>}
+            >
+              <div className="p-4 flex flex-col gap-4">
+                {/* <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-md border border-gray-800 py-2 px-2 flex flex-col items-center">
                   <span className="text-gray-500 text-sm">APY</span>
                   <span className="text-green-500 font-semibold">%</span>
@@ -280,34 +285,31 @@ export default function Lending() {
                 </div>
               </div> */}
 
-              <ProgressBar
-                label="Borrowing Power"
-                value={borrowingPower}
-                valueNode={<span className="text-green-500">{borrowingPower.toFixed(2)}%</span>}
-              />
+                <ProgressBar
+                  label="Borrowing Power"
+                  value={borrowingPower}
+                  valueNode={<span className="text-green-500">{borrowingPower.toFixed(2)}%</span>}
+                />
 
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500 text-sm">Available</span>
-                  <span className="text-gray-100">{(100 - borrowingPower).toFixed(2)}%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500 text-sm">Risk Factor</span>
-                  <span className="text-red-500">{riskFactor.toFixed(2)}%</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Available</span>
+                    <span className="text-gray-100">{(100 - borrowingPower).toFixed(2)}%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Risk Factor</span>
+                    <span className="text-red-500">{riskFactor.toFixed(2)}%</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </PrimaryBoard>
+            </PrimaryBoard>
 
-          {/* Deposits Board & Borrow Board */}
-          {userInfo && (
-            <>
-              <DepositBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
-              <BorrowBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
-            </>
-          )}
+            {/* Deposits Board & Borrow Board */}
+            <DepositBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
+            <BorrowBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
+          </div>
+        )}
 
-        </div>
       </div >
       <AssetDialog
         visible={dialogVisible}

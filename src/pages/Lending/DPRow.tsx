@@ -25,7 +25,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   //  ---------------------------------------------------------------------------------
 
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
 
   //  ---------------------------------------------------------------------------------
   //  Balance data
@@ -118,12 +118,14 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       </Td>
 
       {/* Wallet */}
-      <Td>
-        <div className="flex flex-col">
-          <span className="font-semibold uppercase">{balanceData?.formatted ? Number(balanceData.formatted).toFixed(4) : 0} {asset.symbol}</span>
-          <span className="text-sm text-gray-500">${balanceInUsd.toFixed(4)}</span>
-        </div>
-      </Td>
+      {isConnected && (
+        <Td>
+          <div className="flex flex-col">
+            <span className="font-semibold uppercase">{balanceData?.formatted ? Number(balanceData.formatted).toFixed(4) : 0} {asset.symbol}</span>
+            <span className="text-sm text-gray-500">${balanceInUsd.toFixed(4)}</span>
+          </div>
+        </Td>
+      )}
     </Tr>
   )
 }
