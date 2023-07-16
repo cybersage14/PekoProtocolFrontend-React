@@ -2,12 +2,12 @@ import { lazy, useMemo, useState } from "react";
 import { List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
-import { formatEther, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import { IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
+import { ILiquidation, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
 
 // -----------------------------------------------------------------------------------
 
@@ -57,13 +57,6 @@ export default function Liquidate() {
 
   //  ----------------------------------------------------------------
 
-  const users = useMemo(() => {
-    if (listOfUsers) {
-      return listOfUsers.filter(userInfo => userInfo.ethBorrowAmount || userInfo.usdtBorrowAmount)
-    }
-    return []
-  }, [listOfUsers])
-
   const ethPriceInUsd = useMemo<number>(() => {
     if (ethPriceInBigInt) {
       return Number(formatEther(ethPriceInBigInt))
@@ -84,6 +77,27 @@ export default function Liquidate() {
     }
     return 0
   }, [liquidatationThresholdInBigInt])
+
+  const liquidations = useMemo<Array<ILiquidation>>(() => {
+    if (listOfUsers) {
+      let _liquidations = [];
+      for (let i = 0; i < listOfUsers.length; i += 1) {
+        if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
+          let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+          let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+          if (depositedValueInUsd > 0) {
+            let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+            if (riskFactor > liquidationThreshold) {
+              _liquidations.push({ ...listOfUsers[i], riskFactor })
+            }
+          }
+        }
+      }
+      return _liquidations;
+    }
+    return []
+  }, [listOfUsers])
 
   //  ----------------------------------------------------------------
 
@@ -108,8 +122,11 @@ export default function Liquidate() {
         <>
           {isMobile ? visible ? (
             <List className="text-sm">
-              {users?.map((userInfo, index) => (
-                <MBRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
+              {liquidations.map((liquidationItem, index) => (
+                <MBRow
+                  key={index}
+                  liquidation={liquidationItem}
+                />
               ))}
             </List>
           ) : (
@@ -128,13 +145,10 @@ export default function Liquidate() {
                 </tr>
               </thead>
               <tbody>
-                {users?.map((userInfo, index) => (
-                  <DPRow 
-                    key={index} 
-                    userInfo={userInfo} 
-                    ethPriceInUsd={Number(ethPriceInUsd)} 
-                    usdcPriceInUsd={Number(usdcPriceInUsd)} 
-                    liquidationThreshold={liquidationThreshold} 
+                {liquidations.map((liquidationItem, index) => (
+                  <DPRow
+                    key={index}
+                    liquidation={liquidationItem}
                   />
                 ))}
               </tbody>
