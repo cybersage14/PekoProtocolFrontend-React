@@ -13,6 +13,7 @@ import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUser
 
 const UserProfileSection = lazy(() => import('./UserProfileSection'))
 const DepositsSection = lazy(() => import('./DepositsSection'))
+const DialogClaimPeko = lazy(() => import('./DialogClaimPeko'))
 
 // -----------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,8 @@ export default function Dashboard() {
 
   const { address } = useAccount()
 
-  const [walletBalanceInUsd, setWalletBalanceInUsd] = useState<number>(0);
+  const [walletBalanceInUsd, setWalletBalanceInUsd] = useState<number>(0)
+  const [dialogClaimPekoOpened, setDialogClaimPekoOpened] = useState<boolean>(false)
 
   //  ------------------------------------------------------------------------------
   //  Get ethereum balance of wallet
@@ -59,6 +61,12 @@ export default function Dashboard() {
     args: [address],
     watch: true
   });
+
+  //  ------------------------------------------------------------------------------
+
+  const handleDialogClaimPeko = () => {
+    setDialogClaimPekoOpened(!dialogClaimPekoOpened)
+  }
 
   //  ------------------------------------------------------------------------------
 
@@ -137,6 +145,10 @@ export default function Dashboard() {
             <Link to="/lending">
               <FilledButton className="">Lending</FilledButton>
             </Link>
+            <FilledButton
+              className="w-32"
+              onClick={handleDialogClaimPeko}
+            >Claim $Peko</FilledButton>
             {/* <Link to="/swap">
               <FilledButton className="">Swap</FilledButton>
             </Link> */}
@@ -163,6 +175,15 @@ export default function Dashboard() {
       <LPTokensSection />
       <FarmsSection /> */}
       <DepositsSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+
+      {userInfo && (
+        <DialogClaimPeko
+          visible={dialogClaimPekoOpened}
+          setVisible={setDialogClaimPekoOpened}
+          userInfo={userInfo}
+        />
+      )}
+
     </div>
   )
 }
