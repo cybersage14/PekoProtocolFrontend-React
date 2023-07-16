@@ -3,17 +3,19 @@ import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useCopyToClipboard, useOnClickOutside } from 'usehooks-ts';
-import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import FilledButton from "../../components/buttons/FilledButton";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUserInfo } from "../../utils/interfaces";
+import { toast } from "react-toastify";
+import useLoading from "../../hooks/useLoading";
 
 // -----------------------------------------------------------------------------------------------------
 
 const UserProfileSection = lazy(() => import('./UserProfileSection'))
 const DepositsSection = lazy(() => import('./DepositsSection'))
-const DialogClaimPeko = lazy(() => import('./DialogClaimPeko'))
+// const DialogClaimPeko = lazy(() => import('./DialogClaimPeko'))
 
 // -----------------------------------------------------------------------------------------------------
 
@@ -23,6 +25,7 @@ export default function Dashboard() {
   useOnClickOutside(ref, () => copy(''))
 
   const { address } = useAccount()
+  const { openLoading, closeLoading } = useLoading()
 
   const [walletBalanceInUsd, setWalletBalanceInUsd] = useState<number>(0)
   const [dialogClaimPekoOpened, setDialogClaimPekoOpened] = useState<boolean>(false)
@@ -61,6 +64,19 @@ export default function Dashboard() {
     args: [address],
     watch: true
   });
+
+  //  Claim Peko
+  const { config: depositConfig } = usePrepareContractWrite({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'claimPeko',
+  })
+
+  const { write: claimPeko, data: claimPekoData } = useContractWrite(depositConfig);
+
+  const { isLoading: claimPekoIsLoading, isSuccess: claimPekoIsSuccess, isError: claimPekoIsError } = useWaitForTransaction({
+    hash: claimPekoData?.hash,
+  })
 
   //  ------------------------------------------------------------------------------
 
@@ -112,6 +128,28 @@ export default function Dashboard() {
     setWalletBalanceInUsd(balanceInUsd)
   }, [ethBalanceData, usdcBalanceData])
 
+  useEffect(() => {
+    if (claimPekoIsSuccess) {
+      toast.success('Claimed.')
+      closeLoading()
+    }
+  }, [claimPekoIsSuccess])
+
+  useEffect(() => {
+    if (claimPekoIsError) {
+      toast.error('Claiming token has an error.')
+      closeLoading()
+    }
+  }, [claimPekoIsError])
+
+  useEffect(() => {
+    if (claimPekoIsLoading) {
+      openLoading()
+    } else {
+      closeLoading()
+    }
+  }, [claimPekoIsLoading])
+
   //  ------------------------------------------------------------------------------
 
   return (
@@ -147,8 +185,11 @@ export default function Dashboard() {
             </Link>
             <FilledButton
               className="w-32"
-              onClick={handleDialogClaimPeko}
-            >Claim $Peko</FilledButton>
+              disabled={!claimPeko || claimPekoIsLoading}
+              onClick={() => claimPeko?.()}
+            >
+              {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
+            </FilledButton>
             {/* <Link to="/swap">
               <FilledButton className="">Swap</FilledButton>
             </Link> */}
@@ -176,13 +217,13 @@ export default function Dashboard() {
       <FarmsSection /> */}
       <DepositsSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
 
-      {userInfo && (
+      {/* {userInfo && (
         <DialogClaimPeko
           visible={dialogClaimPekoOpened}
           setVisible={setDialogClaimPekoOpened}
           userInfo={userInfo}
         />
-      )}
+      )} */}
 
     </div>
   )
