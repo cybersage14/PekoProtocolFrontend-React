@@ -80,6 +80,10 @@ export interface IBalanceData {
   value: bigint;
 }
 
+export interface ILiquidation extends IUserInfo {
+  riskFactor: number;
+}
+
 export interface IReturnValueOfUserInfo {
   data?: IUserInfo;
   [key: string]: any;

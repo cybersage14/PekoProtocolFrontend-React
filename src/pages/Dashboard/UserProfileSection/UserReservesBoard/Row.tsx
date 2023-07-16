@@ -82,61 +82,65 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
 
   return (
     <>
-      <Tr>
-        {/* Asset */}
-        <Td>
-          <div className="flex items-center gap-2">
-            <img src={asset.imgSrc} alt="" className="w-10" />
-            <div className="flex flex-col">
-              <span className="font-semibold text-green-500">{asset.name}(deposit)</span>
-              <span className="text-sm text-gray-500">
-                ${assetPriceInUsd.toFixed(2)}
-              </span>
+      {depositAmount > 0 && (
+        <Tr>
+          {/* Asset */}
+          <Td>
+            <div className="flex items-center gap-2">
+              <img src={asset.imgSrc} alt="" className="w-10" />
+              <div className="flex flex-col">
+                <span className="font-semibold text-green-500">{asset.name}(deposit)</span>
+                <span className="text-sm text-gray-500">
+                  ${assetPriceInUsd.toFixed(2)}
+                </span>
+              </div>
             </div>
-          </div>
-        </Td>
+          </Td>
 
-        {/* APY */}
-        <Td className="text-green-500">
-          {depositApy.toFixed(2)}%
-        </Td>
+          {/* APY */}
+          <Td className="text-green-500">
+            {depositApy.toFixed(2)}%
+          </Td>
 
-        {/* Amount */}
-        <Td>
-          <div className="flex flex-col">
-            <span className="font-semibold uppercase">{depositAmount.toFixed(4)} {asset.symbol}</span>
-            <span className="text-sm text-gray-500">${depositAmountInUsd.toFixed(2)}</span>
-          </div>
-        </Td>
-      </Tr>
-
-      <Tr>
-        {/* Asset */}
-        <Td>
-          <div className="flex items-center gap-2">
-            <img src={asset.imgSrc} alt="" className="w-10" />
+          {/* Amount */}
+          <Td>
             <div className="flex flex-col">
-              <span className="font-semibold text-red-500">{asset.name}(borrow)</span>
-              <span className="text-sm text-gray-500">
-                ${assetPriceInUsd.toFixed(4)}
-              </span>
+              <span className="font-semibold uppercase">{depositAmount.toFixed(4)} {asset.symbol}</span>
+              <span className="text-sm text-gray-500">${depositAmountInUsd.toFixed(2)}</span>
             </div>
-          </div>
-        </Td>
+          </Td>
+        </Tr>
+      )}
 
-        {/* APY */}
-        <Td className="text-green-500">
-          {borrowApy.toFixed(2)}%
-        </Td>
+      {borrowAmount > 0 && (
+        <Tr>
+          {/* Asset */}
+          <Td>
+            <div className="flex items-center gap-2">
+              <img src={asset.imgSrc} alt="" className="w-10" />
+              <div className="flex flex-col">
+                <span className="font-semibold text-red-500">{asset.name}(borrow)</span>
+                <span className="text-sm text-gray-500">
+                  ${assetPriceInUsd.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </Td>
 
-        {/* Amount */}
-        <Td>
-          <div className="flex flex-col">
-            <span className="font-semibold uppercase">{borrowAmount.toFixed(4)} {asset.symbol}</span>
-            <span className="text-sm text-gray-500">${borrowAmountInUsd.toFixed(2)}</span>
-          </div>
-        </Td>
-      </Tr>
+          {/* APY */}
+          <Td className="text-green-500">
+            {borrowApy.toFixed(2)}%
+          </Td>
+
+          {/* Amount */}
+          <Td>
+            <div className="flex flex-col">
+              <span className="font-semibold uppercase">{borrowAmount.toFixed(4)} {asset.symbol}</span>
+              <span className="text-sm text-gray-500">${borrowAmountInUsd.toFixed(2)}</span>
+            </div>
+          </Td>
+        </Tr>
+      )}
     </>
   )
 }

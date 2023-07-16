@@ -43,7 +43,7 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
         {Number(balanceData?.formatted).toFixed(4)} {asset.symbol}
       </Td>
       <Td>
-        $ {asset.symbol === 'eth' ? ethPriceInUsd : usdcPriceInUsd}
+        $ {asset.symbol === 'eth' ? ethPriceInUsd.toFixed(2) : usdcPriceInUsd.toFixed(2)}
       </Td>
       <Td>${balanceInUsd.toFixed(2)}</Td>
     </Tr>

@@ -1,11 +1,11 @@
+import { useEffect, useMemo, useState } from "react";
 import { ListItem } from "@material-tailwind/react";
+import { toast } from "react-toastify";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IUserInfo } from "../../utils/interfaces";
-import { useEffect, useMemo, useState } from "react";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { toast } from "react-toastify";
 import FilledButton from "../../components/buttons/FilledButton";
 
 //  -----------------------------------------------------------------------------------------

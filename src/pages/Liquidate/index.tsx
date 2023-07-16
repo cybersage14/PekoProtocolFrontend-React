@@ -1,24 +1,18 @@
 import { lazy, useMemo, useState } from "react";
-import { List, ListItem, Switch } from "@material-tailwind/react";
+import { List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
 import { formatEther, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
-import { getVisibleWalletAddress } from "../../utils/functions";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import FilledButton from "../../components/buttons/FilledButton";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
 
 // -----------------------------------------------------------------------------------
 
 const DPRow = lazy(() => import('./DPRow'))
 const MBRow = lazy(() => import('./MBRow'))
-
-// -----------------------------------------------------------------------------------
-
-const TEMP_INDEXES_OF_TABLE: Array<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 // -----------------------------------------------------------------------------------
 
@@ -135,7 +129,13 @@ export default function Liquidate() {
               </thead>
               <tbody>
                 {users?.map((userInfo, index) => (
-                  <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
+                  <DPRow 
+                    key={index} 
+                    userInfo={userInfo} 
+                    ethPriceInUsd={Number(ethPriceInUsd)} 
+                    usdcPriceInUsd={Number(usdcPriceInUsd)} 
+                    liquidationThreshold={liquidationThreshold} 
+                  />
                 ))}
               </tbody>
             </Table>

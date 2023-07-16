@@ -29,7 +29,11 @@ export default function UserReservesBoard({ userInfo, ethPriceInUsd, usdcPriceIn
   }, [userInfo])
 
   return (
-    <PrimaryBoard title="User Reserves" className="col-span-2 lg:col-span-1" action={<span className="text-gray-500">${totalAmountInUsd.toFixed(2)}</span>}>
+    <PrimaryBoard
+      title="User Reserves"
+      className="col-span-2 lg:col-span-1"
+      action={<span className="text-gray-500">${totalAmountInUsd.toFixed(2)}</span>}
+    >
       {/* <p className="text-gray-100 text-center">You have no profile to deposit or borrow.</p>
             <FilledButton>Create profile</FilledButton> */}
       <Table className="w-full">

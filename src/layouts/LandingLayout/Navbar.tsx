@@ -89,7 +89,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {NAV_LINKS.map(linkItem => (
               <Link key={linkItem.id} to={linkItem.to}>
-                <TextButton className={`flex items-center gap-2 ${pathname === linkItem.to ? 'text-gray-100' : 'text-gray-500'}`}>
+                <TextButton className={`flex items-center gap-2 ${pathname === linkItem.to ? 'text-gray-100' : 'text-gray-500'}`} >
                   <Icon icon={linkItem.iconName} className="text-lg" />
                   {linkItem.label}
                 </TextButton>
@@ -145,7 +145,7 @@ export default function Navbar() {
 
             <List>
               {NAV_LINKS.map(linkItem => (
-                <ListItem key={linkItem.id} onClick={() => navigateToPage(linkItem.to)} className={`gap-4 ${pathname === linkItem.to ? 'text-gray-100' : 'text-gray-500'}`}>
+                <ListItem key={linkItem.id} onClick={() => navigateToPage(linkItem.to)} className={`gap-4 ${pathname === linkItem.to ? 'text-gray-100' : 'text-gray-500'}`} disabled={!isConnected}>
                   <Icon icon={linkItem.iconName} className="text-lg" />
                   {linkItem.label}
                 </ListItem>

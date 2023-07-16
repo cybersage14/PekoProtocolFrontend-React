@@ -86,7 +86,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
           <div className="flex flex-col">
             <span className="font-semibold">{asset.name}</span>
             <span className="text-sm text-gray-500">
-              ${asset.symbol === 'eth' ? ethPriceInUsd.toFixed(4) : usdcPriceInUsd.toFixed(4)}
+              ${asset.symbol === 'eth' ? ethPriceInUsd.toFixed(2) : usdcPriceInUsd.toFixed(2)}
             </span>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       <Td>
         <div className="flex flex-col">
           <span className="font-semibold uppercase">{marketSize.toFixed(4)} {asset.symbol}</span>
-          <span className="text-sm text-gray-500">${marketSizeInUsd.toFixed(4)}</span>
+          <span className="text-sm text-gray-500">${marketSizeInUsd.toFixed(2)}</span>
         </div>
       </Td>
 
@@ -113,7 +113,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       <Td>
         <div className="flex flex-col">
           <span className="font-semibold uppercase">{totalBorrowed.toFixed(4)} {asset.symbol}</span>
-          <span className="text-sm text-gray-500">${totalBorrowedInUsd.toFixed(4)}</span>
+          <span className="text-sm text-gray-500">${totalBorrowedInUsd.toFixed(2)}</span>
         </div>
       </Td>
 
@@ -122,7 +122,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
         <Td>
           <div className="flex flex-col">
             <span className="font-semibold uppercase">{balanceData?.formatted ? Number(balanceData.formatted).toFixed(4) : 0} {asset.symbol}</span>
-            <span className="text-sm text-gray-500">${balanceInUsd.toFixed(4)}</span>
+            <span className="text-sm text-gray-500">${balanceInUsd.toFixed(2)}</span>
           </div>
         </Td>
       )}

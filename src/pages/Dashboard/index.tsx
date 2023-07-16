@@ -80,7 +80,10 @@ export default function Dashboard() {
     if (userInfo) {
       const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
       const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
-      return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+
+      if (depositedValueInUsd > 0) {
+        return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+      }
     }
     return 0
   }, [userInfo, ethPriceInUsd, usdcPriceInUsd])

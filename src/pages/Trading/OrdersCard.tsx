@@ -7,7 +7,11 @@ import Tr from "../../components/tableComponents/Tr";
 import Td from "../../components/tableComponents/Td";
 import { TEMP_CRYPTO_LOGO_URL } from "../../utils/constants";
 
+//  ----------------------------------------------------------------------------------------------------
+
 type TTabValue = 'orders' | 'balances';
+
+//  ----------------------------------------------------------------------------------------------------
 
 export default function OrdersCard({ className = '' }: IPropsOfComponent) {
   const [tabValue, setTabValue] = useState<TTabValue>('orders')

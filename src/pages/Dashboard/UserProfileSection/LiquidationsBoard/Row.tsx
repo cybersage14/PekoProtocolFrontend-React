@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Tr from "../../../../components/tableComponents/Tr";
-import { IUserInfo } from "../../../../utils/interfaces";
+import { ILiquidation } from "../../../../utils/interfaces";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
@@ -11,24 +11,17 @@ import FilledButton from "../../../../components/buttons/FilledButton";
 //  -----------------------------------------------------------------------------------------
 
 interface IProps {
-  userInfo: IUserInfo;
+  liquidation: ILiquidation;
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
 }
 
 //  -----------------------------------------------------------------------------------------
 
-export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
   const [approved, setApproved] = useState<boolean>(false);
-
-  const riskFactor = useMemo<number>(() => {
-    const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
-    const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
-
-    return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
-  }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
 
   //  ----------------------------------------------------------------------------------------
 
@@ -37,7 +30,7 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'liquidate',
-    args: [userInfo.accountAddress],
+    args: [liquidation.accountAddress],
     value: parseEther(`${liquidateEthValue}`)
   })
 
@@ -76,9 +69,9 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
   }, [liquidateIsError])
 
   useEffect(() => {
-    setLiquidateEthValue(Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtBorrowAmount, USDC_DECIMAL)))
-  }, [userInfo])
+    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
+    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtBorrowAmount, USDC_DECIMAL)))
+  }, [liquidation])
 
   useEffect(() => {
     if (approveIsSuccess) {
@@ -93,39 +86,39 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
     <Tr>
       {/* Borrowed Value */}
       <Td>
-        {userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
+        {liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
           <div className="flex flex-col gap-1">
-            <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)).toFixed(4)} ETH</span>
+            <span className="uppercase">{Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)).toFixed(4)} ETH</span>
             <span className="uppercase">
-              {Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
+              {Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
             </span>
           </div>
-        ) : !userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
+        ) : !liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
           <span className="uppercase">
-            {Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
+            {Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
           </span>
         ) : (
-          <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)).toFixed(4)} ETH</span>
+          <span className="uppercase">{Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)).toFixed(4)} ETH</span>
         )}
       </Td>
 
       {/* Deposited Value */}
       <Td>
-        {userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
+        {liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
           <div className="flex flex-col gap-1">
-            <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)).toFixed(4)} ETH</span>
-            <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+            <span className="uppercase">{Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)).toFixed(4)} ETH</span>
+            <span className="uppercase">{Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
           </div>
-        ) : !userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
-          <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+        ) : !liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
+          <span className="uppercase">{Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
         ) : (
-          <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)).toFixed(4)} ETH</span>
+          <span className="uppercase">{Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)).toFixed(4)} ETH</span>
         )}
       </Td>
 
       {/* Risk Factor */}
       <Td className="text-red-500">
-        {riskFactor.toFixed(4)} %
+        {liquidation.riskFactor.toFixed(4)} %
       </Td>
 
       <Td>
