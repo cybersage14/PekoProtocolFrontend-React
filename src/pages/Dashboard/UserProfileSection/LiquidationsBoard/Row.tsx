@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Tr from "../../../../components/tableComponents/Tr";
 import { IUserInfo } from "../../../../utils/interfaces";
-import { formatEther, formatUnits, parseEther } from "viem";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { toast } from "react-toastify";
 import Td from "../../../../components/tableComponents/Td";
@@ -19,6 +19,10 @@ interface IProps {
 //  -----------------------------------------------------------------------------------------
 
 export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+  const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
+  const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
+  const [approved, setApproved] = useState<boolean>(false);
+
   const riskFactor = useMemo<number>(() => {
     const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
     const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
@@ -28,28 +32,13 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
 
   //  ----------------------------------------------------------------------------------------
 
-  const liquidateValueInEth = useMemo<string>(() => {
-    if (ethPriceInUsd && usdcPriceInUsd) {
-      const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * ethPriceInUsd
-      const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))) * usdcPriceInUsd
-      const amountInUsd = ethAmountInUsd + usdcAmountInUsd
-
-      return `${amountInUsd / ethPriceInUsd}`
-    }
-
-    return '0'
-  }, [userInfo])
-
-
-  //  ----------------------------------------------------------------------------------------
-
   //  Liquidate
   const { config: liquidateConfig } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'liquidate',
     args: [userInfo.accountAddress],
-    value: parseEther(liquidateValueInEth)
+    value: parseEther(`${liquidateEthValue}`)
   })
 
   const { write: liquidate, data: liquidateData } = useContractWrite(liquidateConfig);
@@ -57,6 +46,26 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
   const { isLoading: liquidateIsLoading, isSuccess: liqudateIsSuccess, isError: liquidateIsError } = useWaitForTransaction({
     hash: liquidateData?.hash
   })
+
+  //  Approve USDC
+  const { config: approveConfig } = usePrepareContractWrite({
+    address: USDC_CONTRACT_ADDRESS,
+    abi: USDC_CONTRACT_ABI,
+    functionName: 'approve',
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)]
+  })
+
+  const { write: approve, data: approveData } = useContractWrite(approveConfig);
+
+  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
+    hash: approveData?.hash,
+  })
+
+  //  ----------------------------------------------------------------------------------------
+
+  const handleLiquidate = () => {
+    approve?.()
+  }
 
   //  ----------------------------------------------------------------------------------------
 
@@ -72,6 +81,18 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
     }
   }, [liquidateIsError])
 
+  useEffect(() => {
+    setLiquidateEthValue(Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)))
+    setLiquidateUsdcValue(Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtBorrowAmount, USDC_DECIMAL)))
+  }, [userInfo])
+
+  useEffect(() => {
+    if (approveIsSuccess) {
+      toast.success('Approved.')
+      setApproved(true)
+    }
+  }, [approveIsSuccess])
+
   //  ----------------------------------------------------------------------------------------
 
   return (
@@ -80,13 +101,17 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
       <Td>
         {userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
           <div className="flex flex-col gap-1">
-            <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount)).toFixed(4)} ETH</span>
-            <span className="uppercase">{Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+            <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)).toFixed(4)} ETH</span>
+            <span className="uppercase">
+              {Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
+            </span>
           </div>
         ) : !userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
-          <span className="uppercase">{Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+          <span className="uppercase">
+            {Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)).toFixed(4)} USDC
+          </span>
         ) : (
-          <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount)).toFixed(4)} ETH</span>
+          <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)).toFixed(4)} ETH</span>
         )}
       </Td>
 
@@ -94,13 +119,13 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
       <Td>
         {userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
           <div className="flex flex-col gap-1">
-            <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount)).toFixed(4)} ETH</span>
-            <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+            <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)).toFixed(4)} ETH</span>
+            <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
           </div>
         ) : !userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
-          <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
+          <span className="uppercase">{Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
         ) : (
-          <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount)).toFixed(4)} ETH</span>
+          <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)).toFixed(4)} ETH</span>
         )}
       </Td>
 
@@ -110,10 +135,21 @@ export default function Row({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps)
       </Td>
 
       <Td>
-        <FilledButton
-          disabled={!liquidate || liquidateIsLoading}
-          onClick={() => liquidate?.()}
-        >{liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}</FilledButton>
+        {approved ? (
+          <FilledButton
+            disabled={!liquidate || liquidateIsLoading}
+            onClick={() => liquidate?.()}
+          >
+            {liquidateIsLoading ? IN_PROGRESS : "Liquidate"}
+          </FilledButton>
+        ) : (
+          <FilledButton
+            disabled={!approve || approveIsLoading}
+            onClick={() => approve?.()}
+          >
+            {approveIsLoading ? IN_PROGRESS : 'Approve'}
+          </FilledButton>
+        )}
       </Td>
     </Tr>
   )

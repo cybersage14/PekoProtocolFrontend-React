@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import Blank from "./pages/Blank";
+import { useAccount } from "wagmi";
 
 // ----------------------------------------------------------------------------------
 
@@ -15,6 +16,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 // ----------------------------------------------------------------------------------
 
 export default function Routes() {
+  const { isConnected } = useAccount()
   return useRoutes([
     {
       element: <LandingLayout />,
@@ -38,7 +40,7 @@ export default function Routes() {
         // },
         {
           path: 'dashboard',
-          element: <Dashboard />
+          element: isConnected ? <Dashboard /> : <Navigate to="/lending" replace />
         },
         // {
         //   path: 'trading',
@@ -46,7 +48,7 @@ export default function Routes() {
         // },
         {
           path: '/',
-          element: <Navigate to="/dashboard" replace />
+          element: <Navigate to="/lending" replace />
         },
         {
           path: '404',
