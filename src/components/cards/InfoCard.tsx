@@ -1,6 +1,6 @@
 interface IProps {
   label: string;
-  value: string;
+  value: string | number;
   unit?: string;
   className?: string;
 }

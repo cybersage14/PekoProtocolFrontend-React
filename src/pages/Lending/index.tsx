@@ -1,4 +1,4 @@
-import { lazy, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useMediaQuery } from 'react-responsive';
@@ -18,10 +18,11 @@ import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
 import { TAssetSymbol } from "../../utils/types";
-import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo } from "../../utils/interfaces";
+import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPoolInfo, IReturnValueOfPools } from "../../utils/interfaces";
 import DPRow from "./DPRow";
-import { formatUnits, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import MBRow from "./MBRow";
+import { getVisibleWalletAddress } from "../../utils/functions";
 
 // -----------------------------------------------------------------------------------
 
@@ -58,6 +59,9 @@ export default function Lending() {
   //  States  -----------------------------------------------------------
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
   const [assetSymbol, setAssetSymbol] = useState<TAssetSymbol>('eth');
+  const [totalMarketSizeInUsd, setTotalMarketSizeInUsd] = useState<number>(0)
+  const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
+  const [lentOut, setLentOut] = useState<number>(0)
 
   //  Wagmi hooks -------------------------------------------------------
 
@@ -75,6 +79,12 @@ export default function Lending() {
     abi: POOL_CONTRACT_ABI,
     args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
     functionName: 'calcTokenPrice',
+  })
+
+  const { data: poolInfos }: IReturnValueOfPools = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'listPools'
   })
 
   //  Functions ---------------------------------------------------------
@@ -104,6 +114,26 @@ export default function Lending() {
     return 0
   }, [usdcPriceInBigInt])
 
+  useEffect(() => {
+    let _totalMarketSize = 0;
+    let _totalBorrowed = 0;
+
+    if (poolInfos) {
+      for (let i = 0; i < poolInfos.length; i += 1) {
+        if (i === 0) {
+          _totalMarketSize += Number(formatEther(poolInfos[i].totalAmount)) * ethPriceInUsd
+          _totalBorrowed += Number(formatEther(poolInfos[i].borrowAmount)) * ethPriceInUsd
+        } else if (i === 1) {
+          _totalMarketSize += Number(formatUnits(poolInfos[i].totalAmount, USDC_DECIMAL)) * usdcPriceInUsd
+          _totalBorrowed += Number(formatUnits(poolInfos[i].borrowAmount, USDC_DECIMAL)) * usdcPriceInUsd
+        }
+      }
+      setTotalMarketSizeInUsd(_totalMarketSize);
+      setTotalBorrowedInUsd(_totalBorrowed);
+      setLentOut(_totalBorrowed / _totalMarketSize * 100)
+    }
+  }, [poolInfos])
+
   //  --------------------------------------------------------------------
 
   return (
@@ -116,17 +146,17 @@ export default function Lending() {
               <div className="flex items-center gap-2">
                 <InfoCard
                   label="Current Market Size"
-                  value="761K"
+                  value={totalMarketSizeInUsd.toFixed(2)}
                   unit="$"
                 />
                 <InfoCard
                   label="Total Borrowed"
-                  value="93K"
+                  value={totalBorrowedInUsd.toFixed(2)}
                   unit="$"
                 />
                 <InfoCard
                   label="Lent Out"
-                  value="12.2%"
+                  value={(totalBorrowedInUsd / totalMarketSizeInUsd * 100).toFixed(2) + '%'}
                 />
               </div>
 
@@ -162,7 +192,7 @@ export default function Lending() {
             {/* Assets board */}
             <CollapsibleBoard title="Assets" collapsible>
               <div className="flex flex-col gap-4">
-                <div className="px-4 pt-4">
+                {/* <div className="px-4 pt-4">
                   <div className="w-full lg:w-1/3">
                     <MainInput
                       startAdornment={<Icon icon="material-symbols:search" className="text-gray-700 text-lg" />}
@@ -171,7 +201,7 @@ export default function Lending() {
                       placeholder="Search token"
                     />
                   </div>
-                </div>
+                </div> */}
 
                 {isMobile ? (
                   <List className="block lg:hidden text-sm">
@@ -189,13 +219,13 @@ export default function Lending() {
                   <Table>
                     <thead>
                       <tr>
-                        <Th label="Asset Name" sortable />
-                        <Th label="LTV" sortable />
-                        <Th label="Deposit APY" sortable />
-                        <Th label="Market Size" sortable />
-                        <Th label="Borrow APY" sortable />
-                        <Th label="Total Borrowed" sortable />
-                        <Th label="Wallet" sortable />
+                        <Th label="Asset Name" />
+                        <Th label="LTV" />
+                        <Th label="Deposit APY" />
+                        <Th label="Market Size" />
+                        <Th label="Borrow APY" />
+                        <Th label="Total Borrowed" />
+                        <Th label="Wallet" />
                       </tr>
                     </thead>
 
@@ -221,7 +251,7 @@ export default function Lending() {
           {/* Account Board */}
           <PrimaryBoard
             title="Account"
-            action={<span className="text-gray-500 text-sm">Connect Wallet</span>}
+            action={<span className="text-gray-500 text-sm">{getVisibleWalletAddress(address || '', 6, 4)}</span>}
           >
             <div className="p-4 flex flex-col gap-4">
               <div className="grid grid-cols-3 gap-3">

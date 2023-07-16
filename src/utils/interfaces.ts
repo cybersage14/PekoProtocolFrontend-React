@@ -104,3 +104,8 @@ export interface IReturnValueOfCalcTokenPrice {
   data?: bigint;
   [key: string]: any;
 }
+
+export interface IReturnValueOfPools {
+  data?: Array<IPoolInfo>;
+  [key: string]: any;
+}

@@ -82,7 +82,7 @@ export default function Liquidate() {
         <p className="text-center text-base text-gray-500">
           Liquidate to earn extra reward!
         </p>
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <label htmlFor="ignore" className="text-gray-100 cursor-pointer">Ignore small debt</label>
           <Switch
             id="ignore"
@@ -90,7 +90,7 @@ export default function Liquidate() {
             checked={!visible}
             onChange={() => setVisible(!visible)}
           />
-        </div>
+        </div> */}
       </header>
 
       {isMobile ? visible ? (
