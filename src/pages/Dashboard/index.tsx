@@ -159,7 +159,7 @@ export default function Dashboard() {
       {/* <TokensSection />
       <LPTokensSection />
       <FarmsSection /> */}
-      <DepositsSection />
+      <DepositsSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
     </div>
   )
 }

@@ -22,7 +22,7 @@ export default function UserProfileSection({ userInfo, ethPriceInUsd, usdcPriceI
 
   return (
     <Section title="User Profile">
-      <div className="grid grid-cols-2 gap-4 h-fit lg:h-64">
+      <div className="grid grid-cols-2 gap-4">
         <UserReservesBoard userInfo={userInfo} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
 
         <LiquidationsBoard userInfo={userInfo} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
