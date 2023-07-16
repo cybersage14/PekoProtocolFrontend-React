@@ -1,12 +1,11 @@
+import { ListItem } from "@material-tailwind/react";
+import { getVisibleWalletAddress } from "../../utils/functions";
+import { IUserInfo } from "../../utils/interfaces";
 import { useEffect, useMemo, useState } from "react";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { toast } from "react-toastify";
-import Td from "../../components/tableComponents/Td";
-import Tr from "../../components/tableComponents/Tr";
-import { getVisibleWalletAddress } from "../../utils/functions";
-import { IUserInfo } from "../../utils/interfaces"
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 
 //  -----------------------------------------------------------------------------------------
@@ -20,7 +19,7 @@ interface IProps {
 
 //  -----------------------------------------------------------------------------------------
 
-export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquidationThreshold }: IProps) {
+export default function MBRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquidationThreshold }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
   const [approved, setApproved] = useState<boolean>(false);
@@ -80,6 +79,12 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
   }, [liquidateIsError])
 
   useEffect(() => {
+    if (approveIsError) {
+      toast.error('Approve Error.')
+    }
+  }, [approveIsError])
+
+  useEffect(() => {
     setLiquidateEthValue(Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)))
     setLiquidateUsdcValue(Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtBorrowAmount, USDC_DECIMAL)))
   }, [userInfo])
@@ -92,16 +97,21 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
   }, [approveIsSuccess])
 
   //  ----------------------------------------------------------------------------------------
-
   return (
     <>
       {liquidationThreshold <= riskFactor ? (
-        <Tr>
+        <ListItem
+          className="flex-col gap-6 text-gray-100 border-b border-gray-800 rounded-none"
+        >
           {/* User */}
-          <Td className="!text-blue-500">{getVisibleWalletAddress(userInfo.accountAddress)}</Td>
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">User: </span>
+            <span className="!text-blue-500">{getVisibleWalletAddress('0x5da095266ec7ec1d979f01a9d7e4ee902e0182bc')}</span>
+          </div>
 
-          {/* Borrowed Asset(s) */}
-          <Td>
+          {/* Borrowed assets */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Borrowed Asset(s): </span>
             <div className="flex justify-center">
               {userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
                 <div className="relative">
@@ -114,10 +124,11 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
                 <img src="/assets/images/ethereum.png" alt="" className="w-10" />
               )}
             </div>
-          </Td>
+          </div>
 
-          {/* Borrowed Value */}
-          <Td>
+          {/* Borrowed value */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Borrowed Value: </span>
             {userInfo.ethBorrowAmount && userInfo.usdtBorrowAmount ? (
               <div className="flex flex-col gap-1">
                 <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount)).toFixed(4)} ETH</span>
@@ -128,26 +139,26 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
             ) : (
               <span className="uppercase">{Number(formatEther(userInfo.ethBorrowAmount)).toFixed(4)} ETH</span>
             )}
-          </Td>
+          </div>
 
-          {/* Deposited Asset(s) */}
-          <Td>
-            <div className="flex justify-center">
-              {userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
-                <div className="relative">
-                  <img src="/assets/images/usdc.png" alt="" className="w-10" />
-                  <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 right-[50%] w-10" />
-                </div>
-              ) : !userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
+          {/* Deposited assets */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Deposited Asset(s): </span>
+            {userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
+              <div className="relative">
                 <img src="/assets/images/usdc.png" alt="" className="w-10" />
-              ) : (
-                <img src="/assets/images/ethereum.png" alt="" className="w-10" />
-              )}
-            </div>
-          </Td>
+                <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 right-[50%] w-10" />
+              </div>
+            ) : !userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
+              <img src="/assets/images/usdc.png" alt="" className="w-10" />
+            ) : (
+              <img src="/assets/images/ethereum.png" alt="" className="w-10" />
+            )}
+          </div>
 
-          {/* Deposited Value */}
-          <Td>
+          {/* Deposited value */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Deposited Value: </span>
             {userInfo.ethDepositAmount && userInfo.usdtDepositAmount ? (
               <div className="flex flex-col gap-1">
                 <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount)).toFixed(4)} ETH</span>
@@ -158,14 +169,17 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
             ) : (
               <span className="uppercase">{Number(formatEther(userInfo.ethDepositAmount)).toFixed(4)} ETH</span>
             )}
-          </Td>
+          </div>
 
-          {/* Risk Factor */}
-          <Td className="text-red-500">
-            {riskFactor.toFixed(4)} %
-          </Td>
+          {/* Risk factor */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Risk Factor: </span>
+            <span className="text-red-500">{riskFactor.toFixed(4)}%</span>
+          </div>
 
-          <Td>
+          {/* Operation */}
+          <div className="flex justify-between w-full">
+            <span className="text-gray-500 font-bold">Operation: </span>
             {approved ? (
               <FilledButton
                 disabled={!liquidate || liquidateIsLoading}
@@ -181,10 +195,11 @@ export default function DPRow({ userInfo, ethPriceInUsd, usdcPriceInUsd, liquida
                 {approveIsLoading ? IN_PROGRESS : 'Approve'}
               </FilledButton>
             )}
-          </Td>
-        </Tr>
-      ) : (<></>)}
+          </div>
+        </ListItem>
+      ) : (
+        <></>
+      )}
     </>
-
   )
 }

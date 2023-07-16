@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { lazy, useMemo, useState } from "react";
 import { List, ListItem, Switch } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
@@ -10,7 +10,11 @@ import { getVisibleWalletAddress } from "../../utils/functions";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, TEMP_CRYPTO_LOGO_URL, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 import { IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
-import DPRow from "./DPRow";
+
+// -----------------------------------------------------------------------------------
+
+const DPRow = lazy(() => import('./DPRow'))
+const MBRow = lazy(() => import('./MBRow'))
 
 // -----------------------------------------------------------------------------------
 
@@ -106,73 +110,38 @@ export default function Liquidate() {
           />
         </div> */}
       </header>
-
-      {isMobile ? visible ? (
-        <List className="text-sm">
-          {TEMP_INDEXES_OF_TABLE.map(index => (
-            <ListItem
-              key={index}
-              className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
-            >
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">User: </span>
-                <span className="!text-blue-500">{getVisibleWalletAddress('0x5da095266ec7ec1d979f01a9d7e4ee902e0182bc')}</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Borrowed Asset(s): </span>
-                <div className="flex justify-center">
-                  <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                </div>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Borrowed Value: </span>
-                <span>$0.08213020982964468</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Deposited Asset(s): </span>
-                <div className="flex justify-center">
-                  <img src={TEMP_CRYPTO_LOGO_URL} alt="" className="w-10" />
-                </div>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Deposited Value: </span>
-                <span>$0.00046209994186645765</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Risk Factor: </span>
-                <span className="text-red-500">23691%</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-gray-500 font-bold">Operation: </span>
-                <FilledButton>Liquidate</FilledButton>
-              </div>
-            </ListItem>
-          ))}
-        </List>
-      ) : (
-        <></>
-      ) : (
-        <Table>
-          <thead>
-            <tr className="bg-gray-900">
-              <Th label="User" />
-              <Th label="Borrowed Asset(s)" />
-              <Th label="Borrowed Value" />
-              <Th label="Deposited Asset(s)" />
-              <Th label="Deposited Value" />
-              <Th label="Risk Factor" />
-              <Th label="Operation" />
-            </tr>
-          </thead>
-          {visible && ethPriceInUsd && usdcPriceInUsd ? (
-            <tbody>
+      {visible && ethPriceInUsd && usdcPriceInUsd ? (
+        <>
+          {isMobile ? visible ? (
+            <List className="text-sm">
               {users?.map((userInfo, index) => (
-                <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
+                <MBRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
               ))}
-            </tbody>
-          ) : (<></>)}
-        </Table>
-      )}
+            </List>
+          ) : (
+            <></>
+          ) : (
+            <Table>
+              <thead>
+                <tr className="bg-gray-900">
+                  <Th label="User" />
+                  <Th label="Borrowed Asset(s)" />
+                  <Th label="Borrowed Value" />
+                  <Th label="Deposited Asset(s)" />
+                  <Th label="Deposited Value" />
+                  <Th label="Risk Factor" />
+                  <Th label="Operation" />
+                </tr>
+              </thead>
+              <tbody>
+                {users?.map((userInfo, index) => (
+                  <DPRow key={index} userInfo={userInfo} ethPriceInUsd={Number(ethPriceInUsd)} usdcPriceInUsd={Number(usdcPriceInUsd)} liquidationThreshold={liquidationThreshold} />
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </>
+      ) : (<></>)}
     </Container>
   )
 }
