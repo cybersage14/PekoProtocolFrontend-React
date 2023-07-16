@@ -3,7 +3,7 @@ import { formatUnits } from "viem";
 import { useContractRead } from "wagmi";
 import Td from "../../../../components/tableComponents/Td";
 import Tr from "../../../../components/tableComponents/Tr";
-import { IAsset, IReturnValueOfPoolInfo } from "../../../../utils/interfaces";
+import { IAsset, IReturnValueOfPoolInfo, IUserInfo } from "../../../../utils/interfaces";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../../utils/constants";
 
 //  ----------------------------------------------------------------------------------------------------
@@ -11,12 +11,13 @@ import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../../utils/cons
 interface IProps {
   asset: IAsset;
   ethPriceInUsd: number;
-  usdcPriceInUsd: number
+  usdcPriceInUsd: number;
+  userInfo: IUserInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: IProps) {
   const [assetPriceInUsd, setAssetPriceInUsd] = useState<number>(0)
   const [depositApy, setDepositApy] = useState<number>(0)
   const [borrowApy, setBorrowApy] = useState<number>(0)
@@ -45,12 +46,18 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   }, [asset])
 
   useEffect(() => {
-    if (poolInfo) {
-      const _depositAmount = Number(formatUnits(poolInfo.totalAmount, asset.decimals))
-      const _borrowAmount = Number(formatUnits(poolInfo.borrowAmount, asset.decimals))
+    if (userInfo) {
+      let _depositAmount = 0;
+      let _borrowAmount = 0;
 
-      setDepositApy(Number(poolInfo.depositApy))
-      setBorrowApy(Number(poolInfo.borrowApy))
+      if (asset.symbol === 'eth') {
+        _depositAmount = Number(formatUnits(userInfo.ethDepositAmount + userInfo.ethRewardAmount, asset.decimals))
+        _borrowAmount = Number(formatUnits(userInfo.ethBorrowAmount + userInfo.ethInterestAmount, asset.decimals))
+      } else {
+        _depositAmount = Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, asset.decimals))
+        _borrowAmount = Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, asset.decimals))
+      }
+
       setDepositAmount(_depositAmount)
       setBorrowAmount(_borrowAmount)
 
@@ -62,7 +69,14 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
         setBorrowAmountInUsd(_borrowAmount * usdcPriceInUsd)
       }
     }
-  }, [poolInfo, asset])
+  }, [userInfo, asset])
+
+  useEffect(() => {
+    if (poolInfo) {
+      setDepositApy(Number(poolInfo.depositApy))
+      setBorrowApy(Number(poolInfo.borrowApy))
+    }
+  }, [poolInfo])
 
   //  ----------------------------------------------------------------------------
 

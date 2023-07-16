@@ -43,7 +43,7 @@ export default function UserReservesBoard({ userInfo, ethPriceInUsd, usdcPriceIn
 
         <tbody>
           {ASSETS.map(asset => (
-            <Row key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+            <Row key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
           ))}
         </tbody>
       </Table>
