@@ -101,6 +101,30 @@ export default function Lending() {
     return 0
   }, [usdcPriceInBigInt])
 
+  const borrowingPower = useMemo<number>(() => {
+    if (userInfo) {
+      const ethBorrowAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount)) * ethPriceInUsd;
+      const usdcBorrowAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+      const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount)) * ethPriceInUsd;
+      const usdcDepositAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+
+      return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / (ethDepositAmountInUsd + usdcDepositAmountInUsd) * 100
+    }
+    return 0
+  }, [])
+
+  const riskFactor = useMemo<number>(() => {
+    if (userInfo) {
+      const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+      const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+      return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+    }
+    return 0
+  }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
+
+  //  useEffect ----------------------------------------------------------
+
   useEffect(() => {
     let _totalMarketSize = 0;
     let _totalBorrowed = 0;
@@ -258,18 +282,18 @@ export default function Lending() {
 
               <ProgressBar
                 label="Borrowing Power"
-                value={22.34}
-                valueNode={<span className="text-red-500">22.34%</span>}
+                value={borrowingPower}
+                valueNode={<span className="text-green-500">{borrowingPower.toFixed(2)}%</span>}
               />
 
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 text-sm">Available</span>
-                  <span className="text-gray-100">65.45%</span>
+                  <span className="text-gray-100">{(100 - borrowingPower).toFixed(2)}%</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 text-sm">Risk Factor</span>
-                  <span className="text-red-500">45.65%</span>
+                  <span className="text-red-500">{riskFactor.toFixed(2)}%</span>
                 </div>
               </div>
             </div>

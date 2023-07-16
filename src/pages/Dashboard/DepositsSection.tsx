@@ -1,6 +1,6 @@
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
-import Section from "./Section";
+import Section from "../../components/Section";
 
 export default function DepositsSection() {
   return (

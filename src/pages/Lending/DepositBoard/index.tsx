@@ -21,7 +21,7 @@ interface IProps {
 export default function DepositBoard({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const totalAmountInUsd = useMemo<number>(() => {
     const ethAmountInUsd = Number(formatEther(userInfo.ethDepositAmount)) * ethPriceInUsd;
-    const usdcAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * ethPriceInUsd;
+    const usdcAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd;
     return ethAmountInUsd + usdcAmountInUsd
   }, [userInfo])
 

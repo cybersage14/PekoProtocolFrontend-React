@@ -1,8 +1,8 @@
 import { lazy, useMemo } from "react";
+import { formatEther, formatUnits } from "viem";
 import PrimaryBoard from "../../../components/boards/PrimaryBoard";
 import { ASSETS, USDC_DECIMAL } from "../../../utils/constants";
 import { IUserInfo } from "../../../utils/interfaces";
-import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ interface IProps {
 export default function BorrowBoard({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const totalAmountInUsd = useMemo<number>(() => {
     const ethAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount)) * ethPriceInUsd;
-    const usdcAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * ethPriceInUsd;
+    const usdcAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd;
     return ethAmountInUsd + usdcAmountInUsd
   }, [userInfo])
 

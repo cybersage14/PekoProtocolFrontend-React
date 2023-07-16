@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { IPropsOfComponent } from "../../utils/interfaces";
+import { IPropsOfComponent } from "../utils/interfaces";
 
 interface IProps extends IPropsOfComponent {
   title: string;
