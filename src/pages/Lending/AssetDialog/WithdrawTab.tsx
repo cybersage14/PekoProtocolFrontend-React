@@ -2,13 +2,13 @@ import { ChangeEvent, useEffect, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
 import { IAsset, IBalanceData, IUserInfo } from "../../../utils/interfaces";
-import { formatEther, formatUnits, parseUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -37,8 +37,6 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
     functionName: 'withdraw',
     args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
   })
-
-  console.log('>>>>>>>>> userInfo => ', userInfo)
 
   const { write: withdraw, data: withdrawData } = useContractWrite(withdrawConfig);
 
