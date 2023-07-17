@@ -39,6 +39,7 @@ export default function Liquidate() {
     abi: POOL_CONTRACT_ABI,
     args: [WETH_CONTRACT_ADDRESS, parseEther('1')],
     functionName: 'calcTokenPrice',
+    watch: true
   })
 
   //  Get the price of ethereum in USD.
@@ -47,12 +48,14 @@ export default function Liquidate() {
     abi: POOL_CONTRACT_ABI,
     args: [USDC_CONTRACT_ADDRESS, parseUnits('1', USDC_DECIMAL)],
     functionName: 'calcTokenPrice',
+    watch: true
   })
 
   const { data: liquidatationThresholdInBigInt } = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
-    functionName: 'getLiquidationThreshhold'
+    functionName: 'getLiquidationThreshhold',
+    watch: true
   })
 
   //  ----------------------------------------------------------------

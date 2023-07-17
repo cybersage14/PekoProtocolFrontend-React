@@ -35,7 +35,8 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
   const { data: liquidatationThresholdInBigInt } = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
-    functionName: 'getLiquidationThreshhold'
+    functionName: 'getLiquidationThreshhold',
+    watch: true
   })
 
   //  -------------------------------------------------------------------------------
