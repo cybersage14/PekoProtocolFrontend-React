@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
@@ -56,6 +56,9 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      deposit?.()
+    }
   })
   //  -----------------------------------------------------
 
@@ -112,15 +115,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     } else {
       setApproved(false)
     }
-  }, [approveIsSuccess, deposit])
-
-  useEffect(() => {
-    if (approved && deposit) {
-      if (asset.symbol !== 'eth') {
-        deposit()
-      }
-    }
-  }, [approved, deposit, asset])
+  }, [approveIsSuccess])
 
   //  -----------------------------------------------------
 

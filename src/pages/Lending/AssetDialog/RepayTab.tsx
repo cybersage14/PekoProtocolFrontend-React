@@ -56,7 +56,10 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const { write: repay, data: repayData } = useContractWrite(repayConfig)
 
   const { isLoading: repayIsLoading, isError: repayIsError, isSuccess: repayIsSuccess } = useWaitForTransaction({
-    hash: repayData?.hash
+    hash: repayData?.hash,
+    onSuccess: () => {
+      repay?.()
+    }
   })
 
   //  --------------------------------------------------------------------------
@@ -118,13 +121,10 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   useEffect(() => {
     if (approveIsSuccess) {
       setApproved(true)
-      if (repay) {
-        repay()
-      }
     } else {
       setApproved(false)
     }
-  }, [approveIsSuccess, repay])
+  }, [approveIsSuccess])
 
   useEffect(() => {
     if (userInfo) {
