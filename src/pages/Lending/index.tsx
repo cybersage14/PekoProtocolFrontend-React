@@ -146,7 +146,12 @@ export default function Lending() {
       }
       setTotalMarketSizeInUsd(_totalMarketSize);
       setTotalBorrowedInUsd(_totalBorrowed);
-      setLentOut(_totalBorrowed / _totalMarketSize * 100)
+
+      if(_totalMarketSize > 0) {
+        setLentOut(_totalBorrowed / _totalMarketSize * 100)
+      } else {
+        setLentOut(0)
+      }
     }
   }, [poolInfos])
 
