@@ -21,7 +21,6 @@ interface IProps {
 export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
-  const [approved, setApproved] = useState<boolean>(false);
 
   //  ----------------------------------------------------------------------------------------
 
@@ -45,14 +44,27 @@ export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IPro
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)]
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)],
   })
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
+  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      liquidate?.()
+    }
   })
+
+  //  ----------------------------------------------------------------------------------------
+
+  const handleLiquidate = async () => {
+    if (liquidateUsdcValue > 0) {
+      approve?.()
+    } else {
+      liquidate?.()
+    }
+  }
 
   //  ----------------------------------------------------------------------------------------
 
@@ -69,19 +81,17 @@ export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IPro
   }, [liquidateIsError])
 
   useEffect(() => {
-    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtBorrowAmount, USDC_DECIMAL)))
-  }, [liquidation])
+    if (approveIsError) {
+      toast.error('Approve Error.')
+    }
+  }, [approveIsError])
 
   useEffect(() => {
-    if (approveIsSuccess) {
-      toast.success('Approved.')
-      setApproved(true)
-    }
-  }, [approveIsSuccess])
+    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
+    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
+  }, [liquidation])
 
   //  ----------------------------------------------------------------------------------------
-
   return (
     <Tr>
       {/* Borrowed Value */}
@@ -122,21 +132,12 @@ export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IPro
       </Td>
 
       <Td>
-        {approved ? (
-          <FilledButton
-            disabled={!liquidate || liquidateIsLoading}
-            onClick={() => liquidate?.()}
-          >
-            {liquidateIsLoading ? IN_PROGRESS : "Liquidate"}
-          </FilledButton>
-        ) : (
-          <FilledButton
-            disabled={!approve || approveIsLoading}
-            onClick={() => approve?.()}
-          >
-            {approveIsLoading ? IN_PROGRESS : 'Approve'}
-          </FilledButton>
-        )}
+        <FilledButton
+          disabled={!approve || approveIsLoading || liquidateIsLoading}
+          onClick={() => handleLiquidate()}
+        >
+          {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        </FilledButton>
       </Td>
     </Tr>
   )
