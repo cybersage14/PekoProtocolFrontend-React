@@ -19,7 +19,6 @@ interface IProps {
 export default function MBRow({ liquidation }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
-  const [approved, setApproved] = useState<boolean>(false);
 
   //  ----------------------------------------------------------------------------------------
 
@@ -48,18 +47,20 @@ export default function MBRow({ liquidation }: IProps) {
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
+  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      liquidate?.()
+    }
   })
 
   //  ----------------------------------------------------------------------------------------
 
   const handleLiquidate = async () => {
-    if (approve) {
-      await approve?.()
-      if (liquidate) {
-        liquidate()
-      }
+    if (liquidateUsdcValue > 0) {
+      approve?.()
+    } else {
+      liquidate?.()
     }
   }
 
@@ -88,14 +89,6 @@ export default function MBRow({ liquidation }: IProps) {
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
 
-  useEffect(() => {
-    if (approveIsSuccess) {
-      setApproved(true)
-    } else {
-      setApproved(false)
-    }
-  }, [approveIsSuccess, liquidate])
-  
   //  ----------------------------------------------------------------------------------------
 
   return (

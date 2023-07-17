@@ -20,7 +20,6 @@ interface IProps {
 export default function DPRow({ liquidation }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
-  const [approved, setApproved] = useState<boolean>(false);
 
   //  ----------------------------------------------------------------------------------------
 
