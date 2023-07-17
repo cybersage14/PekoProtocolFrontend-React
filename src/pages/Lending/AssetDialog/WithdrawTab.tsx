@@ -1,22 +1,19 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
-import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
-import { TAssetSymbol } from "../../../utils/types";
-import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
-import { formatEther, formatUnits } from "viem";
+import { IAsset, IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { formatEther, formatUnits, parseUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
-  assetSymbol: TAssetSymbol;
+  asset: IAsset;
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
@@ -26,7 +23,7 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function WithdrawTab({ assetSymbol, setVisible, balanceData, userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0')
@@ -38,7 +35,7 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'withdraw',
-    args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
   })
 
   const { write: withdraw, data: withdrawData } = useContractWrite(withdrawConfig);
@@ -86,7 +83,7 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
 
   useEffect(() => {
     if (userInfo && balanceData?.decimals) {
-      if (assetSymbol === 'eth') {
+      if (asset.symbol === 'eth') {
         setMaxAmount(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount))
       } else {
         setMaxAmount(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, balanceData.decimals))
@@ -100,13 +97,13 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{assetSymbol}</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{assetSymbol}</span></p>
+          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
@@ -133,7 +130,7 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
         <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {assetSymbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
           </div>
           {/* <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>

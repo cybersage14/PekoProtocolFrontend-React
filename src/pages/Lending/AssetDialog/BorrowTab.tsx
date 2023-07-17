@@ -1,22 +1,19 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther, formatUnits } from "viem";
+import { formatEther, formatUnits, parseUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
-import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
-import { TAssetSymbol } from "../../../utils/types";
-import { IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
-  assetSymbol: TAssetSymbol;
+  asset: IAsset;
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
@@ -27,7 +24,7 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function BorrowTab({ assetSymbol, setVisible, balanceData, userInfo, poolInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function BorrowTab({ asset, setVisible, balanceData, userInfo, poolInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmountInUsd, setMaxAmountInUsd] = useState<number>(0)
@@ -39,7 +36,7 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'borrow',
-    args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
+    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
   })
 
   const { write: borrow, data: borrowData } = useContractWrite(borrowConfig)
@@ -51,11 +48,10 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
   //  ----------------------------------------------------------------------------
 
   const maxAmount = useMemo<number>(() => {
-    if (assetSymbol === 'eth' && ethPriceInUsd > 0) {
+    if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
       return maxAmountInUsd / ethPriceInUsd
     }
-    if (assetSymbol === 'usdc' && usdcPriceInUsd > 0) {
-      console.log(">>>>>>>> usdcPriceInUsd => ", usdcPriceInUsd)
+    if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
       return maxAmountInUsd / usdcPriceInUsd
     }
     return 0
@@ -109,8 +105,8 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
   useEffect(() => {
     if (userInfo) {
       if (ethPriceInUsd && usdcPriceInUsd) {
-        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount)) - Number(formatEther(userInfo.ethBorrowAmount))) * ethPriceInUsd
-        const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL))) * usdcPriceInUsd
+        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) - Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount))) * ethPriceInUsd
+        const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))) * usdcPriceInUsd
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
 
         //  >>>>>>>>>>>>>> Require to calculate LTV
@@ -125,13 +121,13 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{assetSymbol}</span>}
+          endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{assetSymbol}</span></p>
+          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
@@ -159,10 +155,10 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
-              {userInfo && balanceData ? assetSymbol === 'eth' ?
+              {userInfo && balanceData ? asset.symbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
                 Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
-              {assetSymbol}
+              {asset.symbol}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -171,7 +167,7 @@ export default function BorrowTab({ assetSymbol, setVisible, balanceData, userIn
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {assetSymbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
           </div>
         </div>
 

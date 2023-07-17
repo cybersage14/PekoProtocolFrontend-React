@@ -1,23 +1,20 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { Icon } from "@iconify/react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { formatEther, formatUnits, parseEther } from "viem";
+import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
-import TextButton from "../../../components/buttons/TextButton";
 import MoreInfo from "./MoreInfo";
-import { TAssetSymbol } from "../../../utils/types";
 import useLoading from "../../../hooks/useLoading";
-import { IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
 interface IProps {
-  assetSymbol: TAssetSymbol;
+  asset: IAsset;
   setVisible: Function;
   balanceData?: IBalanceData;
   userInfo?: IUserInfo;
@@ -25,7 +22,7 @@ interface IProps {
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function RepayTab({ assetSymbol, setVisible, balanceData, userInfo }: IProps) {
+export default function RepayTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
@@ -56,8 +53,8 @@ export default function RepayTab({ assetSymbol, setVisible, balanceData, userInf
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'repay',
-    args: [assetSymbol === 'eth' ? WETH_CONTRACT_ADDRESS : USDC_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)],
-    value: assetSymbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
+    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
+    value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
   const { write: repay, data: repayData } = useContractWrite(repayConfig)
@@ -136,10 +133,10 @@ export default function RepayTab({ assetSymbol, setVisible, balanceData, userInf
 
   useEffect(() => {
     if (userInfo) {
-      if (assetSymbol === 'eth') {
-        setMaxAmount(formatEther(userInfo.ethBorrowAmount))
+      if (asset.symbol === 'eth') {
+        setMaxAmount(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount))
       } else {
-        setMaxAmount(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL))
+        setMaxAmount(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))
       }
     }
   }, [userInfo])
@@ -150,14 +147,14 @@ export default function RepayTab({ assetSymbol, setVisible, balanceData, userInf
     <>
       <div className="flex flex-col gap-2">
         <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{assetSymbol}</span>}
-          disabled={assetSymbol === 'usdc' && approveIsLoading ? approved ? true : false : false}
+          endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
+          disabled={asset.symbol === 'usdc' && approveIsLoading ? approved ? true : false : false}
           onChange={handleAmount}
           value={amount}
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{assetSymbol}</span></p>
+          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalfAmount}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMaxAmount}>max</OutlinedButton>
@@ -176,7 +173,7 @@ export default function RepayTab({ assetSymbol, setVisible, balanceData, userInf
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
-            disabled={assetSymbol === 'usdc' ? approved ? true : false : false}
+            disabled={asset.symbol === 'usdc' ? approved ? true : false : false}
             onChange={handleSlider}
             value={Number(amount) / Number(maxAmount) * 100}
           />
@@ -197,7 +194,7 @@ export default function RepayTab({ assetSymbol, setVisible, balanceData, userInf
           </div>
         </div> */}
 
-        {assetSymbol === 'eth' ? (
+        {asset.symbol === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
             disabled={!repayPrepareIsSuccess || repayIsLoading}

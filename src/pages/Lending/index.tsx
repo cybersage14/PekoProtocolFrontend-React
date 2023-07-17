@@ -15,7 +15,7 @@ import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
 import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { TAssetSymbol } from "../../utils/types";
-import { IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
+import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";
 import { getVisibleWalletAddress } from "../../utils/functions";
@@ -35,7 +35,7 @@ export default function Lending() {
 
   //  States  -----------------------------------------------------------
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
-  const [assetSymbol, setAssetSymbol] = useState<TAssetSymbol>('eth');
+  const [selectedAsset, setSelectedAsset] = useState<IAsset>(ASSETS[0])
   const [totalMarketSizeInUsd, setTotalMarketSizeInUsd] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
   const [lentOut, setLentOut] = useState<number>(0)
@@ -76,8 +76,8 @@ export default function Lending() {
 
   //  Functions ---------------------------------------------------------
 
-  const openDialog = (_assetSymbol: TAssetSymbol) => {
-    setAssetSymbol(_assetSymbol);
+  const openDialog = (_asset: IAsset) => {
+    setSelectedAsset(_asset)
     if (isConnected) {
       return setDialogVisible(true);
     } else {
