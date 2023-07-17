@@ -1,14 +1,13 @@
-import { Dialog } from "@material-tailwind/react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { parseUnits } from "viem";
+import { toast } from "react-toastify";
 import CustomDialog from "../../components/dialogs/CustomDialog";
 import MainInput from "../../components/form/MainInput";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { IN_PROGRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../utils/constants";
 import { IUserInfo } from "../../utils/interfaces";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
 import FilledButton from "../../components/buttons/FilledButton";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { parseUnits } from "viem";
-import { toast } from "react-toastify";
 
 //  ---------------------------------------------------------------------------------------
 

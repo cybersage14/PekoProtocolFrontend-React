@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, useContractRead } from "wagmi";
 import { ListItem } from "@material-tailwind/react";
 import { IAsset, IBalanceData, IReturnValueOfBalance, IReturnValueOfPoolInfo } from "../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../utils/constants";
+import { APY_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../utils/constants";
 import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------
@@ -22,6 +22,8 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
   const [marketSizeInUsd, setMarketSizeInUsd] = useState<number>(0)
   const [totalBorrowed, setTotalBorrowed] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
+  const [depositApyInPercentage, setDepositApyInPercentage] = useState<number>(0)
+  const [borrowApyInPercentage, setBorrowApyInPercentage] = useState<number>(0)
 
   //  ---------------------------------------------------------------------------------
 
@@ -68,6 +70,8 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
         setTotalBorrowed(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)))
         setTotalBorrowedInUsd(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)) * usdcPriceInUsd)
       }
+      setDepositApyInPercentage(Number(formatUnits(poolInfo.depositApy, APY_DECIMAL)))
+      setBorrowApyInPercentage(Number(formatUnits(poolInfo.borrowApy, APY_DECIMAL)))
     } else {
       setMarketSize(0)
       setMarketSizeInUsd(0)
@@ -82,7 +86,7 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
     <ListItem
       key={asset.id}
       className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
-      onClick={() => openDialog(asset.symbol)}
+      onClick={() => openDialog(asset)}
     >
       {/* Asset name */}
       <div className="flex justify-between w-full">
@@ -107,7 +111,7 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       {/* Deposit APY */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Deposit APY: </span>
-        <span className="text-green-500">{Number(poolInfo?.depositApy)}%</span>
+        <span className="text-green-500">{depositApyInPercentage.toFixed(2)}%</span>
       </div>
 
       {/* Market size */}
@@ -122,7 +126,7 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       {/* Borrow APY */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Borrow APY: </span>
-        <span className="text-red-500">{Number(poolInfo?.borrowApy)}%</span>
+        <span className="text-red-500">{borrowApyInPercentage.toFixed(2)}%</span>
       </div>
 
       {/* Total Borrowed */}

@@ -14,7 +14,6 @@ import Th from "../../components/tableComponents/Th";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
 import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import { TAssetSymbol } from "../../utils/types";
 import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";

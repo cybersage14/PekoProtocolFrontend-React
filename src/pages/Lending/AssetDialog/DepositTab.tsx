@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -78,13 +78,18 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     const balanceInNumber = Number(balanceData?.formatted);
     if (amountInNumber !== 0) {
       if (amountInNumber <= balanceInNumber) {
-        console.log('>>>>>>>>>> amountIsValid => ', true)
         return true;
       }
     }
-    console.log('>>>>>>>>>> amountIsValid => ', false)
     return false;
   }, [amount, balanceData?.formatted])
+
+  const depositApyInPercenage = useMemo<number>(() => {
+    if (poolInfo) {
+      return Number(formatUnits(poolInfo.depositApy, APY_DECIMAL))
+    }
+    return 0
+  }, [poolInfo])
 
   //  -----------------------------------------------------
 
@@ -166,7 +171,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">{Number(poolInfo?.depositApy)}%</span>
+            <span className="text-gray-100">{depositApyInPercenage.toFixed(2)}%</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
