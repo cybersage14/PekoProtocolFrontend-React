@@ -81,9 +81,11 @@ export default function DepositTab({ assetSymbol, setVisible, balanceData, userI
     const balanceInNumber = Number(balanceData?.formatted);
     if (amountInNumber !== 0) {
       if (amountInNumber <= balanceInNumber) {
+        console.log('>>>>>>>>>> amountIsValid => ', true)
         return true;
       }
     }
+    console.log('>>>>>>>>>> amountIsValid => ', false)
     return false;
   }, [amount, balanceData?.formatted])
 

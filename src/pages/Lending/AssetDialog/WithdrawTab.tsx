@@ -87,8 +87,9 @@ export default function WithdrawTab({ assetSymbol, setVisible, balanceData, user
   useEffect(() => {
     if (userInfo && balanceData?.decimals) {
       if (assetSymbol === 'eth') {
+        setMaxAmount(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount))
       } else {
-        setMaxAmount(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals))
+        setMaxAmount(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, balanceData.decimals))
       }
     }
   }, [userInfo])
