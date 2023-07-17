@@ -314,7 +314,7 @@ export default function Lending() {
       <AssetDialog
         visible={dialogVisible}
         setVisible={setDialogVisible}
-        assetSymbol={assetSymbol}
+        asset={selectedAsset}
         ethPriceInUsd={ethPriceInUsd}
         usdcPriceInUsd={usdcPriceInUsd}
         userInfo={userInfo}
