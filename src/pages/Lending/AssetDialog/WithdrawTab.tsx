@@ -57,15 +57,15 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   }
 
   const handleHalf = () => {
-    setAmount(`${Number(maxAmount) / 2}`)
+    setAmount(`${(Number(maxAmount) / 2).toFixed(4)}`)
   }
 
   const handleMax = () => {
-    setAmount(maxAmount)
+    setAmount(Number(maxAmount).toFixed(4))
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${value * Number(maxAmount) / 100}`)
+    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
   }
 
   //  --------------------------------------------------------------------

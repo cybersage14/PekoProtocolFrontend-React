@@ -75,16 +75,19 @@ export default function DPRow({ liquidation }: IProps) {
 
   useEffect(() => {
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    console.log('>>>>>>>>>>>>> liquidateEthValue => ', Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
 
   useEffect(() => {
     if (approveIsSuccess) {
-      toast.success('Approved.')
       setApproved(true)
+      if (liquidate) {
+        liquidate()
+      }
+    } else {
+      setApproved(false)
     }
-  }, [approveIsSuccess])
+  }, [approveIsSuccess, liquidate])
 
   //  ----------------------------------------------------------------------------------------
 
@@ -165,21 +168,13 @@ export default function DPRow({ liquidation }: IProps) {
       </Td>
 
       <Td>
-        {approved ? (
-          <FilledButton
-            disabled={!liquidate || liquidateIsLoading}
-            onClick={() => liquidate?.()}
-          >
-            {liquidateIsLoading ? IN_PROGRESS : "Liquidate"}
-          </FilledButton>
-        ) : (
-          <FilledButton
-            disabled={!approve || approveIsLoading}
-            onClick={() => approve?.()}
-          >
-            {approveIsLoading ? IN_PROGRESS : 'Approve'}
-          </FilledButton>
-        )}
+
+        <FilledButton
+          disabled={!approve || approveIsLoading || liquidateIsLoading}
+          onClick={() => approve?.()}
+        >
+          {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        </FilledButton>
       </Td>
     </Tr>
   )

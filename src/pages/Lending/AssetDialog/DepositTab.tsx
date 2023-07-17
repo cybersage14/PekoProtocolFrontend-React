@@ -68,7 +68,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${value * Number(balanceData?.formatted) / 100}`)
+    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
   }
 
   //  -----------------------------------------------------
@@ -134,11 +134,11 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           <div className="flex items-center gap-2">
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${Number(balanceData?.formatted) / 2}`)}
+              onClick={() => setAmount(`${(Number(balanceData?.formatted) / 2).toFixed(4)}`)}
             >half</OutlinedButton>
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${balanceData?.formatted}`)}
+              onClick={() => setAmount(`${Number(balanceData?.formatted).toFixed(4)}`)}
             >max</OutlinedButton>
           </div>
         </div>

@@ -70,15 +70,15 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   }
 
   const handleMaxAmount = () => {
-    setAmount(maxAmount)
+    setAmount(Number(maxAmount).toFixed(4))
   }
 
   const handleHalfAmount = () => {
-    setAmount(`${Number(maxAmount) / 2}`)
+    setAmount(`${Number(Number(maxAmount) / 2).toFixed(4)}`)
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${value * Number(maxAmount) / 100}`)
+    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
   }
 
   //  --------------------------------------------------------------------------

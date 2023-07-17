@@ -75,15 +75,15 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   }
 
   const handleHalf = () => {
-    setAmount(`${maxAmount / 2}`)
+    setAmount(`${(maxAmount / 2).toFixed(4)}`)
   }
 
   const handleMax = () => {
-    setAmount(`${maxAmount}`)
+    setAmount(`${maxAmount.toFixed(4)}`)
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${value * maxAmount / 100}`)
+    setAmount(`${(value * maxAmount / 100).toFixed(4)}`)
   }
 
   //  ----------------------------------------------------------------------------

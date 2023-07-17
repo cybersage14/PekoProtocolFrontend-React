@@ -43,7 +43,7 @@ export default function MBRow({ liquidation }: IProps) {
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)]
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)],
   })
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
@@ -74,17 +74,22 @@ export default function MBRow({ liquidation }: IProps) {
 
   useEffect(() => {
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtBorrowAmount, USDC_DECIMAL)))
+    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
 
   useEffect(() => {
     if (approveIsSuccess) {
-      toast.success('Approved.')
       setApproved(true)
+      if (liquidate) {
+        liquidate()
+      }
+    } else {
+      setApproved(false)
     }
-  }, [approveIsSuccess])
+  }, [approveIsSuccess, liquidate])
 
   //  ----------------------------------------------------------------------------------------
+
   return (
     <ListItem
       className="flex-col gap-6 text-gray-100 border-b border-gray-800 rounded-none"
@@ -172,22 +177,13 @@ export default function MBRow({ liquidation }: IProps) {
       {/* Operation */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Operation: </span>
-        {approved ? (
-          <FilledButton
-            disabled={!liquidate || liquidateIsLoading}
-            onClick={() => liquidate?.()}
-          >
-            {liquidateIsLoading ? IN_PROGRESS : "Liquidate"}
-          </FilledButton>
-        ) : (
-          <FilledButton
-            disabled={!approve || approveIsLoading}
-            onClick={() => approve?.()}
-          >
-            {approveIsLoading ? IN_PROGRESS : 'Approve'}
-          </FilledButton>
-        )}
+        <FilledButton
+          disabled={!approve || approveIsLoading || liquidateIsLoading}
+          onClick={() => approve?.()}
+        >
+          {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        </FilledButton>
       </div>
-    </ListItem>
+    </ListItem >
   )
 }
