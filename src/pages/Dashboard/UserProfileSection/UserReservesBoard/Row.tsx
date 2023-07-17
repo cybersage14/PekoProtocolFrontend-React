@@ -4,7 +4,7 @@ import { useContractRead } from "wagmi";
 import Td from "../../../../components/tableComponents/Td";
 import Tr from "../../../../components/tableComponents/Tr";
 import { IAsset, IReturnValueOfPoolInfo, IUserInfo } from "../../../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../../utils/constants";
+import { APY_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../../utils/constants";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -73,8 +73,8 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
 
   useEffect(() => {
     if (poolInfo) {
-      setDepositApy(Number(poolInfo.depositApy))
-      setBorrowApy(Number(poolInfo.borrowApy))
+      setDepositApy(Number(formatUnits(poolInfo.depositApy, APY_DECIMAL)))
+      setBorrowApy(Number(formatUnits(poolInfo.borrowApy, APY_DECIMAL)))
     }
   }, [poolInfo])
 

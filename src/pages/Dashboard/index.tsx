@@ -3,12 +3,12 @@ import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useCopyToClipboard, useOnClickOutside } from 'usehooks-ts';
+import { toast } from "react-toastify";
 import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import FilledButton from "../../components/buttons/FilledButton";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUserInfo } from "../../utils/interfaces";
-import { toast } from "react-toastify";
 import useLoading from "../../hooks/useLoading";
 
 // -----------------------------------------------------------------------------------------------------

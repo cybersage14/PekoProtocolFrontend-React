@@ -36,7 +36,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'borrow',
-    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
+    args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
   })
 
   const { write: borrow, data: borrowData } = useContractWrite(borrowConfig)

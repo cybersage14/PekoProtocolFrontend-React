@@ -53,7 +53,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'repay',
-    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
+    args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
     value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
