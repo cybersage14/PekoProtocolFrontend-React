@@ -102,7 +102,7 @@ export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;
 
 //  Pool Info
 export const POOL_CONTRACT_ADDRESS =
-  "0x53eD7d5c569d125541344F340a7825FF3FA44d1E";
+  "0x3c2ddFd19c4Dbb10AA8B7470886457eec514A0f3";
 export const POOL_CONTRACT_ABI = [
   {
     inputs: [

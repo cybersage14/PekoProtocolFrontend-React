@@ -37,6 +37,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
     watch: true
   })
 
+  //  Get the balance data of pool
   const { data: balanceDataOfPool }: IReturnValueOfBalance = useBalance({
     address: POOL_CONTRACT_ADDRESS,
     token: asset.symbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
