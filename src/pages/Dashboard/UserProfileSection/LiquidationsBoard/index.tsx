@@ -1,11 +1,11 @@
 import { lazy, useMemo } from "react";
+import { formatEther, formatUnits } from "viem";
+import { useAccount, useContractRead } from "wagmi";
 import PrimaryBoard from "../../../../components/boards/PrimaryBoard";
 import Table from "../../../../components/tableComponents/Table";
 import Th from "../../../../components/tableComponents/Th";
 import { ILiquidation, IReturnValueOfListOfUsers, IUserInfo } from "../../../../utils/interfaces";
-import { useAccount, useContractRead } from "wagmi";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
-import { formatEther, formatUnits } from "viem";
 
 //  -----------------------------------------------------------------------------------------
 

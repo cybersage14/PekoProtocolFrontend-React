@@ -100,8 +100,9 @@ export const TEMP_LPS: Array<ILP> = [
 
 export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;
 
+//  Pool Info
 export const POOL_CONTRACT_ADDRESS =
-  "0xD4AB62Fd7b167Ed1D8517FBcC40B14E4b30Df05D";
+  "0x53eD7d5c569d125541344F340a7825FF3FA44d1E";
 export const POOL_CONTRACT_ABI = [
   {
     inputs: [
@@ -508,6 +509,7 @@ export const POOL_CONTRACT_ABI = [
   { stateMutability: "payable", type: "receive" }
 ];
 
+//  USDC info
 export const USDC_CONTRACT_ADDRESS =
   "0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068";
 export const USDC_CONTRACT_ABI = [
@@ -1187,10 +1189,12 @@ export const USDC_CONTRACT_ABI = [
 ];
 export const USDC_DECIMAL = 6;
 
+//  Peko info
 export const PEKO_CONTRACT_ADDRESS =
   "0x96E422C02149CBD21241F0E63da1f2E89371fDfc";
 export const PEKO_DECIMAL = 18;
 
+//  WETH info
 export const WETH_CONTRACT_ADDRESS =
   "0x2C1b868d6596a18e32E61B901E4060C872647b6C";
 export const WETH_DECIMAL = 18;
