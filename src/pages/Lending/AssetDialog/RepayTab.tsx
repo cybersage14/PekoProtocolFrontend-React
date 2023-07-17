@@ -30,10 +30,6 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
 
   //  --------------------------------------------------------------------------
 
-  const { openLoading, closeLoading } = useLoading()
-
-  //  --------------------------------------------------------------------------
-
   //  Approve USDC
   const { config: approveConfig } = usePrepareContractWrite({
     address: USDC_CONTRACT_ADDRESS,
@@ -102,14 +98,12 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
 
   useEffect(() => {
     if (repayIsError) {
-      closeLoading()
       toast.error('Borrow has been failed.')
     }
   }, [repayIsError])
 
   useEffect(() => {
     if (repayIsSuccess) {
-      closeLoading()
       toast.success('Repaid.')
       setVisible(false)
     }
@@ -123,13 +117,14 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
 
   useEffect(() => {
     if (approveIsSuccess) {
-      closeLoading();
-      toast.success('Approved!');
       setApproved(true)
+      if (repay) {
+        repay()
+      }
     } else {
       setApproved(false)
     }
-  }, [approveIsSuccess])
+  }, [approveIsSuccess, repay])
 
   useEffect(() => {
     if (userInfo) {
@@ -202,21 +197,13 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
           >
             {repayIsLoading ? IN_PROGRESS : 'Repay'}
           </FilledButton>
-        ) : approved ? (
-          <FilledButton
-            className="mt-8 py-2 text-base"
-            disabled={!repayPrepareIsSuccess || repayIsLoading}
-            onClick={() => repay?.()}
-          >
-            {repayIsLoading ? IN_PROGRESS : 'Repay'}
-          </FilledButton>
         ) : (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid || approveIsLoading}
+            disabled={!approve || !amountIsValid || approveIsLoading || repayIsLoading}
             onClick={() => approve?.()}
           >
-            {approveIsLoading ? IN_PROGRESS : 'Approve'}
+            {approveIsLoading || repayIsLoading ? IN_PROGRESS : 'Repay'}
           </FilledButton>
         )}
 
