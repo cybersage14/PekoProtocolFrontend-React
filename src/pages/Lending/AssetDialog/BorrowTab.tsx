@@ -104,7 +104,6 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   useEffect(() => {
     if (errorOfBorrowPrepare) {
       // toast.warn(`${errorOfBorrowPrepare.cause}`)
-      console.log('>>>>>>>>>> errorOfBorrowPrepare => ', errorOfBorrowPrepare)
     }
   }, [errorOfBorrowPrepare])
 
@@ -116,7 +115,6 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
         const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))) * usdcPriceInUsd
         const amountInUsd = ethAmountInUsd + usdcAmountInUsd
 
-        //  >>>>>>>>>>>>>> Require to calculate LTV
         setMaxAmountInUsd(amountInUsd * Number(poolInfo?.LTV) / 100)
       }
     }

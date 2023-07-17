@@ -61,8 +61,6 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
         }
       }
 
-      console.log('>>>>>>>>>> _liquidations => ', _liquidations)
-
       return _liquidations
     }
     return []

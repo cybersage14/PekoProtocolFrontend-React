@@ -36,14 +36,14 @@ export default function LandingLayout() {
 
   return (
     <>
-      {isLoading ? <Loading /> : (
-        <div className="min-h-screen flex flex-col bg-[#111111]">
-          <Navbar />
-          <div className="flex-1">
-            <Outlet />
-          </div>
-          <Footer />
-        </div>)}
+      <div className="min-h-screen flex flex-col bg-[#111111]">
+        <Navbar />
+        <div className="flex-1">
+          <Outlet />
+        </div>
+        <Footer />
+      </div>
+      {isLoading && <Loading />}
     </>
 
   )

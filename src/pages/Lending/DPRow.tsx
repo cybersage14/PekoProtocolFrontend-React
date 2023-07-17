@@ -45,8 +45,6 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
     watch: true
   })
 
-  console.log('>>>>>>>> poolInfo => ', poolInfo)
-
   //  ----------------------------------------------------------------------------------
 
   const balanceInUsd = useMemo<number>(() => {
