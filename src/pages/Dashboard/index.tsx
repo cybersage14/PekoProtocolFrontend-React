@@ -144,13 +144,13 @@ export default function Dashboard() {
     }
   }, [claimPekoIsError])
 
-  useEffect(() => {
-    if (claimPekoIsLoading) {
-      openLoading()
-    } else {
-      closeLoading()
-    }
-  }, [claimPekoIsLoading])
+  // useEffect(() => {
+  //   if (claimPekoIsLoading) {
+  //     openLoading()
+  //   } else {
+  //     closeLoading()
+  //   }
+  // }, [claimPekoIsLoading])
 
   //  ------------------------------------------------------------------------------
 
