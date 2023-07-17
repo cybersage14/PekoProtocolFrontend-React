@@ -56,7 +56,9 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
 
   const { isLoading: repayIsLoading, isError: repayIsError, isSuccess: repayIsSuccess } = useWaitForTransaction({
     hash: repayData?.hash,
+    timeout: 4_000,
     onSuccess: () => {
+      console.log('>>>>>> timeout => ', 4000)
       repay?.()
     }
   })
