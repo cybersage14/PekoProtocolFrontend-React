@@ -39,7 +39,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)]
+    args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(asset.decimals)]
   })
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
