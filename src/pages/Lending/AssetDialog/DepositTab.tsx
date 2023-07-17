@@ -108,7 +108,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   useEffect(() => {
     if (approveIsSuccess) {
-      toast.success('Approved!');
+      deposit?.()
       setApproved(true)
     } else {
       setApproved(false)
@@ -187,21 +187,13 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           >
             {depositIsLoading ? IN_PROGRESS : "Deposit"}
           </FilledButton>
-        ) : approved ? (
-          <FilledButton
-            className="mt-8 py-2 text-base"
-            disabled={!deposit || depositIsLoading}
-            onClick={() => deposit?.()}
-          >
-            {depositIsLoading ? IN_PROGRESS : "Deposit"}
-          </FilledButton>
         ) : (
           <FilledButton
             className="mt-8 py-2 text-base"
             disabled={!approve || !amountIsValid || approveIsLoading}
             onClick={() => approve?.()}
           >
-            {approveIsLoading ? IN_PROGRESS : 'Approve'}
+            {approveIsLoading || depositIsLoading ? IN_PROGRESS : 'Deposit'}
           </FilledButton>
         )}
 

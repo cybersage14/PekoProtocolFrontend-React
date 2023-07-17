@@ -35,11 +35,10 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'withdraw',
-    // args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
-    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
+    args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
   })
 
-  console.log('>>>>>>>> Number(amount) * 10 ** asset.decimals => ', Number(amount) * 10 ** asset.decimals)
+  console.log('>>>>>>>>> userInfo => ', userInfo)
 
   const { write: withdraw, data: withdrawData } = useContractWrite(withdrawConfig);
 

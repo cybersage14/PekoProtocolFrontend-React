@@ -44,7 +44,7 @@ export default function DPRow({ liquidation }: IProps) {
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)]
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)],
   })
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
@@ -75,7 +75,8 @@ export default function DPRow({ liquidation }: IProps) {
 
   useEffect(() => {
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtBorrowAmount, USDC_DECIMAL)))
+    console.log('>>>>>>>>>>>>> liquidateEthValue => ', Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
+    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
 
   useEffect(() => {

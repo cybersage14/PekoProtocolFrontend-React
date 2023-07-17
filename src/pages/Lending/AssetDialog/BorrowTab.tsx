@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther, formatUnits, parseUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -56,6 +56,13 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     }
     return 0
   }, [maxAmountInUsd])
+
+  const borrowApyInPercentage = useMemo<number>(() => {
+    if (poolInfo) {
+      return Number(poolInfo.borrowApy) / 10 ** APY_DECIMAL
+    }
+    return 0
+  }, [poolInfo])
 
   //  ----------------------------------------------------------------------------
 
@@ -163,7 +170,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">{Number(poolInfo?.borrowApy).toFixed(2)}%</span>
+            <span className="text-gray-100">{borrowApyInPercentage.toFixed(2)}%</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
