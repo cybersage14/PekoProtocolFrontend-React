@@ -159,7 +159,7 @@ export default function Lending() {
 
   return (
     <Container className="my-8">
-      <div className="grid grid-cols-5 gap-8">
+      <div className="grid grid-cols-5 gap-4">
         <div className="col-span-5 lg:col-span-4">
           <div className="flex flex-col gap-4">
             {/* Infos and Liquidate button */}
