@@ -49,9 +49,22 @@ export default function DPRow({ liquidation }: IProps) {
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
+  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      liquidate?.()
+    }
   })
+
+  //  ----------------------------------------------------------------------------------------
+
+  const handleLiquidate = async () => {
+    if (liquidateUsdcValue > 0) {
+      approve?.()
+    } else {
+      liquidate?.()
+    }
+  }
 
   //  ----------------------------------------------------------------------------------------
 
@@ -77,17 +90,6 @@ export default function DPRow({ liquidation }: IProps) {
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
-
-  useEffect(() => {
-    if (approveIsSuccess) {
-      setApproved(true)
-      if (liquidate) {
-        liquidate()
-      }
-    } else {
-      setApproved(false)
-    }
-  }, [approveIsSuccess, liquidate])
 
   //  ----------------------------------------------------------------------------------------
 
@@ -168,10 +170,9 @@ export default function DPRow({ liquidation }: IProps) {
       </Td>
 
       <Td>
-
         <FilledButton
           disabled={!approve || approveIsLoading || liquidateIsLoading}
-          onClick={() => approve?.()}
+          onClick={() => handleLiquidate()}
         >
           {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
         </FilledButton>

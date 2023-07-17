@@ -54,6 +54,17 @@ export default function MBRow({ liquidation }: IProps) {
 
   //  ----------------------------------------------------------------------------------------
 
+  const handleLiquidate = async () => {
+    if (approve) {
+      await approve?.()
+      if (liquidate) {
+        liquidate()
+      }
+    }
+  }
+
+  //  ----------------------------------------------------------------------------------------
+
   useEffect(() => {
     if (liqudateIsSuccess) {
       toast.success('Liquidated.')
@@ -80,14 +91,11 @@ export default function MBRow({ liquidation }: IProps) {
   useEffect(() => {
     if (approveIsSuccess) {
       setApproved(true)
-      if (liquidate) {
-        liquidate()
-      }
     } else {
       setApproved(false)
     }
   }, [approveIsSuccess, liquidate])
-
+  
   //  ----------------------------------------------------------------------------------------
 
   return (
@@ -179,7 +187,7 @@ export default function MBRow({ liquidation }: IProps) {
         <span className="text-gray-500 font-bold">Operation: </span>
         <FilledButton
           disabled={!approve || approveIsLoading || liquidateIsLoading}
-          onClick={() => approve?.()}
+          onClick={() => handleLiquidate()}
         >
           {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
         </FilledButton>

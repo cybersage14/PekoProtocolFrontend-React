@@ -109,13 +109,18 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   useEffect(() => {
     if (approveIsSuccess) {
       setApproved(true)
-      if (deposit) {
-        deposit()
-      }
     } else {
       setApproved(false)
     }
   }, [approveIsSuccess, deposit])
+
+  useEffect(() => {
+    if (approved && deposit) {
+      if (asset.symbol !== 'eth') {
+        deposit()
+      }
+    }
+  }, [approved, deposit, asset])
 
   //  -----------------------------------------------------
 
