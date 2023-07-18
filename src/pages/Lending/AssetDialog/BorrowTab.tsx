@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -161,7 +161,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
             <span className="text-gray-100 uppercase">
               {userInfo && balanceData ? asset.symbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-                Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
+                (Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)) + MINOR_PLUS_FOR_APPROVE).toFixed(4) : ''}&nbsp;
               {asset.symbol}
             </span>
           </div>

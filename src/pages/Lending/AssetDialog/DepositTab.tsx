@@ -29,12 +29,26 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   //  -----------------------------------------------------
 
+  const amountToDeposit = useMemo<number>(() => {
+    if (asset.symbol === 'eth') {
+      return Number(amount) * 10 ** asset.decimals
+    } else {
+      if (Number(amount) >= MINOR_PLUS_FOR_APPROVE) {
+        return (Number(amount) - MINOR_PLUS_FOR_APPROVE) * 10 ** asset.decimals
+      } else {
+        return 0
+      }
+    }
+  }, [asset, amount])
+
+  //  -----------------------------------------------------
+
   //  Deposit
   const { config: depositConfig } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'deposit',
-    args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
+    args: [asset.contractAddress, amountToDeposit],
     value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
@@ -71,7 +85,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${((value * Number(balanceData?.formatted) / 100) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
+    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
   }
 
   //  -----------------------------------------------------
@@ -93,6 +107,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     }
     return 0
   }, [poolInfo])
+
+
 
   //  -----------------------------------------------------
 
@@ -134,11 +150,11 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           <div className="flex items-center gap-2">
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${((Number(balanceData?.formatted) / 2) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)}
+              onClick={() => setAmount(`${(Number(balanceData?.formatted) / 2).toFixed(4)}`)}
             >half</OutlinedButton>
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${(Number(balanceData?.formatted) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)}
+              onClick={() => setAmount(`${Number(balanceData?.formatted).toFixed(4)}`)}
             >max</OutlinedButton>
           </div>
         </div>
@@ -167,7 +183,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             <span className="text-gray-100 uppercase">
               {userInfo && balanceData ? asset.symbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-                Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)).toFixed(4) : ''}&nbsp;
+                (Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)) + MINOR_PLUS_FOR_APPROVE).toFixed(4) : ''}&nbsp;
               {asset.symbol}
             </span>
           </div>

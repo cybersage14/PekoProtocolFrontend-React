@@ -29,6 +29,20 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
 
   //  --------------------------------------------------------------------------
 
+  const amountToRepay = useMemo<number>(() => {
+    if (asset.symbol === 'eth') {
+      return Number(amount) * 10 ** asset.decimals
+    } else {
+      if (Number(amount) >= MINOR_PLUS_FOR_APPROVE) {
+        return (Number(amount) - MINOR_PLUS_FOR_APPROVE) * 10 ** asset.decimals
+      } else {
+        return 0
+      }
+    }
+  }, [asset, amount])
+
+  //  --------------------------------------------------------------------------
+
   //  Approve USDC
   const { config: approveConfig } = usePrepareContractWrite({
     address: USDC_CONTRACT_ADDRESS,
@@ -42,16 +56,19 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: (data) => {
+      console.log('>>>>>>> data => ', data)
       repay?.()
     }
   })
+
+  console.log('>>>>>>> amountToRepay => ', amountToRepay)
 
   //  Repay
   const { config: repayConfig, isSuccess: repayPrepareIsSuccess, error: errorOfRepayPrepare } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'repay',
-    args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
+    args: [asset.contractAddress, amountToRepay],
     value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
 
@@ -72,15 +89,15 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   }
 
   const handleMaxAmount = () => {
-    setAmount((Number(maxAmount) + MINOR_PLUS_FOR_APPROVE).toFixed(4))
+    setAmount(Number(maxAmount).toFixed(4))
   }
 
   const handleHalfAmount = () => {
-    setAmount(`${(Number(Number(maxAmount) / 2) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
+    setAmount(`${(Number(maxAmount) / 2).toFixed(4)}`)
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${(Number(value * Number(maxAmount) / 100) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
+    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
   }
 
   //  --------------------------------------------------------------------------

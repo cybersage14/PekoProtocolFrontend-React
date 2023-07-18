@@ -1227,4 +1227,4 @@ export const ASSETS: Array<IAsset> = [
   }
 ];
 
-export const MINOR_PLUS_FOR_APPROVE = 0.0001;
+export const MINOR_PLUS_FOR_APPROVE = 0.1;
