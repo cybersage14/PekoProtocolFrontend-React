@@ -61,7 +61,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${usdcAmountToPay}`, USDC_DECIMAL)],
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${usdcAmountToPay + MINOR_PLUS_FOR_APPROVE}`, USDC_DECIMAL)],
   })
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
   const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
