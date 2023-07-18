@@ -56,8 +56,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
-    onSuccess: (data) => {
-      console.log(">>>>>>>>>>> data => ", data)
+    onSuccess: () => {
       deposit?.()
     }
   })

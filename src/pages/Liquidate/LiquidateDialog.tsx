@@ -18,27 +18,6 @@ interface IProps {
 
 // ---------------------------------------------------------------------------------------------
 
-const ASSETS: Array<IAsset> = [
-  {
-    id: 1,
-    name: "Ethereum",
-    symbol: "eth",
-    imgSrc: "/assets/images/ethereum.png",
-    contractAddress: WETH_CONTRACT_ADDRESS,
-    decimals: WETH_DECIMAL
-  },
-  {
-    id: 2,
-    name: "USD Coin",
-    symbol: "usdc",
-    imgSrc: "/assets/images/usdc.png",
-    contractAddress: USDC_CONTRACT_ADDRESS,
-    decimals: USDC_DECIMAL
-  }
-]
-
-// ---------------------------------------------------------------------------------------------
-
 export default function LiquidateDialog({ visible, setVisible, closeLiquidateDialog, liquidation }: IProps) {
   const [ethAmountToPay, setEthAmountToPay] = useState<number>(0)
   const [usdcAmountToPay, setUsdcAmountToPay] = useState<number>(0)
@@ -157,6 +136,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   useEffect(() => {
     if (liqudateIsSuccess) {
       toast.success('Liquidated.')
+      closeLiquidateDialog()
     }
   }, [liqudateIsSuccess])
 

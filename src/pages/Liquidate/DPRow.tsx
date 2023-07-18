@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { toast } from "react-toastify";
+import { formatEther, formatUnits } from "viem";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { ILiquidation } from "../../utils/interfaces"
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
+import { USDC_DECIMAL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 
 //  -----------------------------------------------------------------------------------------
