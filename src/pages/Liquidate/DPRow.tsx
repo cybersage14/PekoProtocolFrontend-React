@@ -86,7 +86,7 @@ export default function DPRow({ liquidation }: IProps) {
   }, [approveIsError])
 
   useEffect(() => {
-    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
+    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) / 10000 * 9999 + 0.001)
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
   }, [liquidation])
 
