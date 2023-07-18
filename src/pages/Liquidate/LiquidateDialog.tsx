@@ -67,6 +67,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
+      console.log('>>>>>>> liquidate => ', liquidate)
       liquidate?.()
     }
   })
