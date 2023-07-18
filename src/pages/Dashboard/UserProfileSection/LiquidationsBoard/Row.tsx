@@ -4,7 +4,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Tr from "../../../../components/tableComponents/Tr";
 import { ILiquidation } from "../../../../utils/interfaces";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
+import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
 import Td from "../../../../components/tableComponents/Td";
 import FilledButton from "../../../../components/buttons/FilledButton";
 
@@ -88,7 +88,7 @@ export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IPro
 
   useEffect(() => {
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
+    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) + MINOR_PLUS_FOR_APPROVE)
   }, [liquidation])
 
   //  ----------------------------------------------------------------------------------------

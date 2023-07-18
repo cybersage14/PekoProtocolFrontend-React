@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
+import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -67,20 +67,20 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     const { value } = e.target;
 
     if (value.match(REGEX_NUMBER_VALID)) {
-      setAmount(value);
+      setAmount(`${Number(value) + MINOR_PLUS_FOR_APPROVE}`);
     }
   }
 
   const handleMaxAmount = () => {
-    setAmount(Number(maxAmount).toFixed(4))
+    setAmount((Number(maxAmount) + MINOR_PLUS_FOR_APPROVE).toFixed(4))
   }
 
   const handleHalfAmount = () => {
-    setAmount(`${Number(Number(maxAmount) / 2).toFixed(4)}`)
+    setAmount(`${(Number(Number(maxAmount) / 2) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
+    setAmount(`${(Number(value * Number(maxAmount) / 100) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
   }
 
   //  --------------------------------------------------------------------------

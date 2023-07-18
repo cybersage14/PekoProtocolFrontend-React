@@ -5,7 +5,7 @@ import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import CustomDialog from "../../components/dialogs/CustomDialog";
 import { IAsset, ILiquidation, IReturnValueOfBalance } from "../../utils/interfaces";
 import FilledButton from "../../components/buttons/FilledButton";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
+import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   useEffect(() => {
     if (liquidation) {
       setEthAmountToPay(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-      setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
+      setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) + MINOR_PLUS_FOR_APPROVE)
       setEthAmountToGetPaid(Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)))
       setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
     }

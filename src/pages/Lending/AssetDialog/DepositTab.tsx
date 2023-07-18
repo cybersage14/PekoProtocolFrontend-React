@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -66,12 +66,12 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     const { value } = e.target;
 
     if (value.match(REGEX_NUMBER_VALID)) {
-      setAmount(value);
+      setAmount(`${Number(value) + MINOR_PLUS_FOR_APPROVE}`);
     }
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
+    setAmount(`${((value * Number(balanceData?.formatted) / 100) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)
   }
 
   //  -----------------------------------------------------
@@ -134,11 +134,11 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           <div className="flex items-center gap-2">
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${(Number(balanceData?.formatted) / 2).toFixed(4)}`)}
+              onClick={() => setAmount(`${((Number(balanceData?.formatted) / 2) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)}
             >half</OutlinedButton>
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${Number(balanceData?.formatted).toFixed(4)}`)}
+              onClick={() => setAmount(`${(Number(balanceData?.formatted) + MINOR_PLUS_FOR_APPROVE).toFixed(4)}`)}
             >max</OutlinedButton>
           </div>
         </div>
