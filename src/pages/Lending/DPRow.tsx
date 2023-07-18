@@ -65,7 +65,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
   //  ----------------------------------------------------------------------------------
 
   useEffect(() => {
-    if (poolInfo) {
+    if (poolInfo && balanceDataOfPool) {
       setMarketSize(Number(balanceDataOfPool?.formatted))
       if (asset.symbol === 'eth') {
         setMarketSizeInUsd(Number(balanceDataOfPool?.formatted) * ethPriceInUsd)
@@ -86,7 +86,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       setDepositApyInPercentage(0)
       setBorrowApyInPercentage(0)
     }
-  }, [poolInfo, asset])
+  }, [poolInfo, balanceDataOfPool])
 
   //  ----------------------------------------------------------------------------------
 
