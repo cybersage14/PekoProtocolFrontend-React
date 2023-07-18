@@ -111,11 +111,10 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   useEffect(() => {
     if (userInfo) {
       if (ethPriceInUsd && usdcPriceInUsd) {
-        const ethAmountInUsd = (Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) - Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount))) * ethPriceInUsd
-        const usdcAmountInUsd = (Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) - Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))) * usdcPriceInUsd
-        const amountInUsd = ethAmountInUsd + usdcAmountInUsd
+        const totalDepositInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+        const totalBorrowInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-        setMaxAmountInUsd(amountInUsd * Number(poolInfo?.LTV) / 100)
+        setMaxAmountInUsd(totalDepositInUsd * Number(poolInfo?.LTV) / 100 - totalBorrowInUsd)
       }
     }
   }, [userInfo])
