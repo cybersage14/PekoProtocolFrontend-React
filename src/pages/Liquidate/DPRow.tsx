@@ -6,7 +6,7 @@ import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { ILiquidation } from "../../utils/interfaces"
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
 import FilledButton from "../../components/buttons/FilledButton";
 
 //  -----------------------------------------------------------------------------------------
@@ -21,80 +21,12 @@ interface IProps {
 //  -----------------------------------------------------------------------------------------
 
 export default function DPRow({ liquidation, ethPriceInUsd, usdcPriceInUsd, openLiquidateDialog }: IProps) {
-  const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
-  const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
   const [borrowedValueInUsd, setBorrowedValueInUsd] = useState<number>(0)
   const [depositedValueInUsd, setDepositedValueInUsd] = useState<number>(0)
 
   //  ----------------------------------------------------------------------------------------
 
-  //  Liquidate
-  const { config: liquidateConfig } = usePrepareContractWrite({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'liquidate',
-    args: [liquidation.accountAddress],
-    value: parseEther(`${liquidateEthValue}`)
-  })
-
-  const { write: liquidate, data: liquidateData } = useContractWrite(liquidateConfig);
-
-  const { isLoading: liquidateIsLoading, isSuccess: liqudateIsSuccess, isError: liquidateIsError } = useWaitForTransaction({
-    hash: liquidateData?.hash
-  })
-
-  //  Approve USDC
-  const { config: approveConfig } = usePrepareContractWrite({
-    address: USDC_CONTRACT_ADDRESS,
-    abi: USDC_CONTRACT_ABI,
-    functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)],
-  })
-
-  const { write: approve, data: approveData } = useContractWrite(approveConfig);
-
-  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
-    hash: approveData?.hash,
-    onSuccess: () => {
-      liquidate?.()
-    }
-  })
-
-  //  ----------------------------------------------------------------------------------------
-
-  const handleLiquidate = async () => {
-    if (liquidateUsdcValue > 0) {
-      approve?.()
-    } else {
-      liquidate?.()
-    }
-  }
-
-  //  ----------------------------------------------------------------------------------------
-
   useEffect(() => {
-    if (liqudateIsSuccess) {
-      toast.success('Liquidated.')
-    }
-  }, [liqudateIsSuccess])
-
-  useEffect(() => {
-    if (liquidateIsError) {
-      toast.error('Error.')
-    }
-  }, [liquidateIsError])
-
-  useEffect(() => {
-    if (approveIsError) {
-      toast.error('Approve Error.')
-    }
-  }, [approveIsError])
-
-  useEffect(() => {
-    //  >>>>>>>>>>>>>>>>> Need to be fixed.
-    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) / 10000 * 9999 + 0.001)
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
-
     const _borrowedValueInUsd = Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) * ethPriceInUsd +
       Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
     const _depositedValueInUsd = Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)) * ethPriceInUsd +

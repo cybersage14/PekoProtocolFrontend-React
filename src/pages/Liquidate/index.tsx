@@ -54,6 +54,8 @@ export default function Liquidate() {
     watch: true
   })
 
+
+  //  Get the threshold of liquidation
   const { data: liquidatationThresholdInBigInt } = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
