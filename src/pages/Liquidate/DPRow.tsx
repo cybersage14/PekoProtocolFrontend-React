@@ -13,13 +13,18 @@ import FilledButton from "../../components/buttons/FilledButton";
 
 interface IProps {
   liquidation: ILiquidation;
+  ethPriceInUsd: number;
+  usdcPriceInUsd: number;
+  openLiquidateDialog: Function;
 }
 
 //  -----------------------------------------------------------------------------------------
 
-export default function DPRow({ liquidation }: IProps) {
+export default function DPRow({ liquidation, ethPriceInUsd, usdcPriceInUsd, openLiquidateDialog }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
+  const [borrowedValueInUsd, setBorrowedValueInUsd] = useState<number>(0)
+  const [depositedValueInUsd, setDepositedValueInUsd] = useState<number>(0)
 
   //  ----------------------------------------------------------------------------------------
 
@@ -86,8 +91,17 @@ export default function DPRow({ liquidation }: IProps) {
   }, [approveIsError])
 
   useEffect(() => {
+    //  >>>>>>>>>>>>>>>>> Need to be fixed.
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) / 10000 * 9999 + 0.001)
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
+
+    const _borrowedValueInUsd = Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+    const _depositedValueInUsd = Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+    setBorrowedValueInUsd(_borrowedValueInUsd)
+    setDepositedValueInUsd(_depositedValueInUsd)
   }, [liquidation])
 
   //  ----------------------------------------------------------------------------------------
@@ -103,7 +117,7 @@ export default function DPRow({ liquidation }: IProps) {
           {liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
             <div className="relative">
               <img src="/assets/images/usdc.png" alt="" className="w-10" />
-              <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 left-[50%] w-10" />
+              <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 left-[60%] w-10" />
             </div>
           ) : !liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
             <img src="/assets/images/usdc.png" alt="" className="w-10" />
@@ -115,7 +129,7 @@ export default function DPRow({ liquidation }: IProps) {
 
       {/* Borrowed Value */}
       <Td>
-        {liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
+        {/* {liquidation.ethBorrowAmount && liquidation.usdtBorrowAmount ? (
           <div className="flex flex-col gap-1">
             <span className="uppercase">{Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)).toFixed(4)} ETH</span>
             <span className="uppercase">
@@ -128,7 +142,8 @@ export default function DPRow({ liquidation }: IProps) {
           </span>
         ) : (
           <span className="uppercase">{Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)).toFixed(4)} ETH</span>
-        )}
+        )} */}
+        ${borrowedValueInUsd.toFixed(2)}
       </Td>
 
       {/* Deposited Asset(s) */}
@@ -137,7 +152,7 @@ export default function DPRow({ liquidation }: IProps) {
           {liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
             <div className="relative">
               <img src="/assets/images/usdc.png" alt="" className="w-10" />
-              <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 right-[50%] w-10" />
+              <img src="/assets/images/ethereum.png" alt="" className="absolute top-0 right-[60%] w-10" />
             </div>
           ) : !liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
             <img src="/assets/images/usdc.png" alt="" className="w-10" />
@@ -149,7 +164,7 @@ export default function DPRow({ liquidation }: IProps) {
 
       {/* Deposited Value */}
       <Td>
-        {liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
+        {/* {liquidation.ethDepositAmount && liquidation.usdtDepositAmount ? (
           <div className="flex flex-col gap-1">
             <span className="uppercase">{Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)).toFixed(4)} ETH</span>
             <span className="uppercase">
@@ -160,7 +175,8 @@ export default function DPRow({ liquidation }: IProps) {
           <span className="uppercase">{Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)).toFixed(4)} USDC</span>
         ) : (
           <span className="uppercase">{Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)).toFixed(4)} ETH</span>
-        )}
+        )} */}
+        ${depositedValueInUsd.toFixed(2)}
       </Td>
 
       {/* Risk Factor */}
@@ -169,11 +185,14 @@ export default function DPRow({ liquidation }: IProps) {
       </Td>
 
       <Td>
-        <FilledButton
+        {/* <FilledButton
           disabled={!approve || approveIsLoading || liquidateIsLoading}
           onClick={() => handleLiquidate()}
         >
           {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        </FilledButton> */}
+        <FilledButton onClick={() => openLiquidateDialog(liquidation)}>
+          Liquidate
         </FilledButton>
       </Td>
     </Tr>

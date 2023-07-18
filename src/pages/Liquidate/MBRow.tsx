@@ -12,13 +12,18 @@ import FilledButton from "../../components/buttons/FilledButton";
 
 interface IProps {
   liquidation: ILiquidation;
+  ethPriceInUsd: number;
+  usdcPriceInUsd: number;
+  openLiquidateDialog: Function;
 }
 
 //  -----------------------------------------------------------------------------------------
 
-export default function MBRow({ liquidation }: IProps) {
+export default function MBRow({ liquidation, ethPriceInUsd, usdcPriceInUsd, openLiquidateDialog }: IProps) {
   const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
   const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
+  const [borrowedValueInUsd, setBorrowedValueInUsd] = useState<number>(0)
+  const [depositedValueInUsd, setDepositedValueInUsd] = useState<number>(0)
 
   //  ----------------------------------------------------------------------------------------
 
@@ -85,8 +90,17 @@ export default function MBRow({ liquidation }: IProps) {
   }, [approveIsError])
 
   useEffect(() => {
+    //  >>>>>>>>>>>>>>>>> Need to be fixed.
     setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) / 10000 * 9999 + 0.001)
     setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
+
+    const _borrowedValueInUsd = Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+    const _depositedValueInUsd = Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+    setBorrowedValueInUsd(_borrowedValueInUsd)
+    setDepositedValueInUsd(_depositedValueInUsd)
   }, [liquidation])
 
   //  ----------------------------------------------------------------------------------------
@@ -178,11 +192,14 @@ export default function MBRow({ liquidation }: IProps) {
       {/* Operation */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Operation: </span>
-        <FilledButton
+        {/* <FilledButton
           disabled={!approve || approveIsLoading || liquidateIsLoading}
           onClick={() => handleLiquidate()}
         >
           {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        </FilledButton> */}
+        <FilledButton onClick={() => openLiquidateDialog(liquidation)}>
+          Liquidate
         </FilledButton>
       </div>
     </ListItem >

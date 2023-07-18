@@ -13,6 +13,7 @@ import { ILiquidation, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers }
 
 const DPRow = lazy(() => import('./DPRow'))
 const MBRow = lazy(() => import('./MBRow'))
+const LiquidateDialog = lazy(() => import('./LiquidateDialog'))
 
 // -----------------------------------------------------------------------------------
 
@@ -22,6 +23,8 @@ export default function Liquidate() {
   //  ----------------------------------------------------------------
 
   const [visible, setVisible] = useState<boolean>(true)
+  const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
+  const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
 
   //  ----------------------------------------------------------------
 
@@ -69,7 +72,7 @@ export default function Liquidate() {
 
   const usdcPriceInUsd = useMemo<number>(() => {
     if (usdcPriceInBigInt) {
-      return Number(formatEther(usdcPriceInBigInt))
+      return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
     }
     return 0
   }, [usdcPriceInBigInt])
@@ -104,6 +107,18 @@ export default function Liquidate() {
 
   //  ----------------------------------------------------------------
 
+  const openLiquidateDialog = (liquidation: ILiquidation) => {
+    setSelectedLiquidation(liquidation)
+    setLiquidateDialogOpened(true)
+  }
+
+  const closeLiquidateDialog = () => {
+    setSelectedLiquidation(null)
+    setLiquidateDialogOpened(false)
+  }
+
+  //  ----------------------------------------------------------------
+
   return (
     <Container className="container my-8 flex flex-col gap-8">
       <header className="flex flex-col items-center gap-4">
@@ -129,6 +144,9 @@ export default function Liquidate() {
                 <MBRow
                   key={index}
                   liquidation={liquidationItem}
+                  ethPriceInUsd={ethPriceInUsd}
+                  usdcPriceInUsd={usdcPriceInUsd}
+                  openLiquidateDialog={openLiquidateDialog}
                 />
               ))}
             </List>
@@ -150,8 +168,11 @@ export default function Liquidate() {
               <tbody>
                 {liquidations.map((liquidationItem, index) => (
                   <DPRow
+                    ethPriceInUsd={ethPriceInUsd}
+                    usdcPriceInUsd={usdcPriceInUsd}
                     key={index}
                     liquidation={liquidationItem}
+                    openLiquidateDialog={openLiquidateDialog}
                   />
                 ))}
               </tbody>
@@ -159,6 +180,12 @@ export default function Liquidate() {
           )}
         </>
       ) : (<></>)}
+      <LiquidateDialog
+        liquidation={selectedLiquidation}
+        visible={liquidateDialogOpened}
+        setVisible={setLiquidateDialogOpened}
+        closeLiquidateDialog={closeLiquidateDialog}
+      />
     </Container>
   )
 }

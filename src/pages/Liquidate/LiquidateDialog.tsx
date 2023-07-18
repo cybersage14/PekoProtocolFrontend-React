@@ -2,15 +2,17 @@ import { useState } from "react";
 import CustomDialog from "../../components/dialogs/CustomDialog";
 import SelectTokenWithPrice from "../../components/form/SelectTokenWithPrice";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
-import { IAsset } from "../../utils/interfaces";
+import { IAsset, ILiquidation } from "../../utils/interfaces";
 import FilledButton from "../../components/buttons/FilledButton";
 import { USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
 interface IProps {
+  liquidation: ILiquidation | null;
   visible: boolean;
   setVisible: Function;
+  closeLiquidateDialog: Function;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -36,7 +38,7 @@ const ASSETS: Array<IAsset> = [
 
 // ---------------------------------------------------------------------------------------------
 
-export default function LiquidateDialog({ visible, setVisible }: IProps) {
+export default function LiquidateDialog({ visible, setVisible, closeLiquidateDialog, liquidation }: IProps) {
   const [payToken, setPayToken] = useState<IAsset>(ASSETS[0])
   const [payTokenAmount, setPayTokenAmount] = useState<string>('0')
   const [receiveToken, setReceiveToken] = useState<IAsset>(ASSETS[1])
