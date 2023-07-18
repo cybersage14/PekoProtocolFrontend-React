@@ -3,9 +3,9 @@ import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useW
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import CustomDialog from "../../components/dialogs/CustomDialog";
-import { IAsset, ILiquidation, IReturnValueOfBalance } from "../../utils/interfaces";
+import { ILiquidation, IReturnValueOfBalance } from "../../utils/interfaces";
 import FilledButton from "../../components/buttons/FilledButton";
-import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS, WETH_DECIMAL } from "../../utils/constants";
+import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 

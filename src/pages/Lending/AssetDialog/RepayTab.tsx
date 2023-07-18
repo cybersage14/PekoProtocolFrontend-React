@@ -67,7 +67,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     const { value } = e.target;
 
     if (value.match(REGEX_NUMBER_VALID)) {
-      setAmount(`${Number(value) + MINOR_PLUS_FOR_APPROVE}`);
+      setAmount(value);
     }
   }
 
