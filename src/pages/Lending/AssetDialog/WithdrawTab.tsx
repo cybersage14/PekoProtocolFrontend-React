@@ -1,10 +1,10 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -26,7 +26,7 @@ interface IProps {
 export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [maxAmount, setMaxAmount] = useState<string>('0')
+  const [maxAmountInUsd, setMaxAmountInUsd] = useState<number>(0)
 
   //  --------------------------------------------------------------------
 
@@ -46,6 +46,18 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
 
   //  --------------------------------------------------------------------
 
+  const maxAmount = useMemo<number>(() => {
+    if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
+      return maxAmountInUsd / ethPriceInUsd
+    }
+    if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
+      return maxAmountInUsd / usdcPriceInUsd
+    }
+    return 0
+  }, [maxAmountInUsd])
+
+  //  --------------------------------------------------------------------
+
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -55,25 +67,27 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   }
 
   const handleHalf = () => {
-    setAmount(`${(Number(maxAmount) / 2).toFixed(4)}`)
+    setAmount(`${(maxAmount / 2).toFixed(4)}`)
   }
 
   const handleMax = () => {
-    setAmount(Number(maxAmount).toFixed(4))
+    setAmount(maxAmount.toFixed(4))
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
+    setAmount(`${Number(value * maxAmount / 100).toFixed(4)}`)
   }
 
   //  --------------------------------------------------------------------
 
+  //  Ping error alert.
   useEffect(() => {
     if (withdrawIsError) {
       toast.error('Withdraw has been failed.');
     }
   }, [withdrawIsError])
 
+  //  Ping alert and close dialog.
   useEffect(() => {
     if (withdrawIsSuccess) {
       toast.success('Withdrawed.')
@@ -81,12 +95,14 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
     }
   }, [withdrawIsSuccess])
 
+  //  Get max withdrawable amount in USD.
   useEffect(() => {
-    if (userInfo && balanceData?.decimals) {
-      if (asset.symbol === 'eth') {
-        setMaxAmount(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount))
-      } else {
-        setMaxAmount(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, balanceData.decimals))
+    if (userInfo) {
+      if (ethPriceInUsd && usdcPriceInUsd) {
+        const totalDepositInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+        const totalBorrowInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+        setMaxAmountInUsd(totalDepositInUsd - totalBorrowInUsd)
       }
     }
   }, [userInfo])
@@ -103,7 +119,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
@@ -122,7 +138,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
-            value={Number(amount) / Number(maxAmount) * 100}
+            value={Number(amount) / maxAmount * 100}
             onChange={handleSlider}
           />
         </div>
