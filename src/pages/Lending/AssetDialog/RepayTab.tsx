@@ -130,7 +130,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
       if (asset.symbol === 'eth') {
         setMaxAmount(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount))
       } else {
-        setMaxAmount(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))
+        setMaxAmount(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL))
       }
     }
   }, [userInfo])
