@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useAccount, useBalance } from "wagmi";
 import Td from "../../../components/tableComponents/Td";
-import Tr from "../../../components/tableComponents/Tr";
 import { IAsset, IReturnValueOfBalance } from "../../../utils/interfaces";
 import { USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
 
@@ -32,7 +31,7 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) 
   }, [balanceData])
 
   return (
-    <Tr>
+    <tr>
       <Td>
         <div className="flex items-center gap-2">
           <img src={asset.imgSrc} alt="" className="w-10" />
@@ -46,6 +45,6 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) 
         $ {asset.symbol === 'eth' ? ethPriceInUsd.toFixed(2) : usdcPriceInUsd.toFixed(2)}
       </Td>
       <Td>${balanceInUsd.toFixed(2)}</Td>
-    </Tr>
+    </tr>
   )
 }
