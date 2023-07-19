@@ -13,7 +13,7 @@ import { ILiquidation, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers }
 
 const DPRow = lazy(() => import('./DPRow'))
 const MBRow = lazy(() => import('./MBRow'))
-const LiquidateDialog = lazy(() => import('./LiquidateDialog'))
+const LiquidateDialog = lazy(() => import('../../components/LiquidateDialog'))
 
 // -----------------------------------------------------------------------------------
 

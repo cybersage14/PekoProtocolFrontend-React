@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
-import CustomDialog from "../../components/dialogs/CustomDialog";
-import { ILiquidation, IReturnValueOfBalance } from "../../utils/interfaces";
-import FilledButton from "../../components/buttons/FilledButton";
-import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
+import CustomDialog from "./dialogs/CustomDialog";
+import { ILiquidation, IReturnValueOfBalance } from "../utils/interfaces";
+import FilledButton from "./buttons/FilledButton";
+import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
