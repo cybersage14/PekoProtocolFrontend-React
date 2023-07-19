@@ -128,7 +128,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         }
 
         if (depositTokenInUsd > 0) {
-          let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo.LTV) - totalBorrowInUsd) / Number(poolInfo.LTV)
+          let _maxValueInUsd = totalDepositInUsd * Number(poolInfo.LTV) / 100 - totalBorrowInUsd
           console.log('>>>>>>>>>> _maxValueInUsd => ', _maxValueInUsd)
           console.log('>>>>>>>>>> depositTokenInUsd => ', depositTokenInUsd)
 
