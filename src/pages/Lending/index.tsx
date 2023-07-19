@@ -14,7 +14,7 @@ import Th from "../../components/tableComponents/Th";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
 import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import { IAsset, IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
+import { IAsset, IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfGetMarketInfo, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";
 import { getVisibleWalletAddress } from "../../utils/functions";
@@ -46,6 +46,15 @@ export default function Lending() {
     address: POOL_CONTRACT_ADDRESS,
     watch: true
   })
+
+  const { data: marketInfo }: IReturnValueOfGetMarketInfo = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getMarketInfo',
+    watch: true
+  })
+
+  console.log('>>>>>>>> marketInfo => ', marketInfo)
 
   //  Get the USDC balance data of pool
   const { data: usdcBalanceDataOfPool }: IReturnValueOfBalance = useBalance({
@@ -143,30 +152,30 @@ export default function Lending() {
 
   //  useEffect ----------------------------------------------------------
 
-  useEffect(() => {
-    let _totalMarketSize = 0;
-    let _totalBorrowed = 0;
+  // useEffect(() => {
+  //   let _totalMarketSize = 0;
+  //   let _totalBorrowed = 0;
 
-    if (poolInfos) {
-      for (let i = 0; i < poolInfos.length; i += 1) {
-        if (i === 0) {
-          _totalMarketSize += Number(formatEther(poolInfos[i].totalAmount)) * ethPriceInUsd
-          _totalBorrowed += Number(formatEther(poolInfos[i].borrowAmount)) * ethPriceInUsd
-        } else if (i === 1) {
-          _totalMarketSize += Number(formatUnits(poolInfos[i].totalAmount, USDC_DECIMAL)) * usdcPriceInUsd
-          _totalBorrowed += Number(formatUnits(poolInfos[i].borrowAmount, USDC_DECIMAL)) * usdcPriceInUsd
-        }
-      }
-      setTotalMarketSizeInUsd(_totalMarketSize);
-      setTotalBorrowedInUsd(_totalBorrowed);
+  //   if (poolInfos) {
+  //     for (let i = 0; i < poolInfos.length; i += 1) {
+  //       if (i === 0) {
+  //         _totalMarketSize += Number(formatEther(poolInfos[i].totalAmount)) * ethPriceInUsd
+  //         _totalBorrowed += Number(formatEther(poolInfos[i].borrowAmount)) * ethPriceInUsd
+  //       } else if (i === 1) {
+  //         _totalMarketSize += Number(formatUnits(poolInfos[i].totalAmount, USDC_DECIMAL)) * usdcPriceInUsd
+  //         _totalBorrowed += Number(formatUnits(poolInfos[i].borrowAmount, USDC_DECIMAL)) * usdcPriceInUsd
+  //       }
+  //     }
+  //     setTotalMarketSizeInUsd(_totalMarketSize);
+  //     setTotalBorrowedInUsd(_totalBorrowed);
 
-      if (_totalMarketSize > 0) {
-        setLentOut(_totalBorrowed / _totalMarketSize * 100)
-      } else {
-        setLentOut(0)
-      }
-    }
-  }, [poolInfos])
+  //     if (_totalMarketSize > 0) {
+  //       setLentOut(_totalBorrowed / _totalMarketSize * 100)
+  //     } else {
+  //       setLentOut(0)
+  //     }
+  //   }
+  // }, [poolInfos])
 
   useEffect(() => {
     let ethBalance = 0;
@@ -181,6 +190,17 @@ export default function Lending() {
 
     setTotalMarketSizeInUsd(ethBalance * ethPriceInUsd + usdcBalance * usdcPriceInUsd)
   }, [ethBalanceDataOfPool, usdcBalanceDataOfPool])
+
+  useEffect(() => {
+    if (marketInfo) {
+      const _totalMarketSizeInUsd = Number(formatUnits(marketInfo[0], USDC_DECIMAL))
+      const _totalBorrowedInUsd = Number(formatUnits(marketInfo[1], USDC_DECIMAL))
+
+      setTotalMarketSizeInUsd(_totalMarketSizeInUsd);
+      setTotalBorrowedInUsd(_totalBorrowedInUsd);
+      setLentOut(_totalBorrowedInUsd / _totalMarketSizeInUsd * 100)
+    }
+  }, [marketInfo])
 
   //  --------------------------------------------------------------------
 

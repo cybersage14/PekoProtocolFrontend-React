@@ -113,3 +113,8 @@ export interface IReturnValueOfPools {
   data?: Array<IPoolInfo>;
   [key: string]: any;
 }
+
+export interface IReturnValueOfGetMarketInfo {
+  data?: Array<bigint>;
+  [key: string]: any;
+}
