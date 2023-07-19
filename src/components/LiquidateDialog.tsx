@@ -5,7 +5,7 @@ import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import CustomDialog from "./dialogs/CustomDialog";
 import { ILiquidation, IReturnValueOfBalance } from "../utils/interfaces";
 import FilledButton from "./buttons/FilledButton";
-import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -23,7 +23,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   const [usdcAmountToPay, setUsdcAmountToPay] = useState<number>(0)
   const [ethAmountToGetPaid, setEthAmountToGetPaid] = useState<number>(0)
   const [usdcAmountToGetPaid, setUsdcAmountToGetPaid] = useState<number>(0)
-  const [buttonClicked, setButtonClicked] = useState<boolean>(false)
 
   //  ---------------------------------------------------------------------------
 
@@ -53,10 +52,14 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     value: parseEther(`${ethAmountToPay}`)
   })
   const { write: liquidate, data: liquidateData } = useContractWrite(liquidateConfig);
-  const { isLoading: liquidateIsLoading, isSuccess: liqudateIsSuccess, isError: liquidateIsError } = useWaitForTransaction({
+  const { isLoading: liquidateIsLoading } = useWaitForTransaction({
     hash: liquidateData?.hash,
-    onSettled: () => {
-      setButtonClicked(false)
+    onSuccess: () => {
+      toast.success('Liquidated.')
+      closeLiquidateDialog()
+    },
+    onError: () => {
+      toast.error('Aprrove occured error.')
     }
   })
 
@@ -65,11 +68,14 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${usdcAmountToPay + MINOR_PLUS_FOR_APPROVE}`, USDC_DECIMAL)],
+    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${usdcAmountToPay}`, USDC_DECIMAL)],
   })
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
-  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
-    hash: approveData?.hash
+  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
+    hash: approveData?.hash,
+    onError: () => {
+      toast.error('Approve occured error.')
+    }
   })
 
   //  ---------------------------------------------------------------------------
@@ -112,18 +118,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
 
   //  ---------------------------------------------------------------------------
 
-  //  Call when "Repay" button is clicked
-  const handleLiquidate = async () => {
-    setButtonClicked(true)
-    if (usdcAmountToPay > 0) {
-      approve?.()
-    } else {
-      liquidate?.()
-    }
-  }
-
-  //  ---------------------------------------------------------------------------
-
   //  Get totalBorrow and totalDeposit of the liquidation
   useEffect(() => {
     if (liquidation) {
@@ -131,40 +125,12 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       if (Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) === 0) {
         setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
       } else {
-        setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) + MINOR_PLUS_FOR_APPROVE)
+        setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)))
       }
       setEthAmountToGetPaid(Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)))
       setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
     }
   }, [liquidation])
-
-  //  Ping success alert when liquidated.
-  useEffect(() => {
-    if (liqudateIsSuccess) {
-      toast.success('Liquidated.')
-      closeLiquidateDialog()
-    }
-  }, [liqudateIsSuccess])
-
-  //  Ping error alert when liquidation occured error
-  useEffect(() => {
-    if (liquidateIsError) {
-      toast.error('Error.')
-    }
-  }, [liquidateIsError])
-
-  //  Ping error alert when USDC approve occured error
-  useEffect(() => {
-    if (approveIsError) {
-      toast.error('Approve Error.')
-    }
-  }, [approveIsError])
-
-  useEffect(() => {
-    if (buttonClicked && liquidate) {
-      liquidate()
-    }
-  }, [liquidate, buttonClicked])
 
   //  ---------------------------------------------------------------------------
 
@@ -233,13 +199,35 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
           </div>
         </div>
 
-        <FilledButton
-          className="w-full text-base py-3 font-semibold"
-          disabled={!approve || approveIsLoading || liquidateIsLoading}
-          onClick={() => handleLiquidate()}
-        >
-          {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Repay'}
-        </FilledButton>
+        {usdcAmountToPay > 0 ? (
+          <>
+            {approveIsSuccess ? (
+              <FilledButton
+                className="w-full text-base py-3 font-semibold"
+                disabled={!liquidate || liquidateIsLoading}
+                onClick={() => liquidate?.()}
+              >
+                {liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+              </FilledButton>
+            ) : (
+              <FilledButton
+                className="w-full text-base py-3 font-semibold"
+                disabled={!approve || approveIsLoading}
+                onClick={() => approve?.()}
+              >
+                {approveIsLoading ? IN_PROGRESS : 'Approve'}
+              </FilledButton>
+            )}
+          </>
+        ) : (
+          <FilledButton
+            className="w-full text-base py-3 font-semibold"
+            disabled={!liquidate || liquidateIsLoading}
+            onClick={() => liquidate?.()}
+          >
+            {liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+          </FilledButton>
+        )}
       </div>
     </CustomDialog>
   )
