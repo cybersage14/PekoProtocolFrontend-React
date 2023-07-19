@@ -67,7 +67,7 @@ export default function Liquidate() {
 
   const ethPriceInUsd = useMemo<number>(() => {
     if (ethPriceInBigInt) {
-      return Number(formatEther(ethPriceInBigInt))
+      return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
     }
     return 0
   }, [ethPriceInBigInt])
@@ -93,6 +93,10 @@ export default function Liquidate() {
         if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
           let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
           let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+          console.log('>>>>>>>>>> ethPriceInUsd => ', ethPriceInUsd)
+          console.log('>>>>>>>>>> usdcPriceInUsd => ', usdcPriceInUsd)
+          console.log(">>>>>>>>>> depositedValueInUsd => ", depositedValueInUsd)
 
           if (depositedValueInUsd > 0) {
             let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
