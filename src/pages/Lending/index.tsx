@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useMediaQuery } from 'react-responsive';
 import { List } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
@@ -14,7 +14,7 @@ import Th from "../../components/tableComponents/Th";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
 import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import { IAsset, IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfGetMarketInfo, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
+import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfGetMarketInfo, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";
 import { getVisibleWalletAddress } from "../../utils/functions";
@@ -41,25 +41,10 @@ export default function Lending() {
 
   //  Wagmi hooks -------------------------------------------------------
 
-  //  Get the ETH balance data of pool
-  const { data: ethBalanceDataOfPool }: IReturnValueOfBalance = useBalance({
-    address: POOL_CONTRACT_ADDRESS,
-    watch: true
-  })
-
   const { data: marketInfo }: IReturnValueOfGetMarketInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getMarketInfo',
-    watch: true
-  })
-
-  console.log('>>>>>>>> marketInfo => ', marketInfo)
-
-  //  Get the USDC balance data of pool
-  const { data: usdcBalanceDataOfPool }: IReturnValueOfBalance = useBalance({
-    address: POOL_CONTRACT_ADDRESS,
-    token: USDC_CONTRACT_ADDRESS,
     watch: true
   })
 
@@ -151,45 +136,6 @@ export default function Lending() {
   }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
 
   //  useEffect ----------------------------------------------------------
-
-  // useEffect(() => {
-  //   let _totalMarketSize = 0;
-  //   let _totalBorrowed = 0;
-
-  //   if (poolInfos) {
-  //     for (let i = 0; i < poolInfos.length; i += 1) {
-  //       if (i === 0) {
-  //         _totalMarketSize += Number(formatEther(poolInfos[i].totalAmount)) * ethPriceInUsd
-  //         _totalBorrowed += Number(formatEther(poolInfos[i].borrowAmount)) * ethPriceInUsd
-  //       } else if (i === 1) {
-  //         _totalMarketSize += Number(formatUnits(poolInfos[i].totalAmount, USDC_DECIMAL)) * usdcPriceInUsd
-  //         _totalBorrowed += Number(formatUnits(poolInfos[i].borrowAmount, USDC_DECIMAL)) * usdcPriceInUsd
-  //       }
-  //     }
-  //     setTotalMarketSizeInUsd(_totalMarketSize);
-  //     setTotalBorrowedInUsd(_totalBorrowed);
-
-  //     if (_totalMarketSize > 0) {
-  //       setLentOut(_totalBorrowed / _totalMarketSize * 100)
-  //     } else {
-  //       setLentOut(0)
-  //     }
-  //   }
-  // }, [poolInfos])
-
-  useEffect(() => {
-    let ethBalance = 0;
-    let usdcBalance = 0;
-
-    if (ethBalanceDataOfPool) {
-      ethBalance = Number(ethBalanceDataOfPool.formatted)
-    }
-    if (usdcBalanceDataOfPool) {
-      usdcBalance = Number(usdcBalanceDataOfPool.formatted)
-    }
-
-    setTotalMarketSizeInUsd(ethBalance * ethPriceInUsd + usdcBalance * usdcPriceInUsd)
-  }, [ethBalanceDataOfPool, usdcBalanceDataOfPool])
 
   useEffect(() => {
     if (marketInfo) {
