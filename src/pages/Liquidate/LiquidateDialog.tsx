@@ -23,6 +23,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   const [usdcAmountToPay, setUsdcAmountToPay] = useState<number>(0)
   const [ethAmountToGetPaid, setEthAmountToGetPaid] = useState<number>(0)
   const [usdcAmountToGetPaid, setUsdcAmountToGetPaid] = useState<number>(0)
+  const [buttonClicked, setButtonClicked] = useState<boolean>(false)
 
   //  ---------------------------------------------------------------------------
 
@@ -67,7 +68,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
-      console.log('>>>>>>> liquidate => ', liquidate)
       liquidate?.()
     }
   })
@@ -114,6 +114,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
 
   //  Call when "Repay" button is clicked
   const handleLiquidate = async () => {
+    setButtonClicked(true)
     if (usdcAmountToPay > 0) {
       approve?.()
     } else {
@@ -158,6 +159,12 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       toast.error('Approve Error.')
     }
   }, [approveIsError])
+
+  useEffect(() => {
+    if (buttonClicked && liquidate) {
+      liquidate()
+    }
+  }, [liquidate, buttonClicked])
 
   //  ---------------------------------------------------------------------------
 
