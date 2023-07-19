@@ -127,7 +127,7 @@ export default function Lending() {
       }
     }
     return 0
-  }, [])
+  }, [userInfo])
 
   const riskFactor = useMemo<number>(() => {
     if (userInfo) {
@@ -218,17 +218,17 @@ export default function Lending() {
             <div className="lg:hidden grid grid-cols-2 gap-2">
               <InfoCard
                 label="Current Market Size"
-                value="761K"
+                value={totalMarketSizeInUsd.toFixed(2)}
                 unit="$"
               />
               <InfoCard
                 label="Total Borrowed"
-                value="93K"
+                value={totalBorrowedInUsd.toFixed(2)}
                 unit="$"
               />
               <InfoCard
                 label="Lent Out"
-                value="12.2%"
+                value={lentOut.toFixed(2) + '%'}
               />
               <Link to="/liquidate">
                 <OutlinedButton className="w-full">

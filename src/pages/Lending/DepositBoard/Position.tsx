@@ -28,7 +28,7 @@ export default function Position({ asset, ethPriceInUsd, usdcPriceInUsd, userInf
       setAssetAmount(_assetAmount)
       setAssetAmountInUsd(_assetAmount * usdcPriceInUsd)
     }
-  }, [asset])
+  }, [asset, userInfo])
 
   return (
     <div className="p-4 flex items-center justify-between text-gray-100">

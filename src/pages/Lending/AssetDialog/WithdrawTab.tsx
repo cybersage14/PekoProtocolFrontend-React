@@ -8,7 +8,7 @@ import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VAL
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
-import { IAsset, IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -19,11 +19,12 @@ interface IProps {
   userInfo?: IUserInfo;
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
+  poolInfo?: IPoolInfo;
 }
 
 //  ----------------------------------------------------------------------------------------------------
 
-export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, poolInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmountInUsd, setMaxAmountInUsd] = useState<number>(0)
@@ -99,10 +100,29 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   useEffect(() => {
     if (userInfo) {
       if (ethPriceInUsd && usdcPriceInUsd) {
+        let depositTokenInUsd = 0;
+        let borrowTokenInUsd = 0;
+
         const totalDepositInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd;
         const totalBorrowInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-        setMaxAmountInUsd(totalDepositInUsd - totalBorrowInUsd)
+        if (asset.symbol === 'eth') {
+          depositTokenInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd
+          borrowTokenInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd
+        } else {
+          depositTokenInUsd = Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
+          borrowTokenInUsd = Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+        }
+
+        if (depositTokenInUsd > 0) {
+          let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo?.LTV) / 100 - totalBorrowInUsd) / Number(poolInfo?.LTV) / 100
+
+          if (_maxValueInUsd < depositTokenInUsd) {
+            setMaxAmountInUsd(_maxValueInUsd)
+          } 
+        } else {
+          setMaxAmountInUsd(0)
+        }
       }
     }
   }, [userInfo])

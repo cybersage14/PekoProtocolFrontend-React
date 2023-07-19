@@ -86,6 +86,7 @@ export default function AssetDialog({ visible, setVisible, asset, ethPriceInUsd,
               userInfo={userInfo}
               ethPriceInUsd={ethPriceInUsd}
               usdcPriceInUsd={usdcPriceInUsd}
+              poolInfo={poolInfo}
             /> : tabValue === 'borrow' ?
               <BorrowTab
                 asset={asset}
