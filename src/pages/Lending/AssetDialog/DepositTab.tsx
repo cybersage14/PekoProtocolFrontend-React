@@ -26,6 +26,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false);
+  const [buttonClicked, setButtonClicked] = useState<boolean>(false)
 
   //  -----------------------------------------------------
 
@@ -46,8 +47,15 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { write: deposit, data: depositData } = useContractWrite(depositConfig);
 
-  const { isLoading: depositIsLoading, isSuccess: depositIsSuccess } = useWaitForTransaction({
+  const { isLoading: depositIsLoading } = useWaitForTransaction({
     hash: depositData?.hash,
+    onSettled: () => {
+      setButtonClicked(false)
+    },
+    onSuccess: () => {
+      toast.success('Deposited!');
+      setVisible(false);
+    }
   })
 
   //  Approve USDC
@@ -60,10 +68,14 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess, isError: approveIsError } = useWaitForTransaction({
+  const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
-      deposit?.()
+      setApproved(true)
+    },
+    onError: () => {
+      toast.error('Approve occurred error.')
+      setApproved(false)
     }
   })
   //  -----------------------------------------------------
@@ -78,6 +90,15 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const handleSlider = (value: any) => {
     setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
+  }
+
+  const handleDeposit = () => {
+    setButtonClicked(true)
+    if (asset.symbol === 'eth') {
+      deposit?.()
+    } else {
+      approve?.()
+    }
   }
 
   //  -----------------------------------------------------
@@ -100,30 +121,13 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     return 0
   }, [poolInfo])
 
-
-
   //  -----------------------------------------------------
 
   useEffect(() => {
-    if (approveIsError) {
-      toast.error('approve() occurred error.')
+    if (asset.symbol === 'usdc' && buttonClicked && deposit) {
+      deposit()
     }
-  }, [approveIsError])
-
-  useEffect(() => {
-    if (depositIsSuccess) {
-      toast.success('Deposited!');
-      setVisible(false);
-    }
-  }, [depositIsSuccess])
-
-  useEffect(() => {
-    if (approveIsSuccess) {
-      setApproved(true)
-    } else {
-      setApproved(false)
-    }
-  }, [approveIsSuccess])
+  }, [deposit, buttonClicked, asset])
 
   //  -----------------------------------------------------
 
@@ -192,18 +196,18 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
         {asset.symbol === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!deposit || !amountIsValid || depositIsLoading}
-            onClick={() => deposit?.()}
+            disabled={!deposit || !amountIsValid || depositIsLoading || buttonClicked}
+            onClick={() => handleDeposit()}
           >
-            {depositIsLoading ? IN_PROGRESS : "Deposit"}
+            {buttonClicked ? IN_PROGRESS : "Deposit"}
           </FilledButton>
         ) : (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid || approveIsLoading || depositIsLoading}
-            onClick={() => approve?.()}
+            disabled={!approve || !amountIsValid || approveIsLoading || depositIsLoading || buttonClicked}
+            onClick={() => handleDeposit()}
           >
-            {approveIsLoading || depositIsLoading ? IN_PROGRESS : 'Deposit'}
+            {buttonClicked ? IN_PROGRESS : 'Deposit'}
           </FilledButton>
         )}
 
