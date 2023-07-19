@@ -1,5 +1,7 @@
 import { toast } from "react-toastify";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useMediaQuery } from "react-responsive";
+import { formatUnits } from "viem";
 import Table from "../../../components/tableComponents/Table";
 import Th from "../../../components/tableComponents/Th";
 import Section from "../../../components/Section";
@@ -8,9 +10,6 @@ import Td from "../../../components/tableComponents/Td";
 import { IUserInfo } from "../../../utils/interfaces";
 import { IN_PROGRESS, PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../utils/constants";
 import FilledButton from "../../../components/buttons/FilledButton";
-import { formatUnits } from "viem";
-import { useMediaQuery } from "react-responsive";
-import { List, ListItem } from "@material-tailwind/react";
 
 //  ------------------------------------------------------------------------------------------------------
 
@@ -54,9 +53,9 @@ export default function PekoSection({ userInfo }: IProps) {
   return (
     <Section title="Peko">
       {isMobile ? (
-        <List className="block lg:hidden text-sm">
-          <ListItem
-            className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
+        <div className="flex flex-col text-sm gap-4">
+          <div
+            className="flex flex-col gap-4 text-gray-100 border-b border-gray-800 rounded-none pb-6"
           >
             {/* Symbol */}
             <div className="flex justify-between w-full">
@@ -82,10 +81,16 @@ export default function PekoSection({ userInfo }: IProps) {
             {/* Operation */}
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Oepration: </span>
-              <span className="text-gray-500">{claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}</span>
+              <FilledButton
+                className="w-32"
+                disabled={!claimPeko || claimPekoIsLoading}
+                onClick={() => claimPeko?.()}
+              >
+                {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
+              </FilledButton>
             </div>
-          </ListItem>
-        </List>
+          </div>
+        </div>
       ) : (
         <Table>
           <thead>
