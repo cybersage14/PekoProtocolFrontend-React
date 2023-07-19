@@ -25,13 +25,12 @@ interface IProps {
 export default function DepositTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [buttonClicked, setButtonClicked] = useState<boolean>(false)
 
   //  -----------------------------------------------------
 
   const amountToDeposit = useMemo<number>(() => {
-    return Number(amount) * 10 ** asset.decimals
-  }, [asset, amount])
+    return Number(amount) * 10 ** Number(balanceData?.decimals)
+  }, [asset, amount, balanceData])
 
   //  -----------------------------------------------------
 
@@ -43,17 +42,16 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     args: [asset.contractAddress, amountToDeposit],
     value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
-
   const { write: deposit, data: depositData } = useContractWrite(depositConfig);
-
   const { isLoading: depositIsLoading } = useWaitForTransaction({
     hash: depositData?.hash,
-    onSettled: () => {
-      setButtonClicked(false)
-    },
     onSuccess: () => {
       toast.success('Deposited!');
       setVisible(false);
+    },
+    onError: () => {
+      toast.info('Please approve 1 more USDC than the one you input.')
+      approve?.()
     }
   })
 
@@ -106,14 +104,6 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     }
     return 0
   }, [poolInfo])
-
-  //  -----------------------------------------------------
-
-  useEffect(() => {
-    if (asset.symbol === 'usdc' && buttonClicked && deposit) {
-      deposit()
-    }
-  }, [deposit, buttonClicked, asset])
 
   //  -----------------------------------------------------
 

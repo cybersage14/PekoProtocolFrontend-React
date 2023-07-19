@@ -1226,5 +1226,3 @@ export const ASSETS: Array<IAsset> = [
     decimals: USDC_DECIMAL
   }
 ];
-
-export const MINOR_PLUS_FOR_APPROVE = 0.1;

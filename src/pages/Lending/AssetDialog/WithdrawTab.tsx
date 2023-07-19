@@ -50,21 +50,21 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   const maxAmount = useMemo<number>(() => {
     if (userInfo) {
       let depositTokenAmount = 0
-      let tempTokenAmount = 0
+      let tempMaxAmount = 0
 
       if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
         depositTokenAmount = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount))
-        tempTokenAmount = maxAmountInUsd / ethPriceInUsd
+        tempMaxAmount = maxAmountInUsd / ethPriceInUsd
       }
       if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
         depositTokenAmount = Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL))
-        tempTokenAmount = maxAmountInUsd / usdcPriceInUsd
+        tempMaxAmount = maxAmountInUsd / usdcPriceInUsd
       }
 
-      if (depositTokenAmount < tempTokenAmount) {
+      if (depositTokenAmount < tempMaxAmount) {
         return depositTokenAmount
       }
-      return tempTokenAmount
+      return tempMaxAmount
     }
 
     return 0
