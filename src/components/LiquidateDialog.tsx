@@ -54,7 +54,10 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   })
   const { write: liquidate, data: liquidateData } = useContractWrite(liquidateConfig);
   const { isLoading: liquidateIsLoading, isSuccess: liqudateIsSuccess, isError: liquidateIsError } = useWaitForTransaction({
-    hash: liquidateData?.hash
+    hash: liquidateData?.hash,
+    onSettled: () => {
+      setButtonClicked(false)
+    }
   })
 
   //  Approve USDC
@@ -66,10 +69,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   })
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
   const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
-    hash: approveData?.hash,
-    onSuccess: () => {
-      liquidate?.()
-    }
+    hash: approveData?.hash
   })
 
   //  ---------------------------------------------------------------------------

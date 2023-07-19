@@ -1,4 +1,4 @@
-import { lazy, useMemo } from "react";
+import { lazy, useMemo, useState } from "react";
 import { formatEther, formatUnits } from "viem";
 import { useAccount, useContractRead } from "wagmi";
 import PrimaryBoard from "../../../../components/boards/PrimaryBoard";
@@ -10,6 +10,7 @@ import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../..
 //  -----------------------------------------------------------------------------------------
 
 const Row = lazy(() => import('./Row'))
+const LiquidateDialog = lazy(() => import('../../../../components/LiquidateDialog'))
 
 //  -----------------------------------------------------------------------------------------
 
@@ -22,6 +23,11 @@ interface IProps {
 //  -----------------------------------------------------------------------------------------
 
 export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+  const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
+  const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
+
+  //  -------------------------------------------------------------------------------
+
   const { address } = useAccount()
 
   //  Get listOfUsers
@@ -38,6 +44,18 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
     functionName: 'getLiquidationThreshhold',
     watch: true
   })
+
+  //  -------------------------------------------------------------------------------
+
+  const openLiquidateDialog = (liquidation: ILiquidation) => {
+    setSelectedLiquidation(liquidation)
+    setLiquidateDialogOpened(true)
+  }
+
+  const closeLiquidateDialog = () => {
+    setSelectedLiquidation(null)
+    setLiquidateDialogOpened(false)
+  }
 
   //  -------------------------------------------------------------------------------
 
@@ -82,10 +100,21 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
 
         <tbody>
           {liquidations.map(liquadationItem => (
-            <Row liquidation={liquadationItem} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+            <Row
+              liquidation={liquadationItem}
+              ethPriceInUsd={ethPriceInUsd}
+              usdcPriceInUsd={usdcPriceInUsd}
+              openLiquidateDialog={openLiquidateDialog}
+            />
           ))}
         </tbody>
       </Table>
+      <LiquidateDialog
+        liquidation={selectedLiquidation}
+        visible={liquidateDialogOpened}
+        setVisible={setLiquidateDialogOpened}
+        closeLiquidateDialog={closeLiquidateDialog}
+      />
     </PrimaryBoard>
   )
 }

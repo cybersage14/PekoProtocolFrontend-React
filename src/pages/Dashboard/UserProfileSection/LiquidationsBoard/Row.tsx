@@ -14,81 +14,25 @@ interface IProps {
   liquidation: ILiquidation;
   ethPriceInUsd: number;
   usdcPriceInUsd: number;
+  openLiquidateDialog: Function;
 }
 
 //  -----------------------------------------------------------------------------------------
 
-export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IProps) {
-  const [liquidateEthValue, setLiquidateEthValue] = useState<number>(0)
-  const [liquidateUsdcValue, setLiquidateUsdcValue] = useState<number>(0)
-
-  //  ----------------------------------------------------------------------------------------
-
-  //  Liquidate
-  const { config: liquidateConfig } = usePrepareContractWrite({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'liquidate',
-    args: [liquidation.accountAddress],
-    value: parseEther(`${liquidateEthValue}`)
-  })
-
-  const { write: liquidate, data: liquidateData } = useContractWrite(liquidateConfig);
-
-  const { isLoading: liquidateIsLoading, isSuccess: liqudateIsSuccess, isError: liquidateIsError } = useWaitForTransaction({
-    hash: liquidateData?.hash
-  })
-
-  //  Approve USDC
-  const { config: approveConfig } = usePrepareContractWrite({
-    address: USDC_CONTRACT_ADDRESS,
-    abi: USDC_CONTRACT_ABI,
-    functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, parseUnits(`${liquidateUsdcValue}`, USDC_DECIMAL)],
-  })
-
-  const { write: approve, data: approveData } = useContractWrite(approveConfig);
-
-  const { isLoading: approveIsLoading, isError: approveIsError } = useWaitForTransaction({
-    hash: approveData?.hash,
-    onSuccess: () => {
-      liquidate?.()
-    }
-  })
-
-  //  ----------------------------------------------------------------------------------------
-
-  const handleLiquidate = async () => {
-    if (liquidateUsdcValue > 0) {
-      approve?.()
-    } else {
-      liquidate?.()
-    }
-  }
+export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd, openLiquidateDialog }: IProps) {
+  const [borrowedValueInUsd, setBorrowedValueInUsd] = useState<number>(0)
+  const [depositedValueInUsd, setDepositedValueInUsd] = useState<number>(0)
 
   //  ----------------------------------------------------------------------------------------
 
   useEffect(() => {
-    if (liqudateIsSuccess) {
-      toast.success('Liquidated.')
-    }
-  }, [liqudateIsSuccess])
+    const _borrowedValueInUsd = Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+    const _depositedValueInUsd = Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)) * ethPriceInUsd +
+      Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-  useEffect(() => {
-    if (liquidateIsError) {
-      toast.error('Error.')
-    }
-  }, [liquidateIsError])
-
-  useEffect(() => {
-    if (approveIsError) {
-      toast.error('Approve Error.')
-    }
-  }, [approveIsError])
-
-  useEffect(() => {
-    setLiquidateEthValue(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-    setLiquidateUsdcValue(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) + MINOR_PLUS_FOR_APPROVE)
+    setBorrowedValueInUsd(_borrowedValueInUsd)
+    setDepositedValueInUsd(_depositedValueInUsd)
   }, [liquidation])
 
   //  ----------------------------------------------------------------------------------------
@@ -132,11 +76,8 @@ export default function Row({ liquidation, ethPriceInUsd, usdcPriceInUsd }: IPro
       </Td>
 
       <Td>
-        <FilledButton
-          disabled={!approve || approveIsLoading || liquidateIsLoading}
-          onClick={() => handleLiquidate()}
-        >
-          {approveIsLoading || liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
+        <FilledButton onClick={() => openLiquidateDialog(liquidation)}>
+          Liquidate
         </FilledButton>
       </Td>
     </Tr>
