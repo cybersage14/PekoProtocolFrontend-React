@@ -68,7 +68,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
-  const { isLoading: approveIsLoading } = useWaitForTransaction({
+  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
       setApproved(true)
@@ -138,7 +138,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
           value={amount}
-          disabled={asset.symbol === 'usdc' ? approved ? true : false : false}
+          disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
         />
 
         <div className="flex items-center justify-between">
@@ -196,29 +196,32 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
         {asset.symbol === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!deposit || !amountIsValid || depositIsLoading || buttonClicked}
-            onClick={() => handleDeposit()}
+            disabled={!deposit || !amountIsValid || depositIsLoading}
+            onClick={() => deposit?.()}
           >
-            {buttonClicked ? IN_PROGRESS : "Deposit"}
+            {depositIsLoading ? IN_PROGRESS : "Deposit"}
           </FilledButton>
         ) : (
-          <FilledButton
-            className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid || approveIsLoading || depositIsLoading || buttonClicked}
-            onClick={() => handleDeposit()}
-          >
-            {buttonClicked ? IN_PROGRESS : 'Deposit'}
-          </FilledButton>
+          <>
+            {approveIsSuccess ? (
+              <FilledButton
+                className="mt-8 py-2 text-base"
+                disabled={!deposit || !amountIsValid || depositIsLoading}
+                onClick={() => deposit?.()}
+              >
+                {depositIsLoading ? IN_PROGRESS : "Deposit"}
+              </FilledButton>
+            ) : (
+              <FilledButton
+                className="mt-8 py-2 text-base"
+                disabled={!approve || !amountIsValid || approveIsLoading}
+                onClick={() => approve?.()}
+              >
+                {approveIsLoading ? IN_PROGRESS : 'Approve'}
+              </FilledButton>
+            )}
+          </>
         )}
-
-        {/* <div className="flex items-center">
-          <div className="flex-1 h-[1px] bg-gray-800" />
-          <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
-            More Info
-            <Icon icon={moreInfoCollapsed ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'} />
-          </TextButton>
-          <div className="flex-1 h-[1px] bg-gray-800" />
-        </div> */}
 
         {moreInfoCollapsed && (
           <MoreInfo />

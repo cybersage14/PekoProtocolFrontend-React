@@ -1,8 +1,8 @@
 import { lazy, useMemo } from "react";
+import { formatEther, formatUnits } from "viem";
 import PrimaryBoard from "../../../components/boards/PrimaryBoard";
 import { ASSETS, USDC_DECIMAL } from "../../../utils/constants";
 import { IUserInfo } from "../../../utils/interfaces";
-import { formatEther, formatUnits } from "viem";
 
 //  ----------------------------------------------------------------------------------------------
 
