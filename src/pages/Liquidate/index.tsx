@@ -94,10 +94,6 @@ export default function Liquidate() {
           let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
           let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-          console.log('>>>>>>>>>> ethPriceInUsd => ', ethPriceInUsd)
-          console.log('>>>>>>>>>> usdcPriceInUsd => ', usdcPriceInUsd)
-          console.log(">>>>>>>>>> depositedValueInUsd => ", depositedValueInUsd)
-
           if (depositedValueInUsd > 0) {
             let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
             if (riskFactor > liquidationThreshold) {

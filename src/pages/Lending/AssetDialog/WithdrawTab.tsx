@@ -118,9 +118,6 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         const totalDepositInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd;
         const totalBorrowInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-        console.log('>>>>>>>>> totalDepositInUsd => ', totalDepositInUsd)
-        console.log('>>>>>>>>> totalBorrowInUsd => ', totalBorrowInUsd)
-
         if (asset.symbol === 'eth') {
           depositTokenInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd
         } else {
@@ -129,8 +126,6 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
 
         if (depositTokenInUsd > 0) {
           let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo.LTV) / 100 - totalBorrowInUsd) / (Number(poolInfo.LTV) / 100)
-          console.log('>>>>>>>>>> _maxValueInUsd => ', _maxValueInUsd)
-          console.log('>>>>>>>>>> depositTokenInUsd => ', depositTokenInUsd)
 
           if (_maxValueInUsd <= depositTokenInUsd) {
             setMaxAmountInUsd(_maxValueInUsd)
