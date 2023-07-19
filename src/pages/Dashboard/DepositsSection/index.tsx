@@ -26,11 +26,11 @@ export default function DepositsSection({ ethPriceInUsd, usdcPriceInUsd }: IProp
   return (
     <Section title="Tokens">
       {isMobile ? (
-        <List className="block lg:hidden text-sm">
+        <div className="flex flex-col gap-6 text-sm">
           {ASSETS.map(asset => (
             <MBRow key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
           ))}
-        </List>
+        </div>
       ) : (
         <Table>
           <thead>

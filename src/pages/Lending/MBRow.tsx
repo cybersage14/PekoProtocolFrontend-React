@@ -86,7 +86,6 @@ export default function MBRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   return (
     <ListItem
-      key={asset.id}
       className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
       onClick={() => openDialog(asset)}
     >

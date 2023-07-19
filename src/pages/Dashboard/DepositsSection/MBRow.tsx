@@ -33,9 +33,8 @@ export default function MBRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) 
   //  ------------------------------------------------------------------------------------------
 
   return (
-    <ListItem
-      key={asset.id}
-      className="flex-col gap-2 text-gray-100 border-b border-gray-800 rounded-none"
+    <div
+      className="flex flex-col gap-4 text-gray-100 border-b border-gray-800 rounded-none pb-6"
     >
       {/* Symbol */}
       <div className="flex justify-between w-full">
@@ -55,14 +54,14 @@ export default function MBRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) 
       {/* Price */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Price: </span>
-        <span className="text-gray-500">$ {asset.symbol === 'eth' ? ethPriceInUsd.toFixed(2) : usdcPriceInUsd.toFixed(2)}</span>
+        <span>${asset.symbol === 'eth' ? ethPriceInUsd.toFixed(2) : usdcPriceInUsd.toFixed(2)}</span>
       </div>
 
       {/* Value */}
       <div className="flex justify-between w-full">
         <span className="text-gray-500 font-bold">Value: </span>
-        <span className="text-gray-500">${balanceInUsd.toFixed(2)}</span>
+        <span>${balanceInUsd.toFixed(2)}</span>
       </div>
-    </ListItem>
+    </div>
   )
 }
