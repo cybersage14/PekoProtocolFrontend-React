@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import { useContractRead } from "wagmi";
 import Td from "../../../../components/tableComponents/Td";
-import Tr from "../../../../components/tableComponents/Tr";
 import { IAsset, IReturnValueOfPoolInfo, IUserInfo } from "../../../../utils/interfaces";
 import { APY_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../../utils/constants";
 
@@ -84,7 +83,7 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
   return (
     <>
       {depositAmount > 0 && (
-        <Tr>
+        <tr>
           {/* Asset */}
           <Td>
             <div className="flex items-center gap-2">
@@ -110,11 +109,11 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
               <span className="text-sm text-gray-500">${depositAmountInUsd.toFixed(2)}</span>
             </div>
           </Td>
-        </Tr>
+        </tr>
       )}
 
       {borrowAmount > 0 && (
-        <Tr>
+        <tr>
           {/* Asset */}
           <Td>
             <div className="flex items-center gap-2">
@@ -140,7 +139,7 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
               <span className="text-sm text-gray-500">${borrowAmountInUsd.toFixed(2)}</span>
             </div>
           </Td>
-        </Tr>
+        </tr>
       )}
     </>
   )
