@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits } from "viem";
 import Tr from "../../../../components/tableComponents/Tr";
 import { ILiquidation } from "../../../../utils/interfaces";
-import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
+import { USDC_DECIMAL } from "../../../../utils/constants";
 import Td from "../../../../components/tableComponents/Td";
 import FilledButton from "../../../../components/buttons/FilledButton";
 

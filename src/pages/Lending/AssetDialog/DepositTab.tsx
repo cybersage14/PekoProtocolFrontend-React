@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { APY_DECIMAL, IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -30,15 +30,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   //  -----------------------------------------------------
 
   const amountToDeposit = useMemo<number>(() => {
-    if (asset.symbol === 'eth') {
-      return Number(amount) * 10 ** asset.decimals
-    } else {
-      if (Number(amount) >= MINOR_PLUS_FOR_APPROVE) {
-        return (Number(amount) - MINOR_PLUS_FOR_APPROVE) * 10 ** asset.decimals
-      } else {
-        return 0
-      }
-    }
+    return Number(amount) * 10 ** asset.decimals
   }, [asset, amount])
 
   //  -----------------------------------------------------
@@ -183,7 +175,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             <span className="text-gray-100 uppercase">
               {userInfo && balanceData ? asset.symbol === 'eth' ?
                 Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-                (Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)) + MINOR_PLUS_FOR_APPROVE).toFixed(4) : ''}&nbsp;
+                Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)).toFixed(4) : ''}&nbsp;
               {asset.symbol}
             </span>
           </div>

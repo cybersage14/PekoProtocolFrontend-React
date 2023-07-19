@@ -1,10 +1,10 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits, parseEther } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, MINOR_PLUS_FOR_APPROVE, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -30,15 +30,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   //  --------------------------------------------------------------------------
 
   const amountToRepay = useMemo<number>(() => {
-    if (asset.symbol === 'eth') {
-      return Number(amount) * 10 ** asset.decimals
-    } else {
-      if (Number(amount) >= MINOR_PLUS_FOR_APPROVE) {
-        return (Number(amount) - MINOR_PLUS_FOR_APPROVE) * 10 ** asset.decimals
-      } else {
-        return 0
-      }
-    }
+    return Number(amount) * 10 ** asset.decimals
   }, [asset, amount])
 
   //  --------------------------------------------------------------------------
