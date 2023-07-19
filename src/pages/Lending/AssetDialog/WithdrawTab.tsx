@@ -48,14 +48,27 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   //  --------------------------------------------------------------------
 
   const maxAmount = useMemo<number>(() => {
-    if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
-      return maxAmountInUsd / ethPriceInUsd
+    if (userInfo) {
+      let depositTokenAmount = 0
+      let tempTokenAmount = 0
+
+      if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
+        depositTokenAmount = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount))
+        tempTokenAmount = maxAmountInUsd / ethPriceInUsd
+      }
+      if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
+        depositTokenAmount = Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL))
+        tempTokenAmount = maxAmountInUsd / usdcPriceInUsd
+      }
+
+      if (depositTokenAmount < tempTokenAmount) {
+        return depositTokenAmount
+      }
+      return tempTokenAmount
     }
-    if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
-      return maxAmountInUsd / usdcPriceInUsd
-    }
+
     return 0
-  }, [maxAmountInUsd])
+  }, [maxAmountInUsd, userInfo])
 
   //  --------------------------------------------------------------------
 
@@ -98,34 +111,38 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
 
   //  Get max withdrawable amount in USD.
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && poolInfo) {
       if (ethPriceInUsd && usdcPriceInUsd) {
         let depositTokenInUsd = 0;
-        let borrowTokenInUsd = 0;
 
         const totalDepositInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd;
         const totalBorrowInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
+        console.log('>>>>>>>>> totalDepositInUsd => ', totalDepositInUsd)
+        console.log('>>>>>>>>> totalBorrowInUsd => ', totalBorrowInUsd)
+
         if (asset.symbol === 'eth') {
           depositTokenInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd
-          borrowTokenInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd
         } else {
           depositTokenInUsd = Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
-          borrowTokenInUsd = Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
         }
 
         if (depositTokenInUsd > 0) {
-          let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo?.LTV) / 100 - totalBorrowInUsd) / Number(poolInfo?.LTV) / 100
+          let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo.LTV) - totalBorrowInUsd) / Number(poolInfo.LTV)
+          console.log('>>>>>>>>>> _maxValueInUsd => ', _maxValueInUsd)
+          console.log('>>>>>>>>>> depositTokenInUsd => ', depositTokenInUsd)
 
-          if (_maxValueInUsd < depositTokenInUsd) {
+          if (_maxValueInUsd <= depositTokenInUsd) {
             setMaxAmountInUsd(_maxValueInUsd)
-          } 
+          } else {
+            setMaxAmountInUsd(depositTokenInUsd)
+          }
         } else {
           setMaxAmountInUsd(0)
         }
       }
     }
-  }, [userInfo])
+  }, [userInfo, poolInfo])
 
   //  --------------------------------------------------------------------
 
