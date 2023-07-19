@@ -14,13 +14,13 @@ export default function Footer() {
           Copyrights © {new Date().getFullYear()} Peko
         </span>
 
-        <div className="flex items-center gap-2">
-          <TextIconButton>
+        <div className="flex items-center gap-4">
+          <a href="https://discord.gg/MXR36KK8" target="_blank" rel="noreferrer" className="text-gray-500 transition hover:text-gray-100">
             <Icon icon="ic:baseline-discord" className="text-2xl" />
-          </TextIconButton>
-          <TextIconButton>
+          </a>
+          <a href="https://twitter.com/pekoprotocol" target="_blank" rel="noreferrer" className="text-gray-500 transition hover:text-gray-100">
             <Icon icon="mdi:twitter" className="text-2xl" />
-          </TextIconButton>
+          </a>
         </div>
       </Container>
 
@@ -33,12 +33,12 @@ export default function Footer() {
             <span className="text-gray-600">Audited by:</span>
           </div>
           <div className="flex items-center gap-2">
-            <TextIconButton>
+            <a href="https://discord.gg/MXR36KK8" target="_blank" rel="noreferrer" className="text-gray-500 transition hover:text-gray-100">
               <Icon icon="ic:baseline-discord" className="text-2xl" />
-            </TextIconButton>
-            <TextIconButton>
+            </a>
+            <a href="https://twitter.com/pekoprotocol" target="_blank" rel="noreferrer" className="text-gray-500 transition hover:text-gray-100">
               <Icon icon="mdi:twitter" className="text-2xl" />
-            </TextIconButton>
+            </a>
           </div>
         </div>
       </Container>
