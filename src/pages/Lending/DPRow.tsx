@@ -4,7 +4,7 @@ import { formatEther, formatUnits } from "viem";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
 import { IAsset, IReturnValueOfBalance, IReturnValueOfPoolInfo } from "../../utils/interfaces";
-import { APY_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS } from "../../utils/constants";
+import { APY_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../utils/constants";
 
 //  ----------------------------------------------------------------------------------
 
@@ -37,13 +37,6 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
     watch: true
   })
 
-  //  Get the balance data of pool
-  const { data: balanceDataOfPool }: IReturnValueOfBalance = useBalance({
-    address: POOL_CONTRACT_ADDRESS,
-    token: asset.symbol === 'usdc' ? USDC_CONTRACT_ADDRESS : undefined,
-    watch: true
-  })
-
   //  The info of the pool
   const { data: poolInfo }: IReturnValueOfPoolInfo = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
@@ -65,14 +58,17 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
   //  ----------------------------------------------------------------------------------
 
   useEffect(() => {
-    if (poolInfo && balanceDataOfPool) {
-      setMarketSize(Number(balanceDataOfPool?.formatted))
+    if (poolInfo) {
+      console.log('>>>>>>>> poolInfo => ', poolInfo)
+      setMarketSize(Number(formatEther(poolInfo.totalAmount)))
       if (asset.symbol === 'eth') {
-        setMarketSizeInUsd(Number(balanceDataOfPool?.formatted) * ethPriceInUsd)
+        setMarketSize(Number(formatEther(poolInfo.totalAmount)))
+        setMarketSizeInUsd(Number(formatEther(poolInfo.totalAmount)) * ethPriceInUsd)
         setTotalBorrowed(Number(formatEther(poolInfo.borrowAmount)))
         setTotalBorrowedInUsd(Number(formatEther(poolInfo.borrowAmount)) * ethPriceInUsd)
       } else {
-        setMarketSizeInUsd(Number(balanceDataOfPool?.formatted) * usdcPriceInUsd)
+        setMarketSize(Number(formatUnits(poolInfo.totalAmount, USDC_DECIMAL)))
+        setMarketSizeInUsd(Number(formatUnits(poolInfo.totalAmount, USDC_DECIMAL)) * usdcPriceInUsd)
         setTotalBorrowed(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)))
         setTotalBorrowedInUsd(Number(formatUnits(poolInfo.borrowAmount, asset.decimals)) * usdcPriceInUsd)
       }
@@ -86,7 +82,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
       setDepositApyInPercentage(0)
       setBorrowApyInPercentage(0)
     }
-  }, [poolInfo, balanceDataOfPool])
+  }, [poolInfo])
 
   //  ----------------------------------------------------------------------------------
 
