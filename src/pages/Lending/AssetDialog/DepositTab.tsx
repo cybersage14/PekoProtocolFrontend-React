@@ -25,7 +25,6 @@ interface IProps {
 export default function DepositTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [approved, setApproved] = useState<boolean>(false);
   const [buttonClicked, setButtonClicked] = useState<boolean>(false)
 
   //  -----------------------------------------------------
@@ -70,12 +69,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
     hash: approveData?.hash,
-    onSuccess: () => {
-      setApproved(true)
-    },
     onError: () => {
       toast.error('Approve occurred error.')
-      setApproved(false)
     }
   })
   //  -----------------------------------------------------
@@ -90,15 +85,6 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
   const handleSlider = (value: any) => {
     setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
-  }
-
-  const handleDeposit = () => {
-    setButtonClicked(true)
-    if (asset.symbol === 'eth') {
-      deposit?.()
-    } else {
-      approve?.()
-    }
   }
 
   //  -----------------------------------------------------
@@ -169,7 +155,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             trackStyle={{ backgroundColor: '#3B82F6' }}
             value={Number(amount) / Number(balanceData?.formatted) * 100}
             onChange={handleSlider}
-            disabled={asset.symbol === 'usdc' ? approved ? true : false : false}
+            disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
           />
         </div>
 

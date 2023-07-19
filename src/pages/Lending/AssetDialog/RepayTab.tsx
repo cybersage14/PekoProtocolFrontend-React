@@ -24,13 +24,12 @@ interface IProps {
 export default function RepayTab({ asset, setVisible, balanceData, userInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
-  const [approved, setApproved] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<string>('0');
 
   //  --------------------------------------------------------------------------
 
   const amountToRepay = useMemo<number>(() => {
-    return Number(amount) * 10 ** asset.decimals
+    return Number(amount) * 10 ** Number(balanceData?.decimals)
   }, [asset, amount])
 
   //  --------------------------------------------------------------------------
@@ -40,34 +39,36 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     address: USDC_CONTRACT_ADDRESS,
     abi: USDC_CONTRACT_ABI,
     functionName: 'approve',
-    args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(asset.decimals)]
+    args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)]
   })
 
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
 
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
     hash: approveData?.hash,
-    onSuccess: (data) => {
-      console.log('>>>>>>> data => ', data)
-      repay?.()
+    onError: () => {
+      toast.error('Approve occured error.')
     }
   })
 
-  console.log('>>>>>>> amountToRepay => ', amountToRepay)
-
   //  Repay
-  const { config: repayConfig, isSuccess: repayPrepareIsSuccess, error: errorOfRepayPrepare } = usePrepareContractWrite({
+  const { config: repayConfig, error: errorOfRepayPrepare } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'repay',
     args: [asset.contractAddress, amountToRepay],
     value: asset.symbol === 'eth' ? parseEther(`${Number(amount)}`) : parseEther('0')
   })
-
   const { write: repay, data: repayData } = useContractWrite(repayConfig)
-
-  const { isLoading: repayIsLoading, isError: repayIsError, isSuccess: repayIsSuccess } = useWaitForTransaction({
+  const { isLoading: repayIsLoading, isError: repayIsError } = useWaitForTransaction({
     hash: repayData?.hash,
+    onSuccess: () => {
+      toast.success('Repaid.')
+      setVisible(false)
+    },
+    onError: () => {
+      toast.error('Repaying occured error')
+    }
   })
 
   //  --------------------------------------------------------------------------
@@ -114,25 +115,10 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   }, [repayIsError])
 
   useEffect(() => {
-    if (repayIsSuccess) {
-      toast.success('Repaid.')
-      setVisible(false)
-    }
-  }, [repayIsSuccess])
-
-  useEffect(() => {
     if (errorOfRepayPrepare) {
       // toast.warn(`${errorOfRepayPrepare.cause}`)
     }
   }, [errorOfRepayPrepare])
-
-  useEffect(() => {
-    if (approveIsSuccess) {
-      setApproved(true)
-    } else {
-      setApproved(false)
-    }
-  }, [approveIsSuccess])
 
   useEffect(() => {
     if (userInfo) {
@@ -151,7 +137,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
       <div className="flex flex-col gap-2">
         <MainInput
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
-          disabled={asset.symbol === 'usdc' && approveIsLoading ? approved ? true : false : false}
+          disabled={asset.symbol === 'usdc' && approveIsLoading ? approveIsSuccess ? true : false : false}
           onChange={handleAmount}
           value={amount}
         />
@@ -176,7 +162,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
-            disabled={asset.symbol === 'usdc' ? approved ? true : false : false}
+            disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
             onChange={handleSlider}
             value={Number(amount) / Number(maxAmount) * 100}
           />
@@ -200,29 +186,32 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
         {asset.symbol === 'eth' ? (
           <FilledButton
             className="mt-8 py-2 text-base"
-            disabled={!repayPrepareIsSuccess || repayIsLoading}
+            disabled={!repay || !amountIsValid || repayIsLoading}
             onClick={() => repay?.()}
           >
-            {repayIsLoading ? IN_PROGRESS : 'Repay'}
+            {repayIsLoading ? IN_PROGRESS : "Repay"}
           </FilledButton>
         ) : (
-          <FilledButton
-            className="mt-8 py-2 text-base"
-            disabled={!approve || !amountIsValid || approveIsLoading || repayIsLoading}
-            onClick={() => approve?.()}
-          >
-            {approveIsLoading || repayIsLoading ? IN_PROGRESS : 'Repay'}
-          </FilledButton>
+          <>
+            {approveIsSuccess ? (
+              <FilledButton
+                className="mt-8 py-2 text-base"
+                disabled={!repay || !amountIsValid || repayIsLoading}
+                onClick={() => repay?.()}
+              >
+                {repayIsLoading ? IN_PROGRESS : "Repay"}
+              </FilledButton>
+            ) : (
+              <FilledButton
+                className="mt-8 py-2 text-base"
+                disabled={!approve || !amountIsValid || approveIsLoading}
+                onClick={() => approve?.()}
+              >
+                {approveIsLoading ? IN_PROGRESS : 'Approve'}
+              </FilledButton>
+            )}
+          </>
         )}
-
-        {/* <div className="flex items-center">
-          <div className="flex-1 h-[1px] bg-gray-800" />
-          <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
-            More Info
-            <Icon icon={moreInfoCollapsed ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'} />
-          </TextButton>
-          <div className="flex-1 h-[1px] bg-gray-800" />
-        </div> */}
 
         {moreInfoCollapsed && (
           <MoreInfo />
