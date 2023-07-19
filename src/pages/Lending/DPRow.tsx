@@ -59,7 +59,6 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   useEffect(() => {
     if (poolInfo) {
-      console.log('>>>>>>>> poolInfo => ', poolInfo)
       setMarketSize(Number(formatEther(poolInfo.totalAmount)))
       if (asset.symbol === 'eth') {
         setMarketSize(Number(formatEther(poolInfo.totalAmount)))
