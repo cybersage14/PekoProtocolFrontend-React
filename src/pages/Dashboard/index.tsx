@@ -3,19 +3,17 @@ import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useCopyToClipboard, useOnClickOutside } from 'usehooks-ts';
-import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useBalance, useContractRead } from "wagmi";
 import FilledButton from "../../components/buttons/FilledButton";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUserInfo } from "../../utils/interfaces";
-import useLoading from "../../hooks/useLoading";
 
 // -----------------------------------------------------------------------------------------------------
 
 const UserProfileSection = lazy(() => import('./UserProfileSection'))
 const DepositsSection = lazy(() => import('./DepositsSection'))
-// const DialogClaimPeko = lazy(() => import('./DialogClaimPeko'))
+const PekoSection = lazy(() => import('./PekoSection'))
 
 // -----------------------------------------------------------------------------------------------------
 
@@ -25,19 +23,19 @@ export default function Dashboard() {
   useOnClickOutside(ref, () => copy(''))
 
   const { address } = useAccount()
-  const { openLoading, closeLoading } = useLoading()
 
   const [walletBalanceInUsd, setWalletBalanceInUsd] = useState<number>(0)
   const [dialogClaimPekoOpened, setDialogClaimPekoOpened] = useState<boolean>(false)
 
   //  ------------------------------------------------------------------------------
   //  Get ethereum balance of wallet
-  const { data: ethBalanceData }: IReturnValueOfBalance = useBalance({ address })
+  const { data: ethBalanceData }: IReturnValueOfBalance = useBalance({ address, watch: true })
 
   //  Get usdc balance of wallet
   const { data: usdcBalanceData }: IReturnValueOfBalance = useBalance({
     address,
-    token: USDC_CONTRACT_ADDRESS
+    token: USDC_CONTRACT_ADDRESS,
+    watch: true
   })
 
   //  Get the price of ethereum in USD.
@@ -66,19 +64,6 @@ export default function Dashboard() {
     args: [address],
     watch: true
   });
-
-  //  Claim Peko
-  const { config: depositConfig } = usePrepareContractWrite({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'claimPeko',
-  })
-
-  const { write: claimPeko, data: claimPekoData } = useContractWrite(depositConfig);
-
-  const { isLoading: claimPekoIsLoading, isSuccess: claimPekoIsSuccess, isError: claimPekoIsError } = useWaitForTransaction({
-    hash: claimPekoData?.hash,
-  })
 
   //  ------------------------------------------------------------------------------
 
@@ -130,28 +115,6 @@ export default function Dashboard() {
     setWalletBalanceInUsd(balanceInUsd)
   }, [ethBalanceData, usdcBalanceData])
 
-  useEffect(() => {
-    if (claimPekoIsSuccess) {
-      toast.success('Claimed.')
-      closeLoading()
-    }
-  }, [claimPekoIsSuccess])
-
-  useEffect(() => {
-    if (claimPekoIsError) {
-      toast.error('Claiming token has an error.')
-      closeLoading()
-    }
-  }, [claimPekoIsError])
-
-  // useEffect(() => {
-  //   if (claimPekoIsLoading) {
-  //     openLoading()
-  //   } else {
-  //     closeLoading()
-  //   }
-  // }, [claimPekoIsLoading])
-
   //  ------------------------------------------------------------------------------
 
   return (
@@ -185,13 +148,6 @@ export default function Dashboard() {
             <Link to="/lending">
               <FilledButton className="">Lending</FilledButton>
             </Link>
-            <FilledButton
-              className="w-32"
-              disabled={!claimPeko || claimPekoIsLoading}
-              onClick={() => claimPeko?.()}
-            >
-              {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
-            </FilledButton>
             {/* <Link to="/swap">
               <FilledButton className="">Swap</FilledButton>
             </Link> */}
@@ -218,7 +174,9 @@ export default function Dashboard() {
       <LPTokensSection />
       <FarmsSection /> */}
       <DepositsSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
-
+      {userInfo && (
+        <PekoSection userInfo={userInfo} />
+      )}
       {/* {userInfo && (
         <DialogClaimPeko
           visible={dialogClaimPekoOpened}

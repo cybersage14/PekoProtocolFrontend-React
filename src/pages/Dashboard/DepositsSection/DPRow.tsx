@@ -1,9 +1,9 @@
+import { useMemo } from "react";
 import { useAccount, useBalance } from "wagmi";
 import Td from "../../../components/tableComponents/Td";
 import Tr from "../../../components/tableComponents/Tr";
 import { IAsset, IReturnValueOfBalance } from "../../../utils/interfaces";
 import { USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
-import { useMemo } from "react";
 
 //  ------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ interface IProps {
 
 //  ------------------------------------------------------------------------------------------------
 
-export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const { address } = useAccount()
 
   //  Balance data

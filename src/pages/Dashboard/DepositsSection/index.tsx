@@ -3,10 +3,13 @@ import Table from "../../../components/tableComponents/Table";
 import Th from "../../../components/tableComponents/Th";
 import Section from "../../../components/Section";
 import { ASSETS } from "../../../utils/constants";
+import { useMediaQuery } from "react-responsive";
+import { List } from "@material-tailwind/react";
 
 //  ------------------------------------------------------------------------------------------------------
 
-const Row = lazy(() => import('./Row'))
+const DPRow = lazy(() => import('./DPRow'))
+const MBRow = lazy(() => import('./MBRow'))
 
 //  ------------------------------------------------------------------------------------------------------
 
@@ -18,24 +21,35 @@ interface IProps {
 //  ------------------------------------------------------------------------------------------------------
 
 export default function DepositsSection({ ethPriceInUsd, usdcPriceInUsd }: IProps) {
+  const isMobile = useMediaQuery({ maxWidth: 640 });
+
   return (
     <Section title="Tokens">
-      <Table>
-        <thead>
-          <tr className="bg-gray-900">
-            <Th label="Symbol" />
-            <Th label="Balance" />
-            <Th label="Price" />
-            <Th label="Value" />
-          </tr>
-        </thead>
-
-        <tbody>
+      {isMobile ? (
+        <List className="block lg:hidden text-sm">
           {ASSETS.map(asset => (
-            <Row key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+            <MBRow key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
           ))}
-        </tbody>
-      </Table>
+        </List>
+      ) : (
+        <Table>
+          <thead>
+            <tr className="bg-gray-900">
+              <Th label="Symbol" />
+              <Th label="Balance" />
+              <Th label="Price" />
+              <Th label="Value" />
+            </tr>
+          </thead>
+
+          <tbody>
+            {ASSETS.map(asset => (
+              <DPRow key={asset.id} asset={asset} ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+            ))}
+          </tbody>
+        </Table>
+      )}
+
     </Section>
   )
 }
