@@ -4,7 +4,6 @@ import Th from "../../../components/tableComponents/Th";
 import Section from "../../../components/Section";
 import { ASSETS } from "../../../utils/constants";
 import { useMediaQuery } from "react-responsive";
-import { List } from "@material-tailwind/react";
 
 //  ------------------------------------------------------------------------------------------------------
 

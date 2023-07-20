@@ -137,7 +137,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
       <div className="flex flex-col gap-2">
         <MainInput
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
-          disabled={asset.symbol === 'usdc' && approveIsLoading ? approveIsSuccess ? true : false : false}
+          // disabled={asset.symbol === 'usdc' && approveIsLoading ? approveIsSuccess ? true : false : false}
           onChange={handleAmount}
           value={amount}
         />
@@ -162,7 +162,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             className="bg-gray-900"
             railStyle={{ backgroundColor: '#3F3F46' }}
             trackStyle={{ backgroundColor: '#3B82F6' }}
-            disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
+            // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
             onChange={handleSlider}
             value={Number(amount) / Number(maxAmount) * 100}
           />

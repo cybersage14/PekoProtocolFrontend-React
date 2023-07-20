@@ -114,7 +114,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
           value={amount}
-          disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
+          // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
         />
 
         <div className="flex items-center justify-between">
@@ -145,7 +145,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             trackStyle={{ backgroundColor: '#3B82F6' }}
             value={Number(amount) / Number(balanceData?.formatted) * 100}
             onChange={handleSlider}
-            disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
+            // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
           />
         </div>
 
