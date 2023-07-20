@@ -45,7 +45,8 @@ export default function AssetDialog({ visible, setVisible, asset, ethPriceInUsd,
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getPoolInfo',
-    args: [asset.contractAddress]
+    args: [asset.contractAddress],
+    watch: true
   })
 
   //  -----------------------------------------------------------------

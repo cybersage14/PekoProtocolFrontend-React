@@ -153,7 +153,7 @@ export default function Lending() {
   return (
     <Container className="my-8">
       <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-5 lg:col-span-4">
+        <div className="col-span-5 xl:col-span-4">
           <div className="flex flex-col gap-4">
             {/* Infos and Liquidate button */}
             <div className="hidden lg:flex items-center justify-between">
@@ -218,7 +218,7 @@ export default function Lending() {
                 </div> */}
 
                 {isMobile ? (
-                  <List className="block lg:hidden text-sm">
+                  <List className="text-sm">
                     {ASSETS.map(asset => (
                       <MBRow
                         key={asset.id}
@@ -263,7 +263,7 @@ export default function Lending() {
         </div>
 
         {userInfo && (
-          <div className="col-span-5 lg:col-span-1 flex flex-col gap-4">
+          <div className="col-span-5 xl:col-span-1 flex flex-col gap-4">
             {/* Account Board */}
             <PrimaryBoard
               title="Account"
@@ -309,8 +309,8 @@ export default function Lending() {
             <BorrowBoard ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} userInfo={userInfo} />
           </div>
         )}
+      </div>
 
-      </div >
       <AssetDialog
         visible={dialogVisible}
         setVisible={setDialogVisible}

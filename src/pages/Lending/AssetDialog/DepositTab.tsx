@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
