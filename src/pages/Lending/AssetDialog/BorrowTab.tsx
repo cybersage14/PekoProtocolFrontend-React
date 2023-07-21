@@ -64,6 +64,14 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     return 0
   }, [poolInfo])
 
+  const amountInNumberType = useMemo<string>(() => {
+    if (amount[0] === '0') {
+      if (amount[1] !== '.')
+        return `${Number(amount)}`
+    }
+    return amount
+  }, [amount])
+
   //  ----------------------------------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +135,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
         <MainInput
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
-          value={amount}
+          value={amountInNumberType}
         />
 
         <div className="flex items-center justify-between">

@@ -130,6 +130,14 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     return 0
   }, [approvedUsdcInBigint])
 
+  const amountInNumberType = useMemo<string>(() => {
+    if (amount[0] === '0') {
+      if (amount[1] !== '.')
+        return `${Number(amount)}`
+    }
+    return amount
+  }, [amount])
+
   //  --------------------------------------------------------------------------
 
   useEffect(() => {
@@ -163,7 +171,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           // disabled={asset.symbol === 'usdc' && approveIsLoading ? approveIsSuccess ? true : false : false}
           onChange={handleAmount}
-          value={amount}
+          value={amountInNumberType}
         />
 
         <div className="flex items-center justify-between">

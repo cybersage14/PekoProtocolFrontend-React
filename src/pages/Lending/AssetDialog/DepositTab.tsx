@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo, useState, useRef } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
@@ -9,6 +9,7 @@ import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
 import { IAsset, IBalanceData, IPoolInfo, IReturnValueOfAllowance, IUserInfo } from "../../../utils/interfaces";
+import { useDebounce } from "usehooks-ts";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -25,6 +26,8 @@ interface IProps {
 export default function DepositTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+
+  //  -----------------------------------------------------
 
   const { address } = useAccount()
 
@@ -133,6 +136,14 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     return 0
   }, [approvedUsdcInBigint])
 
+  const amountInNumberType = useMemo<string>(() => {
+    if (amount[0] === '0') {
+      if (amount[1] !== '.')
+        return `${Number(amount)}`
+    }
+    return amount
+  }, [amount])
+
   //  -----------------------------------------------------
 
   return (
@@ -141,7 +152,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
         <MainInput
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
-          value={amount}
+          value={amountInNumberType}
         // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
         />
 
