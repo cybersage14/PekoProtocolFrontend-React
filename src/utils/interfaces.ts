@@ -118,3 +118,8 @@ export interface IReturnValueOfGetMarketInfo {
   data?: Array<bigint>;
   [key: string]: any;
 }
+
+export interface IReturnValueOfAllowance {
+  data?: bigint;
+  [key: string]: any;
+}

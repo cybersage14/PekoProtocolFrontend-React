@@ -2,13 +2,13 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
-import { IAsset, IBalanceData, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IReturnValueOfAllowance, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,8 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0');
 
+  const { address } = useAccount()
+
   //  --------------------------------------------------------------------------
 
   const amountToRepay = useMemo<number>(() => {
@@ -41,14 +43,21 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     functionName: 'approve',
     args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)]
   })
-
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
-
   const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
     hash: approveData?.hash,
     onError: () => {
       toast.error('Approve occured error.')
     }
+  })
+
+  //  Get approved USDC
+  const { data: approvedUsdcInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: USDC_CONTRACT_ADDRESS,
+    abi: USDC_CONTRACT_ABI,
+    functionName: 'allowance',
+    args: [address, POOL_CONTRACT_ADDRESS],
+    watch: true
   })
 
   //  Repay
@@ -93,6 +102,14 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
   }
 
+  const handleUsdcRepay = () => {
+    if (approvedUsdc >= Number(amount)) {
+      repay?.()
+    } else {
+      toast.warn(`Please approve ${Number(amount) - approvedUsdc} USDC more.`)
+    }
+  }
+
   //  --------------------------------------------------------------------------
 
   const amountIsValid = useMemo<boolean>(() => {
@@ -105,6 +122,13 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     }
     return false;
   }, [amount, maxAmount])
+
+  const approvedUsdc = useMemo(() => {
+    if (approvedUsdcInBigint) {
+      return Number(formatUnits(approvedUsdcInBigint, USDC_DECIMAL))
+    }
+    return 0
+  }, [approvedUsdcInBigint])
 
   //  --------------------------------------------------------------------------
 
@@ -196,8 +220,8 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             {approveIsSuccess ? (
               <FilledButton
                 className="mt-8 py-2 text-base"
-                disabled={!repay || !amountIsValid || repayIsLoading}
-                onClick={() => repay?.()}
+                disabled={!amountIsValid || repayIsLoading}
+                onClick={() => handleUsdcRepay()}
               >
                 {repayIsLoading ? IN_PROGRESS : "Repay"}
               </FilledButton>

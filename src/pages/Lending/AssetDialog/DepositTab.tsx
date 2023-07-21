@@ -1,14 +1,14 @@
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useState, useRef } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
-import { IAsset, IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IPoolInfo, IReturnValueOfAllowance, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -25,6 +25,8 @@ interface IProps {
 export default function DepositTab({ asset, setVisible, balanceData, userInfo, poolInfo }: IProps) {
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
+
+  const { address } = useAccount()
 
   //  -----------------------------------------------------
 
@@ -71,6 +73,15 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
       toast.error('Approve occurred error.')
     }
   })
+
+  //  Get approved USDC
+  const { data: approvedUsdcInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: USDC_CONTRACT_ADDRESS,
+    abi: USDC_CONTRACT_ABI,
+    functionName: 'allowance',
+    args: [address, POOL_CONTRACT_ADDRESS],
+    watch: true
+  })
   //  -----------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -78,11 +89,21 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
 
     if (value.match(REGEX_NUMBER_VALID)) {
       setAmount(value);
+
+      e.target.focus();
     }
   }
 
   const handleSlider = (value: any) => {
     setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
+  }
+
+  const handleUsdcDeposit = () => {
+    if (approvedUsdc >= Number(amount)) {
+      deposit?.()
+    } else {
+      toast.warn(`Please approve ${Number(amount) - approvedUsdc} USDC more.`)
+    }
   }
 
   //  -----------------------------------------------------
@@ -105,6 +126,13 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     return 0
   }, [poolInfo])
 
+  const approvedUsdc = useMemo(() => {
+    if (approvedUsdcInBigint) {
+      return Number(formatUnits(approvedUsdcInBigint, USDC_DECIMAL))
+    }
+    return 0
+  }, [approvedUsdcInBigint])
+
   //  -----------------------------------------------------
 
   return (
@@ -114,7 +142,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
           onChange={handleAmount}
           value={amount}
-          // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
+        // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
         />
 
         <div className="flex items-center justify-between">
@@ -145,7 +173,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             trackStyle={{ backgroundColor: '#3B82F6' }}
             value={Number(amount) / Number(balanceData?.formatted) * 100}
             onChange={handleSlider}
-            // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
+          // disabled={asset.symbol === 'usdc' ? approveIsSuccess ? true : false : false}
           />
         </div>
 
@@ -182,8 +210,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             {approveIsSuccess ? (
               <FilledButton
                 className="mt-8 py-2 text-base"
-                disabled={!deposit || !amountIsValid || depositIsLoading}
-                onClick={() => deposit?.()}
+                disabled={!amountIsValid || depositIsLoading}
+                onClick={() => handleUsdcDeposit()}
               >
                 {depositIsLoading ? IN_PROGRESS : "Deposit"}
               </FilledButton>
