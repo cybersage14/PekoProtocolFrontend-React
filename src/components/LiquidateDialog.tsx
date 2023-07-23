@@ -248,7 +248,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
               {!!usdcAmountToGetPaid && (
                 <div className="flex items-center justify-between">
                   <img src="/assets/images/usdc.png" alt="" className="w-10" />
-                  <span className="text-gray-100 text-lg">{usdcAmountToGetPaid.toFixed(6)} USDC</span>
+                  <span className="text-gray-100 text-lg">{usdcAmountToGetPaid} USDC</span>
                 </div>
               )}
             </div>
