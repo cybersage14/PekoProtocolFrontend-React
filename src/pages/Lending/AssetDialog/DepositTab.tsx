@@ -9,7 +9,6 @@ import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
 import { IAsset, IBalanceData, IPoolInfo, IReturnValueOfAllowance, IUserInfo } from "../../../utils/interfaces";
-import { useDebounce } from "usehooks-ts";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -85,29 +84,6 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     args: [address, POOL_CONTRACT_ADDRESS],
     watch: true
   })
-  //  -----------------------------------------------------
-
-  const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-
-    if (value.match(REGEX_NUMBER_VALID)) {
-      setAmount(value);
-
-      e.target.focus();
-    }
-  }
-
-  const handleSlider = (value: any) => {
-    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
-  }
-
-  const handleUsdcDeposit = () => {
-    if (approvedUsdc >= Number(amount)) {
-      deposit?.()
-    } else {
-      toast.warn(`Please approve ${Number(amount) - approvedUsdc} USDC more.`)
-    }
-  }
 
   //  -----------------------------------------------------
 
@@ -143,6 +119,30 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
     }
     return amount
   }, [amount])
+
+  //  -----------------------------------------------------
+
+  const handleUsdcDeposit = () => {
+    if (approvedUsdc >= Number(amount) && deposit) {
+      deposit()
+    } else {
+      toast.warn(`Please approve ${Number(amount) - approvedUsdc} USDC more.`)
+    }
+  }
+
+  const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    if (value.match(REGEX_NUMBER_VALID)) {
+      setAmount(value);
+
+      e.target.focus();
+    }
+  }
+
+  const handleSlider = (value: any) => {
+    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
+  }
 
   //  -----------------------------------------------------
 
