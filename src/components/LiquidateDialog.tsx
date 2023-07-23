@@ -217,7 +217,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
                     <img src="/assets/images/usdc.png" alt="" className="w-10" />
-                    <span className="text-gray-100 text-lg">{usdcAmountToPay} USDC</span>
+                    <span className="text-gray-100 text-lg">{usdcAmountToPay.toFixed(6)} USDC</span>
                   </div>
                   {!usdcIsSufficient && (
                     <span className="text-red-500">Insufficient USDC balance</span>
@@ -247,7 +247,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
               {!!usdcAmountToGetPaid && (
                 <div className="flex items-center justify-between">
                   <img src="/assets/images/usdc.png" alt="" className="w-10" />
-                  <span className="text-gray-100 text-lg">{usdcAmountToGetPaid} USDC</span>
+                  <span className="text-gray-100 text-lg">{usdcAmountToGetPaid.toFixed(6)} USDC</span>
                 </div>
               )}
             </div>
