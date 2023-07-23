@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import CustomDialog from "./dialogs/CustomDialog";
-import { ILiquidation, IReturnValueOfBalance } from "../utils/interfaces";
+import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfBalance } from "../utils/interfaces";
 import FilledButton from "./buttons/FilledButton";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../utils/constants";
+import { DELAY_TIME, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../utils/constants";
 
 // ---------------------------------------------------------------------------------------------
 
@@ -23,6 +23,8 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   const [usdcAmountToPay, setUsdcAmountToPay] = useState<number>(0)
   const [ethAmountToGetPaid, setEthAmountToGetPaid] = useState<number>(0)
   const [usdcAmountToGetPaid, setUsdcAmountToGetPaid] = useState<number>(0)
+  const [approved, setApproved] = useState<boolean>(false);
+  const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
 
   //  ---------------------------------------------------------------------------
 
@@ -43,8 +45,17 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     watch: true
   })
 
+  //  Get approved USDC
+  const { data: approvedUsdcInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: USDC_CONTRACT_ADDRESS,
+    abi: USDC_CONTRACT_ABI,
+    functionName: 'allowance',
+    args: [address, POOL_CONTRACT_ADDRESS],
+    watch: true
+  })
+
   //  Liquidate
-  const { config: liquidateConfig } = usePrepareContractWrite({
+  const { config: liquidateConfig, isSuccess: liquidateIsPrepared } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'liquidate',
@@ -71,9 +82,15 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     args: [POOL_CONTRACT_ADDRESS, usdcAmountToPay * 10 ** USDC_DECIMAL],
   })
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
+  const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      setTimeout(() => {
+        setApproved(true)
+      }, DELAY_TIME)
+    },
     onError: () => {
+      setApproved(false)
       toast.error('Approve occured error.')
     }
   })
@@ -116,6 +133,26 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     return false
   }, [usdcBalanceOfWallet, usdcAmountToPay])
 
+  //  Approved USDC amount
+  const approvedUsdc = useMemo(() => {
+    if (approvedUsdcInBigint) {
+      return Number(formatUnits(approvedUsdcInBigint, USDC_DECIMAL))
+    }
+    return 0
+  }, [approvedUsdcInBigint])
+
+  //  ---------------------------------------------------------------------------
+
+  const handleUsdcLiquidate = () => {
+    console.log('>>>>>>>>>> approvedUsdc => ', approvedUsdc)
+    if (approvedUsdc >= usdcAmountToPay && liquidate) {
+      liquidate()
+    } else {
+      setApproved(false)
+      toast.warn(`Please approve ${usdcAmountToPay} USDC.`)
+    }
+  }
+
   //  ---------------------------------------------------------------------------
 
   //  Get totalBorrow and totalDeposit of the liquidation
@@ -131,6 +168,24 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
     }
   }, [liquidation])
+
+  useEffect(() => {
+    if (liquidateIsPrepared) {
+      setApproved(true)
+    } else {
+      setApproved(false)
+    }
+  }, [liquidateIsPrepared])
+
+  useEffect(() => {
+    if (approveIsLoading) {
+      setApproveIsLoadingDelayed(true)
+    } else {
+      setTimeout(() => {
+        setApproveIsLoadingDelayed(false)
+      }, DELAY_TIME)
+    }
+  }, [approveIsLoading])
 
   //  ---------------------------------------------------------------------------
 
@@ -201,21 +256,21 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
 
         {usdcAmountToPay > 0 ? (
           <>
-            {approveIsSuccess ? (
+            {approved ? (
               <FilledButton
                 className="w-full text-base py-3 font-semibold"
-                disabled={!liquidate || liquidateIsLoading}
-                onClick={() => liquidate?.()}
+                disabled={liquidateIsLoading}
+                onClick={() => handleUsdcLiquidate()}
               >
                 {liquidateIsLoading ? IN_PROGRESS : 'Liquidate'}
               </FilledButton>
             ) : (
               <FilledButton
                 className="w-full text-base py-3 font-semibold"
-                disabled={!approve || approveIsLoading}
+                disabled={!approve || approveIsLoadingDelayed}
                 onClick={() => approve?.()}
               >
-                {approveIsLoading ? IN_PROGRESS : 'Approve'}
+                {approveIsLoadingDelayed ? IN_PROGRESS : 'Approve'}
               </FilledButton>
             )}
           </>
