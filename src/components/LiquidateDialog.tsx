@@ -149,7 +149,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       liquidate()
     } else {
       setApproved(false)
-      toast.warn(`Please approve ${usdcAmountToPay} USDC.`)
+      toast.warn(`Please approve more USDC.`)
     }
   }
 
