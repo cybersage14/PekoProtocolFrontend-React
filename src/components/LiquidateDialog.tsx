@@ -160,9 +160,9 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     if (liquidation) {
       setEthAmountToPay(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
       if (Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) === 0) {
-        setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999)
+        setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
       } else {
-        setUsdcAmountToPay(Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999)
+        setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
       }
       setEthAmountToGetPaid(Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)))
       setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
@@ -176,6 +176,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       setApproved(false)
     }
   }, [liquidateIsPrepared])
+  console.log('>>>>>>>>> approveIsLoading => ', approveIsLoading)
 
   useEffect(() => {
     if (approveIsLoading) {
