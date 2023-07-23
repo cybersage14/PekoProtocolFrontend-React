@@ -165,7 +165,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
                     <span className="text-gray-100 text-lg">{usdcAmountToPay} USDC</span>
                   </div>
                   {!usdcIsSufficient && (
-                    <span className="text-red-500">Insufficient ETH balance</span>
+                    <span className="text-red-500">Insufficient USDC balance</span>
                   )}
                 </div>
               )}
