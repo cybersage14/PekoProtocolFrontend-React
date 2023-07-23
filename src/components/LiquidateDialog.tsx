@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { toast } from "react-toastify";
-import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { formatEther, formatUnits, parseEther } from "viem";
 import CustomDialog from "./dialogs/CustomDialog";
 import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfBalance } from "../utils/interfaces";
 import FilledButton from "./buttons/FilledButton";
