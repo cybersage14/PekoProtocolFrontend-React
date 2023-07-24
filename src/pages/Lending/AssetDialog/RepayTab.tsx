@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
+import { DELAY_TIME, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -25,6 +25,8 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0');
+  const [approved, setApproved] = useState<boolean>(false);
+  const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
 
   const { address } = useAccount()
 
@@ -44,9 +46,15 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
     args: [POOL_CONTRACT_ADDRESS, Number(amount) * 10 ** Number(balanceData?.decimals)]
   })
   const { write: approve, data: approveData } = useContractWrite(approveConfig);
-  const { isLoading: approveIsLoading, isSuccess: approveIsSuccess } = useWaitForTransaction({
+  const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
+    onSuccess: () => {
+      setTimeout(() => {
+        setApproved(true)
+      }, DELAY_TIME)
+    },
     onError: () => {
+      setApproved(false)
       toast.error('Approve occured error.')
     }
   })
@@ -61,7 +69,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   })
 
   //  Repay
-  const { config: repayConfig, error: errorOfRepayPrepare } = usePrepareContractWrite({
+  const { config: repayConfig, error: errorOfRepayPrepare, isSuccess: repayIsPrepared } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'repay',
@@ -103,10 +111,11 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   }
 
   const handleUsdcRepay = () => {
-    if (approvedUsdc >= Number(amount)) {
-      repay?.()
+    if (approvedUsdc >= Number(amount) && repay) {
+      repay()
     } else {
-      toast.warn(`Please approve ${Number(amount) - approvedUsdc} USDC more.`)
+      setApproved(false)
+      toast.warn(`Please approve ${Number(amount)} USDC.`)
     }
   }
 
@@ -161,6 +170,32 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
       }
     }
   }, [userInfo])
+
+  // useEffect(() => {
+  //   if (asset.symbol === 'usdc') {
+  //     if (approvedUsdc > 0 && approvedUsdc >= Number(amount)) {
+  //       setApproved(true)
+  //     }
+  //   }
+  // }, [approvedUsdc, amount, asset])
+
+  useEffect(() => {
+    if (repayIsPrepared) {
+      setApproved(true)
+    } else {
+      setApproved(false)
+    }
+  }, [repayIsPrepared])
+
+  useEffect(() => {
+    if (approveIsLoading) {
+      setApproveIsLoadingDelayed(true)
+    } else {
+      setTimeout(() => {
+        setApproveIsLoadingDelayed(false)
+      }, DELAY_TIME)
+    }
+  }, [approveIsLoading])
 
   //  --------------------------------------------------------------------------
 
@@ -225,7 +260,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
           </FilledButton>
         ) : (
           <>
-            {approveIsSuccess ? (
+            {approved ? (
               <FilledButton
                 className="mt-8 py-2 text-base"
                 disabled={!amountIsValid || repayIsLoading}
@@ -236,10 +271,10 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             ) : (
               <FilledButton
                 className="mt-8 py-2 text-base"
-                disabled={!approve || !amountIsValid || approveIsLoading}
+                disabled={!approve || !amountIsValid || approveIsLoadingDelayed}
                 onClick={() => approve?.()}
               >
-                {approveIsLoading ? IN_PROGRESS : 'Approve'}
+                {approveIsLoadingDelayed ? IN_PROGRESS : 'Approve'}
               </FilledButton>
             )}
           </>

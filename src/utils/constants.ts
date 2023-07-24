@@ -836,3 +836,5 @@ export const ASSETS: Array<IAsset> = [
     decimals: USDC_DECIMAL
   }
 ];
+
+export const DELAY_TIME = 3000; //  3s
