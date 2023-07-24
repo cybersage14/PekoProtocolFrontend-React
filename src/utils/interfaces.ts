@@ -7,6 +7,11 @@ export interface IPropsOfComponent {
   [key: string]: any;
 }
 
+export interface IPropsOfCustomDialog {
+  visible: boolean;
+  setVisible: Function;
+}
+
 export interface IToken {
   id: number;
   name: string;

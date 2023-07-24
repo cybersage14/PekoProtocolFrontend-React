@@ -144,7 +144,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   //  ---------------------------------------------------------------------------
 
   const handleUsdcLiquidate = () => {
-    console.log('>>>>>>>>>> approvedUsdc => ', approvedUsdc)
     if (approvedUsdc >= usdcAmountToPay && liquidate) {
       liquidate()
     } else {

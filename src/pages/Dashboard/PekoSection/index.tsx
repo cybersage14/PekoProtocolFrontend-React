@@ -1,5 +1,5 @@
-import { toast } from "react-toastify";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useState } from "react";
+import { useAccount, useBalance } from "wagmi";
 import { useMediaQuery } from "react-responsive";
 import { formatUnits } from "viem";
 import Table from "../../../components/tableComponents/Table";
@@ -8,8 +8,9 @@ import Section from "../../../components/Section";
 import Tr from "../../../components/tableComponents/Tr";
 import Td from "../../../components/tableComponents/Td";
 import { IUserInfo } from "../../../utils/interfaces";
-import { IN_PROGRESS, PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL } from "../../../utils/constants";
 import FilledButton from "../../../components/buttons/FilledButton";
+import ClaimPekoDialog from "./ClaimPekoDialog";
 
 //  ------------------------------------------------------------------------------------------------------
 
@@ -23,29 +24,14 @@ export default function PekoSection({ userInfo }: IProps) {
   const isMobile = useMediaQuery({ maxWidth: 640 })
   const { address } = useAccount()
 
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false)
+
   //  --------------------------------------------------------------------
 
   const { data: pekoBalanceDataOfWallet } = useBalance({
     address,
     token: PEKO_CONTRACT_ADDRESS,
     watch: true
-  })
-
-  //  Claim Peko
-  const { config: depositConfig } = usePrepareContractWrite({
-    address: POOL_CONTRACT_ADDRESS,
-    abi: POOL_CONTRACT_ABI,
-    functionName: 'claimPeko',
-  })
-  const { write: claimPeko, data: claimPekoData } = useContractWrite(depositConfig);
-  const { isLoading: claimPekoIsLoading } = useWaitForTransaction({
-    hash: claimPekoData?.hash,
-    onSuccess: () => {
-      toast.success('Peko Claimed.')
-    },
-    onError: () => {
-      toast.error('Claim occured error.')
-    }
   })
 
   //  --------------------------------------------------------------------
@@ -83,10 +69,9 @@ export default function PekoSection({ userInfo }: IProps) {
               <span className="text-gray-500 font-bold">Oepration: </span>
               <FilledButton
                 className="w-32"
-                disabled={!claimPeko || claimPekoIsLoading}
-                onClick={() => claimPeko?.()}
+                onClick={() => setDialogVisible(true)}
               >
-                {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
+                Claim
               </FilledButton>
             </div>
           </div>
@@ -119,17 +104,16 @@ export default function PekoSection({ userInfo }: IProps) {
               <Td>
                 <FilledButton
                   className="w-32"
-                  disabled={!claimPeko || claimPekoIsLoading}
-                  onClick={() => claimPeko?.()}
+                  onClick={() => setDialogVisible(true)}
                 >
-                  {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
+                  Claim
                 </FilledButton>
               </Td>
             </Tr>
           </tbody>
         </Table>
       )}
-
+      <ClaimPekoDialog userInfo={userInfo} visible={dialogVisible} setVisible={setDialogVisible} />
     </Section>
   )
 }
