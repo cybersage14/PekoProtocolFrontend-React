@@ -838,3 +838,7 @@ export const ASSETS: Array<IAsset> = [
 ];
 
 export const DELAY_TIME = 6000; //  3s
+
+export const ADMIN_WALLETS = [
+  '0x32912fcf6b385653d7dbf235a66FFD917f47Eb68'
+]

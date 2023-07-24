@@ -1,14 +1,14 @@
+import { ChangeEvent, useMemo, useState } from "react";
 import Slider from "rc-slider";
+import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { toast } from "react-toastify";
+import { formatUnits, parseUnits } from "viem";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import CustomDialog from "../../../components/dialogs/CustomDialog";
 import MainInput from "../../../components/form/MainInput";
 import { IAsset, IPropsOfCustomDialog, IReturnValueOfAllowance } from "../../../utils/interfaces";
 import FilledButton from "../../../components/buttons/FilledButton";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../../utils/constants";
-import { ChangeEvent, useMemo, useState } from "react";
-import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { toast } from "react-toastify";
-import { formatUnits } from "viem";
 
 //  -------------------------------------------------------------------------------------------
 
@@ -29,19 +29,19 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getProfit',
-    args: [asset.contractAddress],
+    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
     watch: true
   })
 
-  //  Claim Peko
+  //  Claim Profit
   const { config: configOfClaimProfit } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'claimProfit',
   })
-  const { write: claimPeko, data: claimPekoData } = useContractWrite(configOfClaimProfit);
-  const { isLoading: claimPekoIsLoading } = useWaitForTransaction({
-    hash: claimPekoData?.hash,
+  const { write: claimProfit, data: claimProfitData } = useContractWrite(configOfClaimProfit);
+  const { isLoading: claimProfitIsLoading } = useWaitForTransaction({
+    hash: claimProfitData?.hash,
     onSuccess: () => {
       toast.success('Peko Claimed.')
       setVisible(false)
@@ -107,7 +107,7 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
       <div className="flex flex-col gap-24">
         <div className="flex flex-col gap-4">
           <MainInput
-            endAdornment={<span className="text-gray-100 uppercase">PEKO</span>}
+            endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
             onChange={handleAmount}
             value={amountInNumberType}
           />
@@ -140,10 +140,10 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
 
         <FilledButton
           className="py-2 text-base"
-          disabled={!amountIsValid || !claimPeko || claimPekoIsLoading}
-          onClick={() => claimPeko?.()}
+          disabled={!amountIsValid || !claimProfit || claimProfitIsLoading}
+          onClick={() => claimProfit?.()}
         >
-          {claimPekoIsLoading ? IN_PROGRESS : "Claim $Peko"}
+          {claimProfitIsLoading ? IN_PROGRESS : 'Claim'}
         </FilledButton>
       </div>
     </CustomDialog>

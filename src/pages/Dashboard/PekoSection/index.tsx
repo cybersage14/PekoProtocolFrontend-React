@@ -5,7 +5,6 @@ import { formatUnits } from "viem";
 import Table from "../../../components/tableComponents/Table";
 import Th from "../../../components/tableComponents/Th";
 import Section from "../../../components/Section";
-import Tr from "../../../components/tableComponents/Tr";
 import Td from "../../../components/tableComponents/Td";
 import { IUserInfo } from "../../../utils/interfaces";
 import { PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL } from "../../../utils/constants";
@@ -40,9 +39,7 @@ export default function PekoSection({ userInfo }: IProps) {
     <Section title="Peko">
       {isMobile ? (
         <div className="flex flex-col text-sm gap-4">
-          <div
-            className="flex flex-col gap-4 text-gray-100 border-b border-gray-800 rounded-none pb-6"
-          >
+          <div className="flex flex-col gap-4 text-gray-100 border-b border-gray-800 pb-6">
             {/* Symbol */}
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Symbol: </span>
@@ -61,7 +58,7 @@ export default function PekoSection({ userInfo }: IProps) {
             {/* Wallet Balance */}
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Wallet Balance: </span>
-              <span className="text-gray-500">{Number(pekoBalanceDataOfWallet?.formatted).toFixed(2)} PEKO</span>
+              <span>{Number(pekoBalanceDataOfWallet?.formatted).toFixed(2)} PEKO</span>
             </div>
 
             {/* Operation */}
@@ -80,34 +77,32 @@ export default function PekoSection({ userInfo }: IProps) {
           <thead>
             <tr className="bg-gray-900">
               <Th label="Symbol" />
-              <Th label="Unclaimed Peko" />
+              <Th label="Unclaimed PEKO" />
               <Th label="Wallet Balance" />
               <Th label="Operation" />
             </tr>
           </thead>
 
           <tbody>
-            <Tr>
+            <tr>
               <Td>
                 <div className="flex items-center gap-2">
                   <img src="/assets/images/logo.png" alt="" className="w-8" />
                   <span className="font-semibold uppercase">PEKO</span>
                 </div>
               </Td>
-              <Td className="text-gray-100 font-bold">
+              <Td className="text-gray-100">
                 {formatUnits(userInfo.pekoRewardAmount, PEKO_DECIMAL)} PEKO
               </Td>
-              <Td className="text-gray-100 font-bold">
-                {Number(pekoBalanceDataOfWallet?.formatted).toFixed(2)} PEKO
+              <Td className="text-gray-100">
+                {pekoBalanceDataOfWallet?.formatted} PEKO
               </Td>
               <Td>
-                <FilledButton
-                  onClick={() => setDialogVisible(true)}
-                >
+                <FilledButton onClick={() => setDialogVisible(true)}>
                   Claim
                 </FilledButton>
               </Td>
-            </Tr>
+            </tr>
           </tbody>
         </Table>
       )}

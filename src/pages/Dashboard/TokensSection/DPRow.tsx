@@ -35,10 +35,10 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd }: IProps) 
       <Td>
         <div className="flex items-center gap-2">
           <img src={asset.imgSrc} alt="" className="w-10" />
-          <span className="font-semibold uppercase">{asset.symbol}</span>
+          <span className="font-bold uppercase">{asset.symbol}</span>
         </div>
       </Td>
-      <Td className="uppercase font-bold">
+      <Td className="uppercase">
         {Number(balanceData?.formatted).toFixed(4)} {asset.symbol}
       </Td>
       <Td>

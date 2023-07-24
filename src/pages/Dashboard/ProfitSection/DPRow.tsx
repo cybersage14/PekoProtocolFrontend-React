@@ -35,7 +35,7 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd, openDialog
     return 0
   }, [profitInBigint])
 
-  const price = useMemo<number>(() => {
+  const profitInUsd = useMemo<number>(() => {
     if (asset.symbol === 'eth') {
       return profit * ethPriceInUsd
     }
@@ -57,8 +57,8 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd, openDialog
       {/* Profit */}
       <Td className="uppercase">{profit} {asset.symbol}</Td>
 
-      {/* Price */}
-      <Td>${price.toFixed(2)}</Td>
+      {/* Profit in USD */}
+      <Td>${profitInUsd.toFixed(2)}</Td>
 
       <Td>
         <FilledButton

@@ -5,7 +5,7 @@ import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import { useCopyToClipboard, useOnClickOutside } from 'usehooks-ts';
 import { useAccount, useBalance, useContractRead } from "wagmi";
 import FilledButton from "../../components/buttons/FilledButton";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { ADMIN_WALLETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import ProfitSection from "./ProfitSection";
@@ -26,7 +26,6 @@ export default function Dashboard() {
   const { address } = useAccount()
 
   const [walletBalanceInUsd, setWalletBalanceInUsd] = useState<number>(0)
-  const [dialogClaimPekoOpened, setDialogClaimPekoOpened] = useState<boolean>(false)
 
   //  ------------------------------------------------------------------------------
   //  Get ethereum balance of wallet
@@ -67,13 +66,7 @@ export default function Dashboard() {
   });
 
   //  ------------------------------------------------------------------------------
-
-  const handleDialogClaimPeko = () => {
-    setDialogClaimPekoOpened(!dialogClaimPekoOpened)
-  }
-
-  //  ------------------------------------------------------------------------------
-
+  //  The USD price of 1 ETH
   const ethPriceInUsd = useMemo<number>(() => {
     if (ethPriceInBigInt) {
       return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
@@ -81,6 +74,7 @@ export default function Dashboard() {
     return 0
   }, [ethPriceInBigInt])
 
+  //  The USD price of 1 USDC
   const usdcPriceInUsd = useMemo<number>(() => {
     if (usdcPriceInBigInt) {
       return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
@@ -88,6 +82,7 @@ export default function Dashboard() {
     return 0
   }, [usdcPriceInBigInt])
 
+  //  Risk factor
   const riskFactor = useMemo<number>(() => {
     if (userInfo) {
       const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
@@ -99,6 +94,16 @@ export default function Dashboard() {
     }
     return 0
   }, [userInfo, ethPriceInUsd, usdcPriceInUsd])
+
+  //  Check the current wallet is one of admin's or not.
+  const isAdminWallet = useMemo<boolean>(() => {
+    const index = ADMIN_WALLETS.findIndex(wallet => wallet === address)
+    console.log('>>>>>>>> index => ', index)
+    if (index >= 0) {
+      return true
+    }
+    return false
+  }, [address])
 
   //  ------------------------------------------------------------------------------
 
@@ -119,7 +124,7 @@ export default function Dashboard() {
   //  ------------------------------------------------------------------------------
 
   return (
-    <div className="container max-w-8xl my-8 flex flex-col gap-8 px-4 lg:px-0">
+    <div className="container max-w-8xl my-8 flex flex-col gap-16 px-4 lg:px-0">
       {/* <MainInput
         startAdornment={<Icon icon="material-symbols:search" className="text-gray-500 text-lg" />}
         className="bg-gray-900"
@@ -185,7 +190,7 @@ export default function Dashboard() {
           userInfo={userInfo}
         />
       )} */}
-      <ProfitSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+      {isAdminWallet && (<ProfitSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />)}
     </div>
   )
 }
