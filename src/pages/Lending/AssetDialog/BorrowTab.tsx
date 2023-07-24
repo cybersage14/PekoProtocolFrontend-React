@@ -49,10 +49,10 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
 
   const maxAmount = useMemo<number>(() => {
     if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
-      return maxAmountInUsd / ethPriceInUsd
+      return Number(Number(maxAmountInUsd / ethPriceInUsd).toFixed(4))
     }
     if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
-      return maxAmountInUsd / usdcPriceInUsd
+      return Number((maxAmountInUsd / usdcPriceInUsd).toFixed(USDC_DECIMAL))
     }
     return 0
   }, [maxAmountInUsd])
@@ -87,7 +87,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   }
 
   const handleMax = () => {
-    setAmount(`${maxAmount.toFixed(4)}`)
+    setAmount(`${maxAmount}`)
   }
 
   const handleSlider = (value: any) => {
