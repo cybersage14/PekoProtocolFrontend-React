@@ -8,11 +8,12 @@ import FilledButton from "../../components/buttons/FilledButton";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { getVisibleWalletAddress } from "../../utils/functions";
 import { IReturnValueOfBalance, IReturnValueOfCalcTokenPrice, IReturnValueOfUserInfo } from "../../utils/interfaces";
+import ProfitSection from "./ProfitSection";
 
 // -----------------------------------------------------------------------------------------------------
 
 const UserProfileSection = lazy(() => import('./UserProfileSection'))
-const DepositsSection = lazy(() => import('./DepositsSection'))
+const TokensSection = lazy(() => import('./TokensSection'))
 const PekoSection = lazy(() => import('./PekoSection'))
 
 // -----------------------------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ export default function Dashboard() {
       {/* <TokensSection />
       <LPTokensSection />
       <FarmsSection /> */}
-      <DepositsSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
+      <TokensSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
       {userInfo && (
         <PekoSection userInfo={userInfo} />
       )}
@@ -184,7 +185,7 @@ export default function Dashboard() {
           userInfo={userInfo}
         />
       )} */}
-
+      <ProfitSection ethPriceInUsd={ethPriceInUsd} usdcPriceInUsd={usdcPriceInUsd} />
     </div>
   )
 }

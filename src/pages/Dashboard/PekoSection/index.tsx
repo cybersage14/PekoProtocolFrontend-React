@@ -68,7 +68,6 @@ export default function PekoSection({ userInfo }: IProps) {
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Oepration: </span>
               <FilledButton
-                className="w-32"
                 onClick={() => setDialogVisible(true)}
               >
                 Claim
@@ -103,7 +102,6 @@ export default function PekoSection({ userInfo }: IProps) {
               </Td>
               <Td>
                 <FilledButton
-                  className="w-32"
                   onClick={() => setDialogVisible(true)}
                 >
                   Claim
