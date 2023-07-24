@@ -61,9 +61,7 @@ export default function DPRow({ asset, ethPriceInUsd, usdcPriceInUsd, openDialog
       <Td>${profitInUsd.toFixed(2)}</Td>
 
       <Td>
-        <FilledButton
-          onClick={() => openDialog(asset)}
-        >
+        <FilledButton onClick={() => openDialog(asset)}>
           Claim
         </FilledButton>
       </Td>

@@ -89,7 +89,7 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
             <div className="flex items-center gap-2">
               <img src={asset.imgSrc} alt="" className="w-10" />
               <div className="flex flex-col">
-                <p className="font-semibold text-green-500 uppercase">{asset.symbol}<span className="capitalize">(deposit)</span></p>
+                <p className="font-semibold text-green-500 uppercase">{asset.symbol}<span className="capitalize font-normal">(deposit)</span></p>
                 <span className="text-sm text-gray-500">
                   ${assetPriceInUsd.toFixed(2)}
                 </span>
@@ -119,7 +119,7 @@ export default function Row({ asset, ethPriceInUsd, usdcPriceInUsd, userInfo }: 
             <div className="flex items-center gap-2">
               <img src={asset.imgSrc} alt="" className="w-10" />
               <div className="flex flex-col">
-                <span className="font-semibold text-red-500">{asset.name}(borrow)</span>
+                <p className="font-semibold text-red-500 uppercase">{asset.symbol}<span className="capitalize font-normal">(borrow)</span></p>
                 <span className="text-sm text-gray-500">
                   ${assetPriceInUsd.toFixed(2)}
                 </span>
