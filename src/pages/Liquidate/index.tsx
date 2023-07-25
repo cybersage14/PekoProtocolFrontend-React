@@ -9,7 +9,6 @@ import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
-import OutlinedButton from "../../components/buttons/OutlinedButton";
 
 // -----------------------------------------------------------------------------------
 
