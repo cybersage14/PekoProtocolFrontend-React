@@ -115,27 +115,6 @@ export default function Liquidate() {
     return Math.ceil(numberOfUsers / 100)
   }, [numberOfUsers])
 
-  // const liquidations = useMemo<Array<ILiquidation>>(() => {
-  //   if (listOfUsers) {
-  //     let _liquidations = [];
-  //     for (let i = 0; i < listOfUsers.length; i += 1) {
-  //       if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
-  //         let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
-  //         let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
-
-  //         if (depositedValueInUsd > 0) {
-  //           let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
-  //           if (riskFactor > liquidationThreshold) {
-  //             _liquidations.push({ ...listOfUsers[i], riskFactor })
-  //           }
-  //         }
-  //       }
-  //     }
-  //     return _liquidations;
-  //   }
-  //   return []
-  // }, [listOfUsers])
-
   //  ----------------------------------------------------------------
 
   const openLiquidateDialog = (liquidation: ILiquidation) => {
@@ -151,7 +130,6 @@ export default function Liquidate() {
   //  ----------------------------------------------------------------
 
   useEffect(() => {
-    console.log('>>>>>>>> listOfUsers => ', listOfUsers)
     if (listOfUsers) {
       const _liquidations = [];
       for (let i = 0; i < listOfUsers.length; i += 1) {
