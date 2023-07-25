@@ -113,10 +113,10 @@ export default function Lending() {
 
   const borrowingPower = useMemo<number>(() => {
     if (userInfo) {
-      const ethBorrowAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount)) * ethPriceInUsd;
-      const usdcBorrowAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd;
-      const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount)) * ethPriceInUsd;
-      const usdcDepositAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+      const ethBorrowAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd;
+      const usdcBorrowAmountInUsd = Number(formatUnits((userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount), USDC_DECIMAL)) * usdcPriceInUsd;
+      const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd;
+      const usdcDepositAmountInUsd = Number(formatUnits((userInfo.usdtDepositAmount + userInfo.usdtRewardAmount), USDC_DECIMAL)) * usdcPriceInUsd;
       setAvailable(((ethDepositAmountInUsd + usdcDepositAmountInUsd) * DEFAULT_LTV) - (ethBorrowAmountInUsd + usdcBorrowAmountInUsd))
       if (ethDepositAmountInUsd + usdcDepositAmountInUsd > 0) {
         return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / ((ethDepositAmountInUsd + usdcDepositAmountInUsd) * DEFAULT_LTV) * 100
@@ -129,7 +129,7 @@ export default function Lending() {
   const riskFactor = useMemo<number>(() => {
     if (userInfo) {
 
-      const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+      const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
       const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
       console.log('>>>>>>>> depositedValueInUsd => ', depositedValueInUsd)

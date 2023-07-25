@@ -1201,7 +1201,7 @@ export const USDC_DECIMAL = 6;
 //  Peko info
 export const PEKO_CONTRACT_ADDRESS =
   "0x96E422C02149CBD21241F0E63da1f2E89371fDfc";
-export const PEKO_DECIMAL = 18;
+export const PEKO_DECIMAL = 6;
 
 //  WETH info
 export const WETH_CONTRACT_ADDRESS =
