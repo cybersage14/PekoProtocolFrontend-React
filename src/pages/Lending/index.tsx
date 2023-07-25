@@ -128,8 +128,12 @@ export default function Lending() {
 
   const riskFactor = useMemo<number>(() => {
     if (userInfo) {
+
       const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
       const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+      console.log('>>>>>>>> depositedValueInUsd => ', depositedValueInUsd)
+      console.log('>>>>>>>> borrowedValueInUsd => ', borrowedValueInUsd)
 
       if (depositedValueInUsd > 0) {
         return borrowedValueInUsd / depositedValueInUsd * 100
