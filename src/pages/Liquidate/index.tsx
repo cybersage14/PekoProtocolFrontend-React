@@ -1,13 +1,15 @@
 import { lazy, useMemo, useState } from "react";
-import { List } from "@material-tailwind/react";
+import { ButtonGroup, List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
+import { Icon } from "@iconify/react";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
-import { ILiquidation, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
+import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
+import OutlinedButton from "../../components/buttons/OutlinedButton";
 
 // -----------------------------------------------------------------------------------
 
@@ -25,6 +27,7 @@ export default function Liquidate() {
   const [visible, setVisible] = useState<boolean>(true)
   const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
   const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
+  const [currentPage, setCurrentPage] = useState<number>(0)
 
   //  ----------------------------------------------------------------
 
@@ -33,7 +36,13 @@ export default function Liquidate() {
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'listUserInfo',
-    watch: true
+    args: [currentPage],
+    watch: true,
+    onSuccess: () => {
+      if (numberOfPages > currentPage) {
+        setCurrentPage(currentPage + 1)
+      }
+    }
   })
 
   //  Get the price of ethereum in USD.
@@ -54,7 +63,6 @@ export default function Liquidate() {
     watch: true
   })
 
-
   //  Get the threshold of liquidation
   const { data: liquidatationThresholdInBigInt } = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
@@ -63,8 +71,15 @@ export default function Liquidate() {
     watch: true
   })
 
-  //  ----------------------------------------------------------------
+  const { data: numberOfUsersInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getMemberNumber',
+    watch: true
+  })
 
+  //  ----------------------------------------------------------------
+  //  The price of 1 ETH in USD
   const ethPriceInUsd = useMemo<number>(() => {
     if (ethPriceInBigInt) {
       return Number(formatUnits(ethPriceInBigInt, USDC_DECIMAL))
@@ -72,6 +87,7 @@ export default function Liquidate() {
     return 0
   }, [ethPriceInBigInt])
 
+  //  The price of 1 USDC in USD
   const usdcPriceInUsd = useMemo<number>(() => {
     if (usdcPriceInBigInt) {
       return Number(formatUnits(usdcPriceInBigInt, USDC_DECIMAL))
@@ -79,12 +95,25 @@ export default function Liquidate() {
     return 0
   }, [usdcPriceInBigInt])
 
+  //  The threshold of liquidation
   const liquidationThreshold = useMemo<number>(() => {
     if (liquidatationThresholdInBigInt) {
       return Number(liquidatationThresholdInBigInt)
     }
     return 0
   }, [liquidatationThresholdInBigInt])
+
+  //  The number of users
+  const numberOfUsers = useMemo<number>(() => {
+    if (numberOfUsersInBigint) {
+      return Number(numberOfUsersInBigint)
+    }
+    return 0
+  }, [numberOfUsersInBigint])
+
+  const numberOfPages = useMemo<number>(() => {
+    return Math.ceil(numberOfUsers / 100)
+  }, [numberOfUsers])
 
   const liquidations = useMemo<Array<ILiquidation>>(() => {
     if (listOfUsers) {
@@ -106,6 +135,8 @@ export default function Liquidate() {
     }
     return []
   }, [listOfUsers])
+
+
 
   //  ----------------------------------------------------------------
 
@@ -188,6 +219,7 @@ export default function Liquidate() {
         setVisible={setLiquidateDialogOpened}
         closeLiquidateDialog={closeLiquidateDialog}
       />
+
     </Container>
   )
 }

@@ -175,7 +175,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       setApproved(false)
     }
   }, [liquidateIsPrepared])
-  console.log('>>>>>>>>> approveIsLoading => ', approveIsLoading)
 
   useEffect(() => {
     if (approveIsLoading) {

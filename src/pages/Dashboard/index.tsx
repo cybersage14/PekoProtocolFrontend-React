@@ -98,7 +98,6 @@ export default function Dashboard() {
   //  Check the current wallet is one of admin's or not.
   const isAdminWallet = useMemo<boolean>(() => {
     const index = ADMIN_WALLETS.findIndex(wallet => wallet === address)
-    console.log('>>>>>>>> index => ', index)
     if (index >= 0) {
       return true
     }

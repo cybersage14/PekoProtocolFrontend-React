@@ -68,9 +68,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
-      console.log('>>>>>>>>>>> out of setTimeOut')
       setTimeout(() => {
-        console.log('>>>>>>>>>>> in setTimeOut')
         setApproved(true)
       }, DELAY_TIME)
     },
