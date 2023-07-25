@@ -1,4 +1,4 @@
-import { lazy, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { ButtonGroup, List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
@@ -28,6 +28,7 @@ export default function Liquidate() {
   const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
   const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(0)
+  const [liquidations, setLiquidations] = useState<Array<ILiquidation>>([])
 
   //  ----------------------------------------------------------------
 
@@ -115,26 +116,26 @@ export default function Liquidate() {
     return Math.ceil(numberOfUsers / 100)
   }, [numberOfUsers])
 
-  const liquidations = useMemo<Array<ILiquidation>>(() => {
-    if (listOfUsers) {
-      let _liquidations = [];
-      for (let i = 0; i < listOfUsers.length; i += 1) {
-        if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
-          let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
-          let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+  // const liquidations = useMemo<Array<ILiquidation>>(() => {
+  //   if (listOfUsers) {
+  //     let _liquidations = [];
+  //     for (let i = 0; i < listOfUsers.length; i += 1) {
+  //       if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
+  //         let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+  //         let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
-          if (depositedValueInUsd > 0) {
-            let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
-            if (riskFactor > liquidationThreshold) {
-              _liquidations.push({ ...listOfUsers[i], riskFactor })
-            }
-          }
-        }
-      }
-      return _liquidations;
-    }
-    return []
-  }, [listOfUsers])
+  //         if (depositedValueInUsd > 0) {
+  //           let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+  //           if (riskFactor > liquidationThreshold) {
+  //             _liquidations.push({ ...listOfUsers[i], riskFactor })
+  //           }
+  //         }
+  //       }
+  //     }
+  //     return _liquidations;
+  //   }
+  //   return []
+  // }, [listOfUsers])
 
   //  ----------------------------------------------------------------
 
@@ -147,6 +148,33 @@ export default function Liquidate() {
     setSelectedLiquidation(null)
     setLiquidateDialogOpened(false)
   }
+
+  //  ----------------------------------------------------------------
+
+  useEffect(() => {
+    console.log('>>>>>>>> listOfUsers => ', listOfUsers)
+    if (listOfUsers) {
+      const _liquidations = [];
+      for (let i = 0; i < listOfUsers.length; i += 1) {
+        if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
+          let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+          let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+          if (depositedValueInUsd > 0) {
+            let riskFactor = borrowedValueInUsd / depositedValueInUsd * 100
+            if (riskFactor > liquidationThreshold) {
+              _liquidations.push({ ...listOfUsers[i], riskFactor })
+            }
+          }
+        }
+      }
+      if (currentPage === 0) {
+        setLiquidations(_liquidations)
+      } else {
+        setLiquidations([...liquidations, ..._liquidations])
+      }
+    }
+  }, [listOfUsers, currentPage])
 
   //  ----------------------------------------------------------------
 
