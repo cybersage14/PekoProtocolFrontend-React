@@ -136,8 +136,6 @@ export default function Liquidate() {
     return []
   }, [listOfUsers])
 
-
-
   //  ----------------------------------------------------------------
 
   const openLiquidateDialog = (liquidation: ILiquidation) => {

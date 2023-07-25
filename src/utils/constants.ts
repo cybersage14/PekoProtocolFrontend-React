@@ -1252,6 +1252,9 @@ export const ASSETS: Array<IAsset> = [
 
 export const DELAY_TIME = 6000; //  3s
 
-export const ADMIN_WALLETS = ["0x32912fcf6b385653d7dbf235a66FFD917f47Eb68"];
+export const ADMIN_WALLETS = [
+  "0x32912fcf6b385653d7dbf235a66FFD917f47Eb68",
+  "0x055f9fB7424651a7F4541827C1B54733d00259e8"
+];
 export const NUMBER_OF_LIQUIDATIONS_PER_PAGE = 100;
 export const DEFAULT_LTV = 0.8;
