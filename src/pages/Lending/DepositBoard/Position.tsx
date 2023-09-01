@@ -20,11 +20,11 @@ export default function Position({ asset, ethPriceInUsd, usdcPriceInUsd, userInf
   useEffect(() => {
     let _assetAmount = 0;
     if (asset.symbol === 'eth') {
-      _assetAmount = Number(formatEther(userInfo.ethDepositAmount)) + Number(formatEther(userInfo.ethInterestAmount))
+      _assetAmount = Number(formatEther(userInfo.ethDepositAmount)) + Number(formatEther(userInfo.ethRewardAmount))
       setAssetAmount(_assetAmount)
       setAssetAmountInUsd(_assetAmount * ethPriceInUsd)
     } else {
-      _assetAmount = Number(formatUnits(userInfo.usdtDepositAmount, asset.decimals)) + Number(formatUnits(userInfo.usdtInterestAmount, asset.decimals))
+      _assetAmount = Number(formatUnits(userInfo.usdtDepositAmount, asset.decimals)) + Number(formatUnits(userInfo.usdtRewardAmount, asset.decimals))
       setAssetAmount(_assetAmount)
       setAssetAmountInUsd(_assetAmount * usdcPriceInUsd)
     }

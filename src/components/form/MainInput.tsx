@@ -1,4 +1,4 @@
-import { LegacyRef, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { IPropsOfComponent } from '../../utils/interfaces';
 
 /* --------------------------------------------------------------------------- */

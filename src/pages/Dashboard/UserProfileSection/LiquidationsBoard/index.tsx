@@ -1,12 +1,13 @@
-import { lazy, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { formatEther, formatUnits } from "viem";
 import { useAccount, useContractRead } from "wagmi";
 import PrimaryBoard from "../../../../components/boards/PrimaryBoard";
 import Table from "../../../../components/tableComponents/Table";
 import Th from "../../../../components/tableComponents/Th";
-import { ILiquidation, IReturnValueOfListOfUsers, IUserInfo } from "../../../../utils/interfaces";
+import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfListOfUsers, IUserInfo } from "../../../../utils/interfaces";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
 
+//  Gesture?
 //  -----------------------------------------------------------------------------------------
 
 const Row = lazy(() => import('./Row'))
@@ -25,6 +26,8 @@ interface IProps {
 export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
   const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
+  const [currentPage, setCurrentPage] = useState<number>(0)
+  const [liquidations, setLiquidations] = useState<Array<ILiquidation>>([])
 
   //  -------------------------------------------------------------------------------
 
@@ -35,13 +38,26 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'listUserInfo',
-    watch: true
+    args: [currentPage],
+    watch: true,
+    onSuccess: () => {
+      if (numberOfPages > currentPage) {
+        setCurrentPage(currentPage + 1)
+      }
+    }
   })
 
   const { data: liquidatationThresholdInBigInt } = useContractRead({
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getLiquidationThreshhold',
+    watch: true
+  })
+
+  const { data: numberOfUsersInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getMemberNumber',
     watch: true
   })
 
@@ -59,10 +75,57 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
 
   //  -------------------------------------------------------------------------------
 
-  const liquidations = useMemo<Array<ILiquidation>>(() => {
-    if (listOfUsers) {
-      let _liquidations = [];
+  // const liquidations = useMemo<Array<ILiquidation>>(() => {
+  //   if (listOfUsers) {
+  //     let _liquidations = [];
 
+  //     for (let i = 0; i < listOfUsers.length; i += 1) {
+  //       if (address === listOfUsers[i].accountAddress) {
+  //         if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
+  //           let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+  //           let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+  //           if (depositedValueInUsd > 0) {
+  //             let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+  //             if (riskFactor > Number(liquidatationThresholdInBigInt)) {
+  //               _liquidations.push({ ...listOfUsers[i], riskFactor })
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     return _liquidations
+  //   }
+  //   return []
+  // }, [listOfUsers])
+
+  //  The threshold of liquidation
+  const liquidationThreshold = useMemo<number>(() => {
+    if (liquidatationThresholdInBigInt) {
+      return Number(liquidatationThresholdInBigInt)
+    }
+    return 0
+  }, [liquidatationThresholdInBigInt])
+
+  //  The number of users
+  const numberOfUsers = useMemo<number>(() => {
+    if (numberOfUsersInBigint) {
+      return Number(numberOfUsersInBigint)
+    }
+    return 0
+  }, [numberOfUsersInBigint])
+
+  const numberOfPages = useMemo<number>(() => {
+    return Math.ceil(numberOfUsers / 100)
+  }, [numberOfUsers])
+
+  //  -------------------------------------------------------------------------------
+
+  useEffect(() => {
+    console.log('>>>>>>>>>> listOfUsers => ', listOfUsers)
+    if (listOfUsers) {
+      const _liquidations = [];
       for (let i = 0; i < listOfUsers.length; i += 1) {
         if (address === listOfUsers[i].accountAddress) {
           if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
@@ -70,19 +133,21 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
             let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
             if (depositedValueInUsd > 0) {
-              let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
-              if (riskFactor > Number(liquidatationThresholdInBigInt)) {
+              let riskFactor = borrowedValueInUsd / depositedValueInUsd * 100
+              if (riskFactor > liquidationThreshold) {
                 _liquidations.push({ ...listOfUsers[i], riskFactor })
               }
             }
           }
         }
       }
-
-      return _liquidations
+      if (currentPage === 0) {
+        setLiquidations(_liquidations)
+      } else {
+        setLiquidations([...liquidations, ..._liquidations])
+      }
     }
-    return []
-  }, [listOfUsers])
+  }, [listOfUsers, currentPage])
 
   //  -------------------------------------------------------------------------------
 
