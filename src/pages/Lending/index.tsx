@@ -13,7 +13,7 @@ import PrimaryBoard from "../../components/boards/PrimaryBoard";
 import Th from "../../components/tableComponents/Th";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { ASSETS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { ASSETS, DEFAULT_LTV, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfGetMarketInfo, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";
@@ -38,6 +38,7 @@ export default function Lending() {
   const [totalMarketSizeInUsd, setTotalMarketSizeInUsd] = useState<number>(0)
   const [totalBorrowedInUsd, setTotalBorrowedInUsd] = useState<number>(0)
   const [lentOut, setLentOut] = useState<number>(0)
+  const [available, setAvailable] = useState<number>(0)
 
   //  Wagmi hooks -------------------------------------------------------
 
@@ -112,24 +113,30 @@ export default function Lending() {
 
   const borrowingPower = useMemo<number>(() => {
     if (userInfo) {
-      const ethBorrowAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount)) * ethPriceInUsd;
-      const usdcBorrowAmountInUsd = Number(formatUnits(userInfo.usdtBorrowAmount, USDC_DECIMAL)) * usdcPriceInUsd;
-      const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount)) * ethPriceInUsd;
-      const usdcDepositAmountInUsd = Number(formatUnits(userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd;
+      const ethBorrowAmountInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd;
+      const usdcBorrowAmountInUsd = Number(formatUnits((userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount), USDC_DECIMAL)) * usdcPriceInUsd;
+      const ethDepositAmountInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd;
+      const usdcDepositAmountInUsd = Number(formatUnits((userInfo.usdtDepositAmount + userInfo.usdtRewardAmount), USDC_DECIMAL)) * usdcPriceInUsd;
+      setAvailable(((ethDepositAmountInUsd + usdcDepositAmountInUsd) * DEFAULT_LTV) - (ethBorrowAmountInUsd + usdcBorrowAmountInUsd))
       if (ethDepositAmountInUsd + usdcDepositAmountInUsd > 0) {
-        return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / (ethDepositAmountInUsd + usdcDepositAmountInUsd) * 100
+        return (ethBorrowAmountInUsd + usdcBorrowAmountInUsd) / ((ethDepositAmountInUsd + usdcDepositAmountInUsd) * DEFAULT_LTV) * 100
       }
     }
+    setAvailable(0)
     return 0
   }, [userInfo])
 
   const riskFactor = useMemo<number>(() => {
     if (userInfo) {
-      const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
+
+      const depositedValueInUsd = Number(formatEther(userInfo.ethDepositAmount + userInfo.ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtDepositAmount + userInfo.usdtRewardAmount, USDC_DECIMAL)) * usdcPriceInUsd
       const borrowedValueInUsd = Number(formatEther(userInfo.ethBorrowAmount + userInfo.ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(userInfo.usdtBorrowAmount + userInfo.usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
 
+      console.log('>>>>>>>> depositedValueInUsd => ', depositedValueInUsd)
+      console.log('>>>>>>>> borrowedValueInUsd => ', borrowedValueInUsd)
+
       if (depositedValueInUsd > 0) {
-        return borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
+        return borrowedValueInUsd / depositedValueInUsd * 100
       }
     }
     return 0
@@ -294,7 +301,7 @@ export default function Lending() {
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-500 text-sm">Available</span>
-                    <span className="text-gray-100">{(100 - borrowingPower).toFixed(2)}%</span>
+                    <span className="text-gray-100">${available.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-500 text-sm">Risk Factor</span>

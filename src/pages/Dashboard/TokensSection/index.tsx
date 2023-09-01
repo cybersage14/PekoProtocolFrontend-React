@@ -19,7 +19,7 @@ interface IProps {
 
 //  ------------------------------------------------------------------------------------------------------
 
-export default function DepositsSection({ ethPriceInUsd, usdcPriceInUsd }: IProps) {
+export default function TokensSection({ ethPriceInUsd, usdcPriceInUsd }: IProps) {
   const isMobile = useMediaQuery({ maxWidth: 640 });
 
   return (

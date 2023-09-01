@@ -26,9 +26,9 @@ export default function LandingLayout() {
     } else if (isTablet) {
       setDialogSizeAct('xl')
     } else if (isLaptop) {
-      setDialogSizeAct('md')
+      setDialogSizeAct('lg')
     } else if (isDesktop) {
-      setDialogSizeAct('sm')
+      setDialogSizeAct('md')
     } else {
       setDialogSizeAct('sm')
     }
@@ -45,6 +45,5 @@ export default function LandingLayout() {
       </div>
       {isLoading && <Loading />}
     </>
-
   )
 }

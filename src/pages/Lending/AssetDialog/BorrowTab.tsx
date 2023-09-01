@@ -49,10 +49,10 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
 
   const maxAmount = useMemo<number>(() => {
     if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
-      return maxAmountInUsd / ethPriceInUsd
+      return Number(Number(maxAmountInUsd / ethPriceInUsd).toFixed(4))
     }
     if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
-      return maxAmountInUsd / usdcPriceInUsd
+      return Number((maxAmountInUsd / usdcPriceInUsd).toFixed(USDC_DECIMAL))
     }
     return 0
   }, [maxAmountInUsd])
@@ -87,7 +87,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   }
 
   const handleMax = () => {
-    setAmount(`${maxAmount.toFixed(4)}`)
+    setAmount(`${maxAmount}`)
   }
 
   const handleSlider = (value: any) => {
@@ -130,68 +130,67 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   //  ----------------------------------------------------------------------------
 
   return (
-    <>
-      <div className="flex flex-col gap-2">
-        <MainInput
-          endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
-          onChange={handleAmount}
-          value={amountInNumberType}
+    <div className="flex flex-col gap-2">
+      <MainInput
+        endAdornment={<span className="text-gray-100 uppercase">{asset.symbol}</span>}
+        onChange={handleAmount}
+        value={amountInNumberType}
+      />
+
+      <div className="flex items-center justify-between">
+        <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+        <div className="flex items-center gap-2">
+          <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
+          <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
+        </div>
+      </div>
+
+      <div className="mt-4 px-2">
+        <Slider
+          marks={{
+            0: '0%',
+            25: '25%',
+            50: '50%',
+            75: '75%',
+            100: '100%'
+          }}
+          className="bg-gray-900"
+          railStyle={{ backgroundColor: '#3F3F46' }}
+          trackStyle={{ backgroundColor: '#3B82F6' }}
+          value={Number(amount) / maxAmount * 100}
+          onChange={handleSlider}
         />
+      </div>
 
+      <div className="flex flex-col gap-2 text-sm mt-8">
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
-          <div className="flex items-center gap-2">
-            <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
-            <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
-          </div>
+          <span className="text-gray-500">Deposited</span>
+          <span className="text-gray-100 uppercase">
+            {userInfo && balanceData ? asset.symbol === 'eth' ?
+              Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
+              Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
+            {asset.symbol}
+          </span>
         </div>
-
-        <div className="mt-4 px-2">
-          <Slider
-            marks={{
-              0: '0%',
-              25: '25%',
-              50: '50%',
-              75: '75%',
-              100: '100%'
-            }}
-            className="bg-gray-900"
-            railStyle={{ backgroundColor: '#3F3F46' }}
-            trackStyle={{ backgroundColor: '#3B82F6' }}
-            value={Number(amount) / maxAmount * 100}
-            onChange={handleSlider}
-          />
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500">APY</span>
+          <span className="text-gray-100">{borrowApyInPercentage.toFixed(2)}%</span>
         </div>
-
-        <div className="flex flex-col gap-2 text-sm mt-8">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">Deposited</span>
-            <span className="text-gray-100 uppercase">
-              {userInfo && balanceData ? asset.symbol === 'eth' ?
-                Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-                Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
-              {asset.symbol}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">{borrowApyInPercentage.toFixed(2)}%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
-          </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500">Wallet</span>
+          <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
         </div>
+      </div>
 
-        <FilledButton
-          className="mt-8 py-2 text-base"
-          disabled={!borrowPrepareIsSuccess || borrowIsLoading}
-          onClick={() => borrow?.()}
-        >
-          {borrowIsLoading ? IN_PROGRESS : 'Borrow'}
-        </FilledButton>
+      <FilledButton
+        className="mt-8 py-2 text-base"
+        disabled={!borrowPrepareIsSuccess || borrowIsLoading}
+        onClick={() => borrow?.()}
+      >
+        {borrowIsLoading ? IN_PROGRESS : 'Borrow'}
+      </FilledButton>
 
-        {/* <div className="flex items-center">
+      {/* <div className="flex items-center">
           <div className="flex-1 h-[1px] bg-gray-800" />
           <TextButton className="flex items-center gap-2" onClick={() => setMoreInfoCollapsed(!moreInfoCollapsed)}>
             More Info
@@ -200,10 +199,9 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
           <div className="flex-1 h-[1px] bg-gray-800" />
         </div> */}
 
-        {moreInfoCollapsed && (
-          <MoreInfo />
-        )}
-      </div>
-    </>
+      {moreInfoCollapsed && (
+        <MoreInfo />
+      )}
+    </div>
   )
 }

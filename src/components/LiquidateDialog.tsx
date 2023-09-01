@@ -144,7 +144,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   //  ---------------------------------------------------------------------------
 
   const handleUsdcLiquidate = () => {
-    console.log('>>>>>>>>>> approvedUsdc => ', approvedUsdc)
     if (approvedUsdc >= usdcAmountToPay && liquidate) {
       liquidate()
     } else {
@@ -176,7 +175,6 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
       setApproved(false)
     }
   }, [liquidateIsPrepared])
-  console.log('>>>>>>>>> approveIsLoading => ', approveIsLoading)
 
   useEffect(() => {
     if (approveIsLoading) {

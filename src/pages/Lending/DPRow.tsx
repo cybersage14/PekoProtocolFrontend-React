@@ -57,6 +57,8 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
 
   //  ----------------------------------------------------------------------------------
 
+  //  Get market size, total borrowed, deposit APY, and borrow APY.
+  
   useEffect(() => {
     if (poolInfo) {
       setMarketSize(Number(formatEther(poolInfo.totalAmount)))
