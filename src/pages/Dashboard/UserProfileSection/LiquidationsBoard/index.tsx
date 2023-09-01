@@ -7,9 +7,6 @@ import Th from "../../../../components/tableComponents/Th";
 import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfListOfUsers, IUserInfo } from "../../../../utils/interfaces";
 import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
 
-//  Gesture?
-//  -----------------------------------------------------------------------------------------
-
 const Row = lazy(() => import('./Row'))
 const LiquidateDialog = lazy(() => import('../../../../components/LiquidateDialog'))
 
